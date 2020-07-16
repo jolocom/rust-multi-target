@@ -1,4 +1,4 @@
-package io.jolocom.nativeModules;
+package io.jolocom.nativeUtils;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

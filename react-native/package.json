@@ -10,6 +10,8 @@
   "scripts": {
     "test": "(cd ../rust/jolocom_native_utils && cargo test)",
     "clean": "(cd ../rust/jolocom_native_utils && cargo clean)",
+    "clean:wrapper": "(cd ./rust/keriox_wrapper && cargo clean)",
+    "clean:android": "rm -rf ./android/src/main/jniLibs/*",
     "build": "../scripts/build.sh"
   },
   "repository": {
