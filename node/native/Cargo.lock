@@ -537,7 +537,7 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 [[package]]
 name = "keriox"
 version = "0.1.0"
-source = "git+https://github.com/jolocom/keriox?branch=utils#34f550250a3fcf9a92cae143befbdfb14233a07b"
+source = "git+https://github.com/jolocom/keriox?branch=utils#d09a7fc6054eb16e6496df7c6418babb41ff8017"
 dependencies = [
  "base64",
  "console_error_panic_hook",

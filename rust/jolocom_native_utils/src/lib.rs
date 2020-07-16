@@ -34,8 +34,10 @@ pub fn validate_events_str(kel: String) -> String {
 #[test]
 fn test() {
     let tings = get_icp().unwrap();
-    print!("\n--\n{}\n--\n", serde_json::to_string(&tings.icp).unwrap());
+    print!("\n--\n{}\n--\n", tings.icp);
+    let nt = serde_json::to_string(&vec![tings.icp]).unwrap();
     print!("\n--\n{}\n--\n", nt);
+
     let ddo = validate_events_str(nt);
     print!("{}", serde_json::to_string(&ddo).unwrap());
 }
