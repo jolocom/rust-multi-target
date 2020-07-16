@@ -9,7 +9,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
 
-  static { System.loadLibrary("signer"); }
+  static { System.loadLibrary("keriox_wrapper"); }
 
   public NativeUtilsModule(ReactApplicationContext reactContext) {
     super(reactContext);

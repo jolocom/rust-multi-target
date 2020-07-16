@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class NativeModulesPackage implements ReactPackage {
+public class NativeUtilsPackage implements ReactPackage {
   @Override
   public List<NativeModule>
   createNativeModules(ReactApplicationContext reactContext) {
-    return Arrays.<NativeModule>asList(new NativeUtilesModule(reactContext));
+    return Arrays.<NativeModule>asList(new NativeUtilsModule(reactContext));
   }
 
   @Override

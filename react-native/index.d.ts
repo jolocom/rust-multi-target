@@ -1,6 +1,4 @@
-declare module 'react-native-substrate-sign' {
-
-  export function keriGetIcp(sk: string, pk: string): Promise<string>;
-
+declare module 'jolocom-native-utils' {
+  export function keriGetIcp(): Promise<string>;
   export function keriValidateEvents(events: string): Promise<string>;
 }

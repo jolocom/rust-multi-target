@@ -1,8 +1,12 @@
 {
   "name": "jolocom-native-utils",
   "title": "Jolocom Native Utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
+  "author": {
+    "name": "Dev",
+    "email": "dev@jolocom.io"
+  },
   "scripts": {
     "test": "(cd ../rust/jolocom_native_utils && cargo test)",
     "clean": "(cd ../rust/jolocom_native_utils && cargo clean)",
