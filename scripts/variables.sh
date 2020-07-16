@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change this name to the rust library name
-LIB_NAME=signer
+LIB_NAME=keriox_wrapper
 API_LEVEL=29
 
 ANDROID_HOME=/opt/android-sdk

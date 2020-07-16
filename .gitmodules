@@ -1,0 +1,3 @@
+[submodule "rust/keriox"]
+	path = rust/keriox
+	url = git@github.com:jolocom/keriox.git

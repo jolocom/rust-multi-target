@@ -1,12 +1,11 @@
 {
-  "name": "react-native-substrate-sign",
-  "title": "React Native Substrate Sign",
+  "name": "jolocom-native-utils",
+  "title": "Jolocom Native Utils",
   "version": "1.0.3",
-  "description": "The react native crypto library written in Rust for Substrate, Polkadot and Ethereum",
   "main": "index.js",
   "scripts": {
-    "test": "(cd ../rust/signer && cargo test)",
-    "clean": "(cd ../rust/signer && cargo clean)",
+    "test": "(cd ../rust/jolocom_native_utils && cargo test)",
+    "clean": "(cd ../rust/jolocom_native_utils && cargo clean)",
     "build": "../scripts/build.sh"
   },
   "repository": {
@@ -16,17 +15,8 @@
   },
   "keywords": [
     "react-native",
-    "crypto",
-    "substrate",
-    "polkadot",
-    "ethereum"
+    "crypto"
   ],
-  "author": {
-    "name": "Admin",
-    "email": "admin@parity.io"
-  },
-  "license": "Apache-2",
-  "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "peerDependencies": {
     "react": "^16.8.1",
