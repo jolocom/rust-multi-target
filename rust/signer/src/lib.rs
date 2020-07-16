@@ -1,23 +1,16 @@
-pub mod derivation;
-pub mod error;
-pub mod event;
-pub mod event_message;
-pub mod prefix;
-pub mod state;
-pub mod util;
+use keriox::event_message::{get_icp, validate_events};
 
-mod export;
+pub fn get_icp_str() -> String {
+    let icp_with_keys = match get_icp() {
+        Ok(icp) => icp,
+        Err(e) => return e.to_string(),
+    };
+    match serde_json::to_string(&icp_with_keys) {
+        Ok(s) => s,
+        Err(e) => e.to_string(),
+    }
+}
 
-use prefix::Prefix;
-
-// export! {
-//     @Java_io_parity_substrateSign_SubstrateSignModule_desPrefix
-//     fn deserialize_prefix(seed: &str) -> String {
-//         let test: bool = match seed.parse::<Prefix>() {
-//             Ok(res) => true,
-//             Err(e) => false,
-//         };
-// 
-//         String::from("hello")
-//     }
-// }
+pub fn validate_events_str(kel: String) -> String {
+    validate_events(kel)
+}
