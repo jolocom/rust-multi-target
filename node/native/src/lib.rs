@@ -6,7 +6,8 @@ fn get_icp(mut cx: FunctionContext) -> JsResult<JsString> {
 }
 
 fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
-    Ok(cx.string(validate_events_str(cx.downcast::<JsString>(0)?)))
+    let str = cx.argument::<JsString>(0)?.value();
+    Ok(cx.string(validate_events_str(str)))
 }
 
 register_module!(mut cx, {
