@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
 
-const { SubstrateSign } = NativeModules;
+const { NativeUtils } = NativeModules;
 
-export default SubstrateSign;
+export default NativeUtils;

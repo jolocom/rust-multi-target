@@ -38,9 +38,9 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void keriGetIcp(String sk, String pk, Promise promise) {
+  public void keriGetIcp(Promise promise) {
     try {
-      String result = getIcp(sk, pk);
+      String result = getIcp();
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "generating the ICP", e);
@@ -48,5 +48,5 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   private static native String validateEvents(String events);
-  private static native String getIcp(String sk, String pk);
+  private static native String getIcp();
 }
