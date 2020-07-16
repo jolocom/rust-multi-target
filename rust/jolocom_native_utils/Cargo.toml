@@ -1,5 +1,5 @@
 [package]
-name = "jolocom-native-utils"
+name = "jolocom_native_utils"
 version = "0.1.0"
 authors = ["Jolocom"]
 edition = "2018"
