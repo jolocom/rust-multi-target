@@ -31,7 +31,7 @@ pub fn validate_events_str(kel_str: String) -> String {
     validate_events(&kel)
 }
 
-pub fn get_id_from_event(event: String) -> String {
+pub fn get_id_from_event_str(event: String) -> String {
     match parse_signed_message(event) {
         Ok(vem) => match vem {
             VersionedEventMessage::V0_0(ev) => ev.event.prefix.to_str(),

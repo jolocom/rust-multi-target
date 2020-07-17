@@ -8,6 +8,10 @@ export const getIcp = async (): Promise<string> => {
     return await addon.getIcp();
 }
 
+export const getIdFromEvent = async (event: string): Promise<string> => {
+    return await addon.getIdFromEvent(event);
+}
+
 getIcp().then(async (icp) => {
     const jicp = JSON.parse(icp);
     const [sev, sigs_str] = jicp.icp.split("\r\n\r\n");
