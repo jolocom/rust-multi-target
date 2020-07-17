@@ -14,8 +14,8 @@ pub fn get_icp_str() -> String {
     }
 }
 
-pub fn validate_events_str(kel: String) -> String {
-    let str_events: Vec<String> = match serde_json::from_str(&kel) {
+pub fn validate_events_str(kel_str: String) -> String {
+    let str_events: Vec<String> = match serde_json::from_str(&kel_str) {
         Ok(k) => k,
         Err(e) => return e.to_string(),
     };
@@ -29,6 +29,15 @@ pub fn validate_events_str(kel: String) -> String {
     };
 
     validate_events(&kel)
+}
+
+pub fn get_id_from_event(event: String) -> String {
+    match parse_signed_message(event) {
+        Ok(vem) => match vem {
+            VersionedEventMessage::V0_0(ev) => ev.event.prefix.to_str(),
+        },
+        Err(e) => e.to_string(),
+    }
 }
 
 #[test]
