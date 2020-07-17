@@ -47,6 +47,17 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void extractIdFromEvent(String event, Promise promise) {
+    try {
+      String result = extractIdFromEventStr(event);
+      promise.resolve(result);
+    } catch (Exception e) {
+      rejectWithException(promise, "extracting the ID from key event", e);
+    }
+  }
+
   private static native String validateEventsStr(String events);
+  private static native String extractIdFromEventStr(String event);
   private static native String getIcpStr();
 }
