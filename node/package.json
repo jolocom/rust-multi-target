@@ -1,0 +1,17 @@
+{
+  "name": "@jolocom/native-utils-node",
+  "version": "0.1.0",
+  "description": "",
+  "main": "js/index.js",
+  "files": "js/",
+  "author": "Charles Cunningham <c.a.cunningham6@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^14.0.23",
+    "neon-cli": "^0.4.0",
+    "typescript": "^3.9.6"
+  },
+  "scripts": {
+    "build": "neon build --release && tsc -p ."
+  }
+}
