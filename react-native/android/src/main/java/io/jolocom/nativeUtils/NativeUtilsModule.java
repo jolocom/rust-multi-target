@@ -30,7 +30,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void validateEvents(String events, Promise promise) {
     try {
-      String result = validateEvents(events);
+      String result = validateEventsStr(events);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "parsing the KEL", e);
@@ -40,7 +40,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void getIcp(Promise promise) {
     try {
-      String result = getIcp();
+      String result = getIcpStr();
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "generating the ICP", e);
