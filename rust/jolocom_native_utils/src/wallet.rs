@@ -1,4 +1,5 @@
 use base64;
+use core::str::FromStr;
 use wallet_rs::{get_random, prelude::*};
 
 pub fn get_random_b64(len: usize) -> String {
@@ -59,9 +60,9 @@ pub fn new_key(
         Err(e) => return e.to_string(),
     };
 
-    let nkt = match serde_json::from_str::<KeyType>(&key_type) {
+    let nkt = match KeyType::from_str(&key_type) {
         Ok(kt) => kt,
-        Err(e) => return e.to_string(),
+        Err(e) => return e,
     };
 
     let _ref = match uw.new_key(nkt, controller) {
@@ -126,4 +127,24 @@ pub fn get_keys(encrypted_wallet: String, id: String, pass: String) -> String {
         Ok(s) => s,
         Err(e) => e.to_string(),
     }
+}
+
+#[test]
+fn test() -> Result<(), String> {
+    let id = "my_did".to_string();
+    let p = "my_password".to_string();
+
+    let ew = new_wallet(id.clone(), p.clone());
+
+    let ew_k1 = new_key(
+        ew,
+        id.clone(),
+        p.clone(),
+        (&KeyType::Ed25519VerificationKey2018).map_err(|e| e.to_string())?,
+        Some(vec!["key-1".to_string()]),
+    );
+
+    let keys = get_keys(ew_k1, id.clone(), p.clone());
+
+    Ok(())
 }
