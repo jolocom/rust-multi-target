@@ -40,7 +40,13 @@ pub fn change_pass(
     export_wallet(uw, &new_pass)
 }
 
-pub fn new_key(encrypted_wallet: String, id: String, pass: String, key_type: String) -> String {
+pub fn new_key(
+    encrypted_wallet: String,
+    id: String,
+    pass: String,
+    key_type: String,
+    controller: Option<Vec<String>>,
+) -> String {
     let mut uw = match wallet_from(encrypted_wallet, id, &pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
@@ -51,7 +57,7 @@ pub fn new_key(encrypted_wallet: String, id: String, pass: String, key_type: Str
         Err(e) => return e.to_string(),
     };
 
-    let _ref = match uw.new_key(nkt) {
+    let _ref = match uw.new_key(nkt, controller) {
         Ok(r) => r,
         Err(e) => return e,
     };
