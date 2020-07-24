@@ -67,6 +67,11 @@ fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
     Ok(cx.boolean(wallet::verify(ew, id, pass, data, key_ref, sig)))
 }
 
+fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
+    let len = cx.argument::<JsNumber>(0)?.value() as usize;
+    Ok(cx.string(wallet::get_random_b64(len.into())))
+}
+
 register_module!(mut cx, {
     cx.export_function("getIcp", get_icp)?;
     cx.export_function("validateEvents", validate_events)?;
@@ -77,5 +82,6 @@ register_module!(mut cx, {
     cx.export_function("getKeys", get_keys)?;
     cx.export_function("sign", sign)?;
     cx.export_function("verify", verify)?;
+    cx.export_function("getRandom", get_random)?;
     Ok(())
 });

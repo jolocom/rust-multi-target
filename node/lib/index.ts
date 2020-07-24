@@ -66,3 +66,9 @@ export const verify = async (
 ): Promise<string> => {
     return await addon.verify(encryptedWallet, id, pass, data, key_ref, signature)
 }
+
+export const getRandom = async (
+    len: number
+): Promise<string> => {
+    return await addon.getRandom(len)
+}

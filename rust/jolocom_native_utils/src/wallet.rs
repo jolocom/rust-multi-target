@@ -1,5 +1,12 @@
 use base64;
-use wallet_rs::prelude::*;
+use wallet_rs::{get_random, prelude::*};
+
+pub fn get_random_b64(len: usize) -> String {
+    match get_random(len) {
+        Ok(rb) => base64::encode_config(rb, base64::URL_SAFE),
+        Err(e) => e,
+    }
+}
 
 pub fn wallet_from(
     encrypted_wallet: String,
