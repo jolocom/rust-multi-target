@@ -1,3 +1,4 @@
+pub mod wallet;
 use keriox::{
     error::Error,
     event_message::{get_icp, parse_signed_message, validate_events, VersionedEventMessage},
