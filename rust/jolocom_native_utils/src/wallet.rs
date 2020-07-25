@@ -1,6 +1,15 @@
 use base64;
 use core::str::FromStr;
+use serde::{Deserialize, Serialize};
+use serde_json;
 use wallet_rs::{get_random, prelude::*};
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddKeyResultRep {
+    pub new_encrypted_state: String,
+    pub new_key: ContentEntity,
+}
 
 pub fn get_random_b64(len: usize) -> String {
     match get_random(len) {
@@ -65,12 +74,18 @@ pub fn new_key(
         Err(e) => return e,
     };
 
-    let _ref = match uw.new_key(nkt, controller) {
+    let key = match uw.new_key(nkt, controller) {
         Ok(r) => r,
         Err(e) => return e,
     };
 
-    export_wallet(uw, &pass)
+    match serde_json::to_string(&AddKeyResultRep {
+        new_encrypted_state: export_wallet(uw, &pass),
+        new_key: key,
+    }) {
+        Ok(s) => s,
+        Err(e) => e.to_string(),
+    }
 }
 
 pub fn sign(
