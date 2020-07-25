@@ -93,16 +93,9 @@ pub fn sign(
     base64::encode_config(sig, base64::URL_SAFE)
 }
 
-pub fn verify(
-    encrypted_wallet: String,
-    id: String,
-    pass: String,
-    data: String,
-    key_ref: String,
-    sig: String,
-) -> bool {
-    let uw = match wallet_from(encrypted_wallet, id, &pass) {
-        Ok(w) => w,
+pub fn verify(pk_info_str: String, data: String, sig: String) -> bool {
+    let pk_info: ContentEntity = match serde_json::from_str(&pk_info_str) {
+        Ok(k) => k,
         Err(_) => return false,
     };
 
@@ -111,10 +104,39 @@ pub fn verify(
         Err(_) => return false,
     };
 
-    match uw.verify_raw(data.as_bytes(), &key_ref, &sig_bytes) {
-        Ok(v) => v,
-        Err(_) => false,
+    match pk_info.content {
+        Content::PublicKey(pk) => match pk.verify(data.as_bytes(), &sig_bytes) {
+            Ok(v) => v,
+            Err(_) => false,
+        },
+        _ => false,
     }
+}
+
+pub fn encrypt(pk_info_str: String, data: String, aad: Option<String>) -> String {
+    let pk_info: ContentEntity = match serde_json::from_str(&pk_info_str) {
+        Ok(k) => k,
+        Err(e) => return e.to_string(),
+    };
+
+    let data_bytes = match base64::decode_config(&data, base64::URL_SAFE) {
+        Ok(b) => b,
+        Err(e) => return e.to_string(),
+    };
+
+    let maybe_aad_bytes = match aad {
+        Some(aad_s) => match base64::decode_config(aad_s, base64::URL_SAFE) {
+            Ok(b) => Some(b),
+            Err(e) => return e.to_string(),
+        },
+        None => None,
+    };
+
+    todo!()
+    // match pk.encrypt(&data_bytes, maybe_aad_bytes) {
+    //     Ok(v) => base64::encode_config(v, base64::URL_SAFE),
+    //     Err(e) => e.to_string(),
+    // }
 }
 
 pub fn get_keys(encrypted_wallet: String, id: String, pass: String) -> String {
