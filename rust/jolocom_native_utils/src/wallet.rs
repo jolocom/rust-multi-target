@@ -113,6 +113,28 @@ pub fn verify(pk_info_str: String, data: String, sig: String) -> bool {
     }
 }
 
+pub fn decrypt(
+    encrypted_wallet: String,
+    id: String,
+    pass: String,
+    data: String,
+    key_ref: String,
+    aad: Option<String>,
+) -> String {
+    // let uw = match wallet_from(encrypted_wallet, id, &pass) {
+    //     Ok(w) => w,
+    //     Err(e) => return e.to_string(),
+    // };
+
+    // let decrypted = match uw.decrypt(data.as_bytes(), aad, &key_ref) {
+    //     Ok(s) => s,
+    //     Err(e) => return e.to_string(),
+    // };
+
+    // base64::encode_config(sig, base64::URL_SAFE)
+    todo!()
+}
+
 pub fn encrypt(pk_info_str: String, data: String, aad: Option<String>) -> String {
     let pk_info: ContentEntity = match serde_json::from_str(&pk_info_str) {
         Ok(k) => k,
@@ -146,6 +168,18 @@ pub fn get_keys(encrypted_wallet: String, id: String, pass: String) -> String {
     };
 
     match serde_json::to_string(&uw.get_keys()) {
+        Ok(s) => s,
+        Err(e) => e.to_string(),
+    }
+}
+
+pub fn get_key(encrypted_wallet: String, id: String, pass: String, key_ref: String) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, &pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+
+    match serde_json::to_string(&uw.get_key(&key_ref)) {
         Ok(s) => s,
         Err(e) => e.to_string(),
     }
