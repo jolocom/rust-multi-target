@@ -18,12 +18,8 @@ pub fn get_random_b64(len: usize) -> String {
     }
 }
 
-pub fn wallet_from(
-    encrypted_wallet: String,
-    id: String,
-    pass: &str,
-) -> Result<UnlockedWallet, String> {
-    let ew = match base64::decode_config(&encrypted_wallet, base64::URL_SAFE) {
+pub fn wallet_from(encrypted_wallet: &str, id: &str, pass: &str) -> Result<UnlockedWallet, String> {
+    let ew = match base64::decode_config(encrypted_wallet, base64::URL_SAFE) {
         Ok(w) => w,
         Err(e) => return Err(e.to_string()),
     };
@@ -32,7 +28,7 @@ pub fn wallet_from(
     lw.unlock(pass.as_bytes())
 }
 
-pub fn new_wallet(id: String, pass: String) -> String {
+pub fn new_wallet(id: &str, pass: &str) -> String {
     let uw = UnlockedWallet::new(&id);
     export_wallet(uw, &pass)
 }
@@ -44,32 +40,27 @@ pub fn export_wallet(uw: UnlockedWallet, pass: &str) -> String {
     }
 }
 
-pub fn change_pass(
-    encrypted_wallet: String,
-    id: String,
-    old_pass: String,
-    new_pass: String,
-) -> String {
+pub fn change_pass(encrypted_wallet: &str, id: &str, old_pass: &str, new_pass: &str) -> String {
     let uw = match wallet_from(encrypted_wallet, id, &old_pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
     };
-    export_wallet(uw, &new_pass)
+    export_wallet(uw, new_pass)
 }
 
 pub fn new_key(
-    encrypted_wallet: String,
-    id: String,
-    pass: String,
-    key_type: String,
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    key_type: &str,
     controller: Option<Vec<String>>,
 ) -> String {
-    let mut uw = match wallet_from(encrypted_wallet, id, &pass) {
+    let mut uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
     };
 
-    let nkt = match KeyType::from_str(&key_type) {
+    let nkt = match KeyType::from_str(key_type) {
         Ok(kt) => kt,
         Err(e) => return e,
     };
@@ -80,7 +71,7 @@ pub fn new_key(
     };
 
     match serde_json::to_string(&AddKeyResultRep {
-        new_encrypted_state: export_wallet(uw, &pass),
+        new_encrypted_state: export_wallet(uw, pass),
         new_key: key,
     }) {
         Ok(s) => s,
@@ -88,19 +79,18 @@ pub fn new_key(
     }
 }
 
-pub fn sign(
-    encrypted_wallet: String,
-    id: String,
-    pass: String,
-    data: String,
-    key_ref: String,
-) -> String {
-    let uw = match wallet_from(encrypted_wallet, id, &pass) {
+pub fn sign(encrypted_wallet: &str, id: &str, pass: &str, data: &str, key_ref: &str) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
     };
 
-    let sig = match uw.sign_raw(data.as_bytes(), &key_ref) {
+    let data_bytes = match base64::decode_config(data, base64::URL_SAFE) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    let sig = match uw.sign_raw(&data_bytes, key_ref) {
         Ok(s) => s,
         Err(e) => return e.to_string(),
     };
@@ -108,19 +98,24 @@ pub fn sign(
     base64::encode_config(sig, base64::URL_SAFE)
 }
 
-pub fn verify(pk_info_str: String, data: String, sig: String) -> bool {
-    let pk_info: ContentEntity = match serde_json::from_str(&pk_info_str) {
+pub fn verify(pk_info_str: &str, data: &str, sig: &str) -> bool {
+    let pk_info: ContentEntity = match serde_json::from_str(pk_info_str) {
         Ok(k) => k,
         Err(_) => return false,
     };
 
-    let sig_bytes = match base64::decode_config(&sig, base64::URL_SAFE) {
+    let data_bytes = match base64::decode_config(&data, base64::URL_SAFE) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+
+    let sig_bytes = match base64::decode_config(sig, base64::URL_SAFE) {
         Ok(s) => s,
         Err(_) => return false,
     };
 
     match pk_info.content {
-        Content::PublicKey(pk) => match pk.verify(data.as_bytes(), &sig_bytes) {
+        Content::PublicKey(pk) => match pk.verify(&data_bytes, &sig_bytes) {
             Ok(v) => v,
             Err(_) => false,
         },
@@ -129,11 +124,11 @@ pub fn verify(pk_info_str: String, data: String, sig: String) -> bool {
 }
 
 pub fn decrypt(
-    encrypted_wallet: String,
-    id: String,
-    pass: String,
-    data: String,
-    key_ref: String,
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    data: &str,
+    key_ref: &str,
     aad: Option<String>,
 ) -> String {
     // let uw = match wallet_from(encrypted_wallet, id, &pass) {
@@ -150,13 +145,13 @@ pub fn decrypt(
     todo!()
 }
 
-pub fn encrypt(pk_info_str: String, data: String, aad: Option<String>) -> String {
-    let pk_info: ContentEntity = match serde_json::from_str(&pk_info_str) {
+pub fn encrypt(pk_info_str: &str, data: &str, aad: Option<String>) -> String {
+    let pk_info: ContentEntity = match serde_json::from_str(pk_info_str) {
         Ok(k) => k,
         Err(e) => return e.to_string(),
     };
 
-    let data_bytes = match base64::decode_config(&data, base64::URL_SAFE) {
+    let data_bytes = match base64::decode_config(data, base64::URL_SAFE) {
         Ok(b) => b,
         Err(e) => return e.to_string(),
     };
@@ -176,8 +171,8 @@ pub fn encrypt(pk_info_str: String, data: String, aad: Option<String>) -> String
     // }
 }
 
-pub fn get_keys(encrypted_wallet: String, id: String, pass: String) -> String {
-    let uw = match wallet_from(encrypted_wallet, id, &pass) {
+pub fn get_keys(encrypted_wallet: &str, id: &str, pass: &str) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
     };
@@ -188,8 +183,8 @@ pub fn get_keys(encrypted_wallet: String, id: String, pass: String) -> String {
     }
 }
 
-pub fn get_key(encrypted_wallet: String, id: String, pass: String, key_ref: String) -> String {
-    let uw = match wallet_from(encrypted_wallet, id, &pass) {
+pub fn get_key(encrypted_wallet: &str, id: &str, pass: &str, key_ref: &str) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
     };
@@ -205,17 +200,11 @@ fn test() -> Result<(), String> {
     let id = "my_did".to_string();
     let p = "my_password".to_string();
 
-    let ew = new_wallet(id.clone(), p.clone());
+    let ew = new_wallet(&id, &p);
 
-    let ew_k1 = new_key(
-        ew,
-        id.clone(),
-        p.clone(),
-        (&KeyType::Ed25519VerificationKey2018).map_err(|e| e.to_string())?,
-        Some(vec!["key-1".to_string()]),
-    );
+    let ew_k1 = new_key(&ew, &id, &p, "EcdsaSecp256k1VerificationKey2019", None);
 
-    let keys = get_keys(ew_k1, id.clone(), p.clone());
+    let keys = get_keys(&ew_k1, &id, &p);
 
     Ok(())
 }

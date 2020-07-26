@@ -18,7 +18,7 @@ fn get_id_from_event(mut cx: FunctionContext) -> JsResult<JsString> {
 fn new_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(0)?.value();
     let pass = cx.argument::<JsString>(1)?.value();
-    Ok(cx.string(wallet::new_wallet(id, pass)))
+    Ok(cx.string(wallet::new_wallet(&id, &pass)))
 }
 
 fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -26,7 +26,7 @@ fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let old_pass = cx.argument::<JsString>(2)?.value();
     let new_pass = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::change_pass(ew, id, old_pass, new_pass)))
+    Ok(cx.string(wallet::change_pass(&ew, &id, &old_pass, &new_pass)))
 }
 
 fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -38,7 +38,7 @@ fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
         Ok(s) => Some(vec![s.value()]),
         Err(e) => None,
     };
-    Ok(cx.string(wallet::new_key(ew, id, pass, key_type, controller)))
+    Ok(cx.string(wallet::new_key(&ew, &id, &pass, &key_type, controller)))
 }
 
 fn get_key(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -46,14 +46,14 @@ fn get_key(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
     let key_ref = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::get_key(ew, id, pass, key_ref)))
+    Ok(cx.string(wallet::get_key(&ew, &id, &pass, &key_ref)))
 }
 
 fn get_keys(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    Ok(cx.string(wallet::get_keys(ew, id, pass)))
+    Ok(cx.string(wallet::get_keys(&ew, &id, &pass)))
 }
 
 fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -62,14 +62,14 @@ fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let data = cx.argument::<JsString>(3)?.value();
     let key_ref = cx.argument::<JsString>(4)?.value();
-    Ok(cx.string(wallet::sign(ew, id, pass, data, key_ref)))
+    Ok(cx.string(wallet::sign(&ew, &id, &pass, &data, &key_ref)))
 }
 
 fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
     let pk_info = cx.argument::<JsString>(0)?.value();
     let data = cx.argument::<JsString>(1)?.value();
     let signature = cx.argument::<JsString>(2)?.value();
-    Ok(cx.boolean(wallet::verify(pk_info, data, signature)))
+    Ok(cx.boolean(wallet::verify(&pk_info, &data, &signature)))
 }
 
 fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -79,7 +79,7 @@ fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
         Ok(s) => Some(s.value()),
         Err(_) => None,
     };
-    Ok(cx.string(wallet::encrypt(pk_info, data, aad)))
+    Ok(cx.string(wallet::encrypt(&pk_info, &data, aad)))
 }
 
 fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -92,7 +92,7 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
         Ok(s) => Some(s.value()),
         Err(_) => None,
     };
-    Ok(cx.string(wallet::decrypt(ew, id, pass, data, key_ref, aad)))
+    Ok(cx.string(wallet::decrypt(&ew, &id, &pass, &data, &key_ref, aad)))
 }
 
 fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -107,6 +107,7 @@ register_module!(mut cx, {
     cx.export_function("newWallet", new_wallet)?;
     cx.export_function("changePass", change_pass)?;
     cx.export_function("newKey", new_key)?;
+    cx.export_function("getKey", get_key)?;
     cx.export_function("getKeys", get_keys)?;
     cx.export_function("sign", sign)?;
     cx.export_function("verify", verify)?;
