@@ -48,6 +48,15 @@ pub fn change_pass(encrypted_wallet: &str, id: &str, old_pass: &str, new_pass: &
     export_wallet(uw, new_pass)
 }
 
+pub fn change_id(encrypted_wallet: &str, id: &str, new_id: &str, pass: &str) -> String {
+    let mut uw = match wallet_from(encrypted_wallet, id, &pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+    uw.id = new_id.to_string();
+    export_wallet(uw, pass)
+}
+
 pub fn new_key(
     encrypted_wallet: &str,
     id: &str,
