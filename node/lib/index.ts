@@ -27,7 +27,19 @@ export const walletUtils = {
         oldPass,
         newPass
     ),
-    
+
+    changeId: async (
+        encryptedWallet: string,
+        id: string,
+        newId: string,
+        pass: string
+    ): Promise<string> => await addon.changeId(
+        encryptedWallet,
+        id,
+        newId,
+        pass
+    ),
+
     newKey: async (
         encryptedWallet: string,
         id: string,
@@ -47,7 +59,7 @@ export const walletUtils = {
         id: string,
         pass: string,
         key_ref: string
-    ): Promise<string> => await addon.getKeys(
+    ): Promise<string> => await addon.getKey(
         encryptedWallet,
         id,
         pass

@@ -29,6 +29,14 @@ fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(wallet::change_pass(&ew, &id, &old_pass, &new_pass)))
 }
 
+fn change_id(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let new_id = cx.argument::<JsString>(2)?.value();
+    let pass = cx.argument::<JsString>(3)?.value();
+    Ok(cx.string(wallet::change_id(&ew, &id, &new_id, &pass)))
+}
+
 fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
@@ -54,7 +62,7 @@ fn get_key_by_controller(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
     let controller = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::get_key(&ew, &id, &pass, &controller)))
+    Ok(cx.string(wallet::get_key_by_controller(&ew, &id, &pass, &controller)))
 }
 
 fn get_keys(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -114,6 +122,7 @@ register_module!(mut cx, {
     cx.export_function("getIdFromEvent", get_id_from_event)?;
     cx.export_function("newWallet", new_wallet)?;
     cx.export_function("changePass", change_pass)?;
+    cx.export_function("changeId", change_id)?;
     cx.export_function("newKey", new_key)?;
     cx.export_function("getKey", get_key)?;
     cx.export_function("getKeyByController", get_key_by_controller)?;
