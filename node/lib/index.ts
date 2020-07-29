@@ -1,4 +1,5 @@
 var addon = require('../native');
+import { CryptoUtils, EncryptedWalletUtils } from "@jolocom/vaulted-key-provider"
 
 export const validateEvents = async (
     events: string
@@ -10,7 +11,7 @@ export const getIdFromEvent = async (
     event: string
 ): Promise<string> => await addon.getIdFromEvent(event);
 
-export const walletUtils = {
+export const walletUtils: EncryptedWalletUtils = {
     newWallet: async (
         id: string,
         pass: string
@@ -118,7 +119,7 @@ export const walletUtils = {
     )
 }
 
-export const cryptoUtils = {
+export const cryptoUtils: CryptoUtils = {
     verify: async (
         pkInfo: string,
         data: string,
