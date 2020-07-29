@@ -49,6 +49,14 @@ fn get_key(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(wallet::get_key(&ew, &id, &pass, &key_ref)))
 }
 
+fn get_key_by_controller(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let controller = cx.argument::<JsString>(3)?.value();
+    Ok(cx.string(wallet::get_key(&ew, &id, &pass, &controller)))
+}
+
 fn get_keys(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
@@ -76,23 +84,23 @@ fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     let pk_info = cx.argument::<JsString>(0)?.value();
     let data = cx.argument::<JsString>(1)?.value();
     let aad = match cx.argument::<JsString>(2) {
-        Ok(s) => Some(s.value()),
-        Err(_) => None,
+        Ok(s) => s.value(),
+        Err(_) => "".to_string(),
     };
-    Ok(cx.string(wallet::encrypt(&pk_info, &data, aad)))
+    Ok(cx.string(wallet::encrypt(&pk_info, &data, &aad)))
 }
 
 fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let data = cx.argument::<JsString>(3)?.value();
     let key_ref = cx.argument::<JsString>(4)?.value();
+    let data = cx.argument::<JsString>(3)?.value();
     let aad = match cx.argument::<JsString>(2) {
-        Ok(s) => Some(s.value()),
-        Err(_) => None,
+        Ok(s) => s.value(),
+        Err(_) => "".to_string(),
     };
-    Ok(cx.string(wallet::decrypt(&ew, &id, &pass, &data, &key_ref, aad)))
+    Ok(cx.string(wallet::decrypt(&ew, &id, &pass, &key_ref, &data, &aad)))
 }
 
 fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -108,6 +116,7 @@ register_module!(mut cx, {
     cx.export_function("changePass", change_pass)?;
     cx.export_function("newKey", new_key)?;
     cx.export_function("getKey", get_key)?;
+    cx.export_function("getKeyByController", get_key_by_controller)?;
     cx.export_function("getKeys", get_keys)?;
     cx.export_function("sign", sign)?;
     cx.export_function("verify", verify)?;

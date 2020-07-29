@@ -197,7 +197,34 @@ pub fn get_key(encrypted_wallet: &str, id: &str, pass: &str, key_ref: &str) -> S
         Err(e) => return e.to_string(),
     };
 
-    match serde_json::to_string(&uw.get_key(&key_ref)) {
+    let pk = match uw.get_key(&key_ref) {
+        Some(pk) => pk,
+        None => return "No key found".to_string(),
+    };
+
+    match serde_json::to_string(&pk) {
+        Ok(s) => s,
+        Err(e) => e.to_string(),
+    }
+}
+
+pub fn get_key_by_controller(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    controller: &str,
+) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+
+    let pk = match uw.get_key_by_controller(controller) {
+        Some(pk) => pk,
+        None => return "No key found".to_string(),
+    };
+
+    match serde_json::to_string(&pk) {
         Ok(s) => s,
         Err(e) => e.to_string(),
     }
