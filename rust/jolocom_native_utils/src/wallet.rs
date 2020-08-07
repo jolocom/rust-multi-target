@@ -1,5 +1,17 @@
 use base64;
 use core::str::FromStr;
+use keriox::{
+    derivation::blake2b_256_digest,
+    error::Error,
+    event::{
+        event_data::{inception::InceptionEvent, EventData},
+        sections::{InceptionWitnessConfig, KeyConfig},
+        Event,
+    },
+    event_message::{EventMessage, VersionedEventMessage},
+    prefix::Prefix,
+    util::dfs_serializer,
+};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use wallet_rs::{get_random, prelude::*};
@@ -9,6 +21,14 @@ use wallet_rs::{get_random, prelude::*};
 pub struct AddKeyResultRep {
     pub new_encrypted_state: String,
     pub new_key: ContentEntity,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WalletInceptionRep {
+    pub id: String,
+    pub encrypted_wallet: String,
+    pub inception_event: String,
 }
 
 pub fn get_random_b64(len: usize) -> String {
@@ -31,6 +51,86 @@ pub fn wallet_from(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Unloc
 pub fn new_wallet(id: &str, pass: &str) -> String {
     let uw = UnlockedWallet::new(&id);
     export_wallet(uw, &pass)
+}
+
+pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> String {
+    let mut uw = match wallet_from(encrypted_wallet, id, pass) {
+        Ok(w) => w,
+        Err(e) => return e,
+    };
+
+    let nk0 = match uw.new_key(KeyType::Ed25519VerificationKey2018, None) {
+        Ok(k) => k,
+        Err(e) => return e,
+    };
+
+    let nk1 = match uw.new_key(KeyType::Ed25519VerificationKey2018, None) {
+        Ok(k) => k,
+        Err(e) => return e,
+    };
+
+    let pref0 = match &nk0.content {
+        Content::PublicKey(pk) => Prefix::PubKeyEd25519(pk.public_key.clone()),
+        _ => return "Wrong Content Type".to_string(),
+    };
+
+    let pref1 = match &nk1.content {
+        Content::PublicKey(pk) => Prefix::Blake2B256(blake2b_256_digest(pk.public_key.as_ref())),
+        _ => return "Wrong Content Type".to_string(),
+    };
+
+    let icp = VersionedEventMessage::V0_0(EventMessage {
+        event: Event {
+            prefix: pref0.clone(),
+            sn: 0,
+            event_data: EventData::Icp(InceptionEvent {
+                key_config: KeyConfig {
+                    threshold: 1,
+                    public_keys: vec![pref0.clone()],
+                    threshold_key_digest: pref1.clone(),
+                },
+                witness_config: InceptionWitnessConfig {
+                    tally: 0,
+                    initial_witnesses: vec![],
+                },
+            }),
+        },
+        sig_config: vec![0],
+        signatures: vec![],
+    });
+
+    uw.id = pref0.to_string();
+
+    let sed = match dfs_serializer::to_string(&icp) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    let sig = match uw.sign_raw(&nk0.id, sed.as_bytes()) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    let sig_pref = Prefix::SigEd25519Sha512(sig);
+
+    let signed_event = match icp {
+        VersionedEventMessage::V0_0(ev) => VersionedEventMessage::V0_0(EventMessage {
+            signatures: vec![sig_pref],
+            ..ev
+        }),
+    };
+
+    match serde_json::to_string(&WalletInceptionRep {
+        id: pref0.to_str(),
+        encrypted_wallet: export_wallet(uw, pass),
+        inception_event: match serde_json::to_string(&signed_event) {
+            Ok(s) => s,
+            Err(e) => return e.to_string(),
+        },
+    }) {
+        Ok(s) => s,
+        Err(e) => e.to_string(),
+    }
 }
 
 pub fn export_wallet(uw: UnlockedWallet, pass: &str) -> String {
