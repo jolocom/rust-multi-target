@@ -49,6 +49,30 @@ fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(wallet::new_key(&ew, &id, &pass, &key_type, controller)))
 }
 
+fn add_content(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let c_ref = cx.argument::<JsString>(3)?.value();
+    let content = cx.argument::<JsString>(4)?.value();
+    Ok(cx.string(wallet::add_content(&ew, &id, &pass, &c_ref, &content)))
+}
+
+fn set_key_controller(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let key_ref = cx.argument::<JsString>(3)?.value();
+    let controller = cx.argument::<JsString>(4)?.value();
+    Ok(cx.string(wallet::set_key_controller(
+        &ew,
+        &id,
+        &pass,
+        &key_ref,
+        &controller,
+    )))
+}
+
 fn get_key(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
@@ -124,8 +148,10 @@ register_module!(mut cx, {
     cx.export_function("changePass", change_pass)?;
     cx.export_function("changeId", change_id)?;
     cx.export_function("newKey", new_key)?;
+    cx.export_function("addContent", add_content)?;
     cx.export_function("getKey", get_key)?;
     cx.export_function("getKeyByController", get_key_by_controller)?;
+    cx.export_function("setKeyController", set_key_controller)?;
     cx.export_function("getKeys", get_keys)?;
     cx.export_function("sign", sign)?;
     cx.export_function("verify", verify)?;

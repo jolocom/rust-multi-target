@@ -88,6 +88,45 @@ pub fn new_key(
     }
 }
 
+pub fn add_content(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    cref: &str,
+    content: &str,
+) -> String {
+    let mut uw = match wallet_from(encrypted_wallet, id, pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+
+    let content_entity: ContentEntity = match serde_json::from_str(content) {
+        Ok(r) => r,
+        Err(e) => return e.to_string(),
+    };
+
+    uw.set_content(&cref.to_string(), content_entity);
+
+    export_wallet(uw, pass)
+}
+
+pub fn set_key_controller(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    key_ref: &str,
+    controller: &str,
+) -> String {
+    let mut uw = match wallet_from(encrypted_wallet, id, pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+
+    uw.add_key_controller(key_ref, controller);
+
+    export_wallet(uw, pass)
+}
+
 pub fn sign(encrypted_wallet: &str, id: &str, pass: &str, key_ref: &str, data: &str) -> String {
     let uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
