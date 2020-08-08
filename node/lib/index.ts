@@ -62,6 +62,20 @@ export const walletUtils: EncryptedWalletUtils = {
         keyType,
         controller
     ),
+
+    addContent: async (
+        encryptedWallet: string,
+        id: string,
+        pass: string,
+        cref: string,
+        content: string
+    ): Promise<string> => await addon.addContent(
+        encryptedWallet,
+        id,
+        pass,
+        cref,
+        content
+    ),
     
     getKey: async (
         encryptedWallet: string,
@@ -86,7 +100,21 @@ export const walletUtils: EncryptedWalletUtils = {
         pass,
         controller
     ),
-     
+
+    setKeyController: async (
+        encryptedWallet: string,
+        id: string,
+        pass: string,
+        keyRef: string,
+        controller: string
+    ): Promise<string> => await addon.setKeyController(
+        encryptedWallet,
+        id,
+        pass,
+        keyRef,
+        controller
+    ),
+
     getKeys: async (
         encryptedWallet: string,
         id: string,

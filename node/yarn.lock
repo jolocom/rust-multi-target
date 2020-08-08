@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@jolocom/vaulted-key-provider@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.1.6.tgz#a6c0ae5f96539ad1ace9ca8832ba11908f8e567c"
-  integrity sha512-kaIKIuS55BayvmE2kCH78sybJGYrkpYgY9Z8Cnr+8yk4Of0gZwZRJd13LOOgGC99SRodvUjt27uM7wl6VrtHuw==
+"@jolocom/vaulted-key-provider@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.3.0.tgz#6f124a311002fc2f62e70667ca8a03646a25a60c"
+  integrity sha512-5jdgdOkSy/CYP9TvT3WYGJAmwK0UNZA375poV3a1YTmcpd957wWwMNBKM7uFQX/0gRf8kpfQfCC2FsAgI1uT1g==
   dependencies:
     base64url "^3.0.1"
 
