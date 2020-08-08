@@ -8,7 +8,7 @@ use keriox::{
         sections::{InceptionWitnessConfig, KeyConfig},
         Event,
     },
-    event_message::{EventMessage, VersionedEventMessage},
+    event_message::{serialize_signed_message, EventMessage, VersionedEventMessage},
     prefix::Prefix,
     util::dfs_serializer,
 };
@@ -123,10 +123,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> String {
     match serde_json::to_string(&WalletInceptionRep {
         id: pref0.to_str(),
         encrypted_wallet: export_wallet(uw, pass),
-        inception_event: match serde_json::to_string(&signed_event) {
-            Ok(s) => s,
-            Err(e) => return e.to_string(),
-        },
+        inception_event: serialize_signed_message(&signed_event),
     }) {
         Ok(s) => s,
         Err(e) => e.to_string(),

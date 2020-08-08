@@ -1,9 +1,5 @@
-use jolocom_native_utils::{get_icp_str, get_id_from_event_str, validate_events_str, wallet};
+use jolocom_native_utils::{get_id_from_event_str, validate_events_str, wallet};
 use neon::prelude::*;
-
-fn get_icp(mut cx: FunctionContext) -> JsResult<JsString> {
-    Ok(cx.string(get_icp_str()))
-}
 
 fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
@@ -19,6 +15,13 @@ fn new_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(0)?.value();
     let pass = cx.argument::<JsString>(1)?.value();
     Ok(cx.string(wallet::new_wallet(&id, &pass)))
+}
+
+fn keri_incept_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    Ok(cx.string(wallet::incept_wallet(&ew, &id, &pass)))
 }
 
 fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -141,10 +144,10 @@ fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
 }
 
 register_module!(mut cx, {
-    cx.export_function("getIcp", get_icp)?;
     cx.export_function("validateEvents", validate_events)?;
     cx.export_function("getIdFromEvent", get_id_from_event)?;
     cx.export_function("newWallet", new_wallet)?;
+    cx.export_function("keriInceptWalet", keri_incept_wallet)?;
     cx.export_function("changePass", change_pass)?;
     cx.export_function("changeId", change_id)?;
     cx.export_function("newKey", new_key)?;
