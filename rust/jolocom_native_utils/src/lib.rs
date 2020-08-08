@@ -6,16 +6,16 @@ use keriox::{
     event_message::{parse_signed_message, validate_events, VersionedEventMessage},
 };
 
-pub fn validate_events_str(kel_str: String) -> String {
+pub fn validate_events_str(kel_str: &str) -> String {
     let str_events: Vec<String> = match serde_json::from_str(&kel_str) {
         Ok(k) => k,
         Err(e) => return e.to_string(),
     };
     let kel: Vec<VersionedEventMessage> = match str_events
         .iter()
-        .map(|e| parse_signed_message(e.to_string()))
-        .collect::<Result<Vec<VersionedEventMessage>, Error>>()
-    {
+        .map(|e| parse_signed_message(e))
+        .collect::<Result<Vec<VersionedEventMessage>, Error>>(
+    ) {
         Ok(k) => k,
         Err(e) => return e.to_string(),
     };
@@ -31,7 +31,7 @@ pub fn validate_events_str(kel_str: String) -> String {
     }
 }
 
-pub fn get_id_from_event_str(event: String) -> String {
+pub fn get_id_from_event_str(event: &str) -> String {
     match parse_signed_message(event) {
         Ok(vem) => match vem {
             VersionedEventMessage::V0_0(ev) => ev.event.prefix.to_str(),

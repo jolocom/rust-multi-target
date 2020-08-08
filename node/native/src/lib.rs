@@ -3,12 +3,12 @@ use neon::prelude::*;
 
 fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(validate_events_str(str)))
+    Ok(cx.string(validate_events_str(&str)))
 }
 
 fn get_id_from_event(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(get_id_from_event_str(str)))
+    Ok(cx.string(get_id_from_event_str(&str)))
 }
 
 fn new_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
