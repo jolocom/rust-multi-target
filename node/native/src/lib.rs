@@ -147,7 +147,7 @@ register_module!(mut cx, {
     cx.export_function("validateEvents", validate_events)?;
     cx.export_function("getIdFromEvent", get_id_from_event)?;
     cx.export_function("newWallet", new_wallet)?;
-    cx.export_function("keriInceptWalet", keri_incept_wallet)?;
+    cx.export_function("keriInceptWallet", keri_incept_wallet)?;
     cx.export_function("changePass", change_pass)?;
     cx.export_function("changeId", change_id)?;
     cx.export_function("newKey", new_key)?;
