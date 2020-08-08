@@ -56,9 +56,8 @@ fn add_content(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let c_ref = cx.argument::<JsString>(3)?.value();
     let content = cx.argument::<JsString>(4)?.value();
-    Ok(cx.string(wallet::add_content(&ew, &id, &pass, &c_ref, &content)))
+    Ok(cx.string(wallet::add_content(&ew, &id, &pass, &content)))
 }
 
 fn set_key_controller(mut cx: FunctionContext) -> JsResult<JsString> {

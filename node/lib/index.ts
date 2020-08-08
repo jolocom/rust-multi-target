@@ -67,13 +67,11 @@ export const walletUtils: EncryptedWalletUtils = {
         encryptedWallet: string,
         id: string,
         pass: string,
-        cref: string,
         content: string
     ): Promise<string> => await addon.addContent(
         encryptedWallet,
         id,
         pass,
-        cref,
         content
     ),
     

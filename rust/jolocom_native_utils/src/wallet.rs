@@ -185,13 +185,7 @@ pub fn new_key(
     }
 }
 
-pub fn add_content(
-    encrypted_wallet: &str,
-    id: &str,
-    pass: &str,
-    cref: &str,
-    content: &str,
-) -> String {
+pub fn add_content(encrypted_wallet: &str, id: &str, pass: &str, content: &str) -> String {
     let mut uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
         Err(e) => return e.to_string(),
@@ -202,7 +196,7 @@ pub fn add_content(
         Err(e) => return e.to_string(),
     };
 
-    uw.set_content(&cref.to_string(), content_entity);
+    uw.import_content(content_entity);
 
     export_wallet(uw, pass)
 }
