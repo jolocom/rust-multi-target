@@ -237,12 +237,11 @@ pub fn sign(encrypted_wallet: &str, id: &str, pass: &str, key_ref: &str, data: &
     base64::encode_config(sig, base64::URL_SAFE)
 }
 
-pub fn verify(pk_info_str: &str, data: &str, sig: &str) -> bool {
-    let pk_info: ContentEntity = match serde_json::from_str(pk_info_str) {
+pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> bool {
+    let key_bytes = match base64::decode_config(&key_str, base64::URL_SAFE) {
         Ok(k) => k,
         Err(_) => return false,
     };
-
     let data_bytes = match base64::decode_config(&data, base64::URL_SAFE) {
         Ok(s) => s,
         Err(_) => return false,
@@ -253,12 +252,17 @@ pub fn verify(pk_info_str: &str, data: &str, sig: &str) -> bool {
         Err(_) => return false,
     };
 
-    match pk_info.content {
-        Content::PublicKey(pk) => match pk.verify(&data_bytes, &sig_bytes) {
-            Ok(v) => v,
-            Err(_) => false,
+    match PublicKeyInfo::new(
+        match KeyType::from_str(key_type) {
+            Ok(t) => t,
+            Err(_) => return false,
         },
-        _ => false,
+        &key_bytes,
+    )
+    .verify(&data_bytes, &sig_bytes)
+    {
+        Ok(v) => v,
+        Err(_) => false,
     }
 }
 

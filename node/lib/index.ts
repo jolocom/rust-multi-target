@@ -156,11 +156,13 @@ export const walletUtils: EncryptedWalletUtils = {
 
 export const cryptoUtils: CryptoUtils = {
     verify: async (
-        pkInfo: string,
+        key: string,
+        type: string,
         data: string,
         signature: string
     ): Promise<boolean> => await addon.verify(
-        pkInfo,
+        key,
+        type,
         data,
         signature
     ),
