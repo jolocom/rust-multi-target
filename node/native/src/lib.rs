@@ -104,7 +104,7 @@ fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let data = cx.argument::<JsString>(3)?.value();
     let key_ref = cx.argument::<JsString>(4)?.value();
-    Ok(cx.string(wallet::sign(&ew, &id, &pass, &data, &key_ref)))
+    Ok(cx.string(wallet::sign_by_controller(&ew, &id, &pass, &data, &key_ref)))
 }
 
 fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {

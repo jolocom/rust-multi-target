@@ -226,6 +226,36 @@ pub fn set_key_controller(
     export_wallet(uw, pass)
 }
 
+pub fn sign_by_controller(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    controller: &str,
+    data: &str,
+) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+
+    let data_bytes = match base64::decode_config(data, base64::URL_SAFE) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    let key_ref = match uw.get_key_by_controller(controller) {
+        Some(c) => c.id,
+        None => return "No Key Found".to_string(),
+    };
+
+    let sig = match uw.sign_raw(&key_ref, &data_bytes) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    base64::encode_config(sig, base64::URL_SAFE)
+}
+
 pub fn sign(encrypted_wallet: &str, id: &str, pass: &str, key_ref: &str, data: &str) -> String {
     let uw = match wallet_from(encrypted_wallet, id, pass) {
         Ok(w) => w,
