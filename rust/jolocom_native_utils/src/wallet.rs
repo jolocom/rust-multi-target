@@ -64,14 +64,24 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> String {
         Err(e) => return e,
     };
 
-    let nk1 = match uw.new_key(KeyType::Ed25519VerificationKey2018, None) {
-        Ok(k) => k,
-        Err(e) => return e,
-    };
-
     let pref0 = match &nk0.content {
         Content::PublicKey(pk) => Prefix::PubKeyEd25519(pk.public_key.clone()),
         _ => return "Wrong Content Type".to_string(),
+    };
+
+    uw.id = ["did:un", &pref0.to_string()].join(":");
+    uw.set_key_controller(
+        &nk0.id,
+        &[
+            uw.id.clone(),
+            base64::encode_config(pref0.derivative(), base64::URL_SAFE),
+        ]
+        .join("#"),
+    );
+
+    let nk1 = match uw.new_key(KeyType::Ed25519VerificationKey2018, None) {
+        Ok(k) => k,
+        Err(e) => return e,
     };
 
     let pref1 = match &nk1.content {
@@ -98,8 +108,6 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> String {
         sig_config: vec![0],
         signatures: vec![],
     });
-
-    uw.id = pref0.to_string();
 
     let sed = match dfs_serializer::to_string(&icp) {
         Ok(s) => s,
@@ -213,7 +221,7 @@ pub fn set_key_controller(
         Err(e) => return e.to_string(),
     };
 
-    uw.add_key_controller(key_ref, controller);
+    uw.set_key_controller(key_ref, controller);
 
     export_wallet(uw, pass)
 }
