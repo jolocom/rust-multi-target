@@ -32,7 +32,11 @@ impl From<IdentifierState> for DIDDocument {
 
 fn pref_to_vm(pref: &Prefix, controller: &Prefix) -> Result<VerificationMethod, &'static str> {
     Ok(VerificationMethod {
-        id: ["#".to_string(), pref.to_str()].join(""),
+        id: [
+            "#".to_string(),
+            base64::encode_config(pref.derivative(), base64::URL_SAFE),
+        ]
+        .join(""),
         key_type: match pref {
             Prefix::PubKeyEd25519NT(_) | Prefix::PubKeyEd25519(_) => {
                 KeyTypes::Ed25519VerificationKey2018
@@ -43,7 +47,7 @@ fn pref_to_vm(pref: &Prefix, controller: &Prefix) -> Result<VerificationMethod, 
             Prefix::PubKeyX25519(_) => KeyTypes::X25519KeyAgreementKey2019,
             _ => return Err("bad key type"),
         },
-        controller: ["did:un:".to_string(), controller.to_str()].join(""),
+        controller: ["did:un:".to_string(), controller.to_string()].join(""),
         key: VerificationMethodProperties::Base64(match pref {
             Prefix::PubKeyEd25519NT(p)
             | Prefix::PubKeyEd25519(p)

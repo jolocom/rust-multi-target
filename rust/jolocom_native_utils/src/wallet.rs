@@ -238,6 +238,7 @@ pub fn sign(encrypted_wallet: &str, id: &str, pass: &str, key_ref: &str, data: &
 }
 
 pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> bool {
+    // use url safe or not?
     let key_bytes = match base64::decode_config(&key_str, base64::URL_SAFE) {
         Ok(k) => k,
         Err(_) => return false,
@@ -383,6 +384,59 @@ fn test() -> Result<(), String> {
     let ew_k1 = new_key(&ew, &id, &p, "EcdsaSecp256k1VerificationKey2019", None);
 
     let keys = get_keys(&ew_k1, &id, &p);
+
+    Ok(())
+}
+
+#[test]
+fn test2() -> Result<(), String> {
+    let id = "my_did";
+
+    let mut uw = UnlockedWallet::new(id);
+    let k1 = uw
+        .new_key(KeyType::EcdsaSecp256k1VerificationKey2019, None)
+        .map_err(|_| "bad sig".to_string())?;
+
+    let message = "hello there".as_bytes();
+    let sig = base64::encode_config(
+        uw.sign_raw(&k1.id, message)
+            .map_err(|_| "bad sig".to_string())?,
+        base64::URL_SAFE,
+    );
+
+    print!("\n\n{}\n\n", &sig);
+
+    let pk = match k1.content {
+        Content::PublicKey(pk) => pk,
+        _ => return Err("bad key".to_string()),
+    };
+
+    let pks = base64::encode_config(pk.public_key, base64::URL_SAFE);
+
+    print!("\n\n{}\n\n", pks);
+
+    assert!(verify(
+        &pks,
+        "EcdsaSecp256k1VerificationKey2019",
+        &base64::encode_config(message, base64::URL_SAFE),
+        &sig
+    ));
+    Ok(())
+}
+
+#[test]
+fn test3() -> Result<(), String> {
+    let kt = "EcdsaSecp256k1VerificationKey2019";
+    let key = "Aw2CKxqxbAH5CJK5fo0LqnREgJQYYsFcAocCKX7TrUmp";
+    let message = base64::encode_config("hello there".as_bytes(), base64::URL_SAFE);
+
+    let sig =
+        "dxolMmEAt56BaIgqTdAZ17QmmNcOA9wkmiVNwtVLr_0Ob3r0R2v9lqDMQxF8Pt--Jl9BDDyaxIsYsbAybZv3rw==";
+    let wrong_sig =
+        "rX1+vdS4/OelZZZZq/+2PJc70P2ZD2wu/eJINet5es9QVkDf7P70whQ84qvyF7Qp/wxVGbW/HWpTqjDCxrJDiA==";
+
+    assert!(verify(key, kt, &message, sig));
+    assert!(!verify(key, kt, &message, wrong_sig));
 
     Ok(())
 }
