@@ -109,9 +109,9 @@ fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
 
 fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
     let key = cx.argument::<JsString>(0)?.value();
-    let key_type = cx.argument::<JsString>(0)?.value();
-    let data = cx.argument::<JsString>(1)?.value();
-    let signature = cx.argument::<JsString>(2)?.value();
+    let key_type = cx.argument::<JsString>(1)?.value();
+    let data = cx.argument::<JsString>(2)?.value();
+    let signature = cx.argument::<JsString>(3)?.value();
     Ok(cx.boolean(wallet::verify(&key, &key_type, &data, &signature)))
 }
 
