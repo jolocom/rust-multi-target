@@ -129,7 +129,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> String {
     };
 
     match serde_json::to_string(&WalletInceptionRep {
-        id: base64::encode_config(&uw.id, base64::URL_SAFE),
+        id: uw.id.clone(),
         encrypted_wallet: export_wallet(uw, pass),
         inception_event: serialize_signed_message(&signed_event),
     }) {
