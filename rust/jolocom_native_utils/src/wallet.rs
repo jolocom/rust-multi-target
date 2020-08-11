@@ -129,7 +129,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> String {
     };
 
     match serde_json::to_string(&WalletInceptionRep {
-        id: pref0.to_str(),
+        id: base64::encode_config(&uw.id, base64::URL_SAFE),
         encrypted_wallet: export_wallet(uw, pass),
         inception_event: serialize_signed_message(&signed_event),
     }) {
@@ -393,26 +393,21 @@ fn test() -> Result<(), String> {
 
     let keys = get_keys(&ew_k1, &id, &p);
 
+    assert!(keys.len() > 16);
+
     Ok(())
 }
 
 #[test]
 fn test2() -> Result<(), String> {
     let id = "my_did";
+    let pass = "my_pass";
+    let message = base64::encode_config("hello there", base64::URL_SAFE);
 
     let mut uw = UnlockedWallet::new(id);
     let k1 = uw
         .new_key(KeyType::EcdsaSecp256k1VerificationKey2019, None)
         .map_err(|_| "bad sig".to_string())?;
-
-    let message = "hello there".as_bytes();
-    let sig = base64::encode_config(
-        uw.sign_raw(&k1.id, message)
-            .map_err(|_| "bad sig".to_string())?,
-        base64::URL_SAFE,
-    );
-
-    print!("\n\n{}\n\n", &sig);
 
     let pk = match k1.content {
         Content::PublicKey(pk) => pk,
@@ -421,14 +416,25 @@ fn test2() -> Result<(), String> {
 
     let pks = base64::encode_config(pk.public_key, base64::URL_SAFE);
 
-    print!("\n\n{}\n\n", pks);
+    let lw = uw
+        .lock(pass.as_bytes())
+        .map_err(|_| "bad lock".to_string())?;
+
+    let sig = sign(
+        &base64::encode_config(lw.ciphertext, base64::URL_SAFE),
+        id,
+        pass,
+        &k1.id,
+        &message,
+    );
 
     assert!(verify(
         &pks,
         "EcdsaSecp256k1VerificationKey2019",
-        &base64::encode_config(message, base64::URL_SAFE),
+        &message,
         &sig
     ));
+
     Ok(())
 }
 
