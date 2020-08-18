@@ -303,6 +303,11 @@ is-fullwidth-code-point@^2.0.0:
   resolved "https://registry.yarnpkg.com/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz#a3b30a5c4f199183167aaab93beefae3ddfb654f"
   integrity sha1-o7MKXE8ZkYMWeqq5O+764937ZU8=
 
+local-did-resolver@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/local-did-resolver/-/local-did-resolver-0.2.2.tgz#2d496003fce724be9b636281637247e5fa48ea18"
+  integrity sha512-nxj9bavs6kHnk/aKYk8IS+CrQItWcGqlqXpeyDHIWcdayqoF4F7nkqysGXAU7M9zazC9olIpDsgoGvWQyj5fRA==
+
 lodash.padend@^4.6.1:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/lodash.padend/-/lodash.padend-4.6.1.tgz#53ccba047d06e158d311f45da625f4e49e6f166e"
