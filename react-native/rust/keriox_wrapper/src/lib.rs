@@ -84,7 +84,7 @@ export! {
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_getRandomStr
-    fn get_random(len: u64) -> String {
+    fn get_random(len: u32) -> String {
         wallet::get_random_b64(len.try_into().unwrap())
     }
 

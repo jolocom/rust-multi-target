@@ -12,7 +12,7 @@
     "clean": "(cd ../rust/jolocom_native_utils && cargo clean)",
     "clean:wrapper": "(cd ./rust/keriox_wrapper && cargo clean)",
     "clean:android": "rm -rf ./android/src/main/jniLibs/*",
-    "build": "../scripts/build.sh"
+    "build": "(cd ../scripts && ./build.sh) && tsc -p ."
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,9 @@
     "react-native": ">=0.60.0-rc.0 <1.0.x"
   },
   "devDependencies": {
+    "@jolocom/vaulted-key-provider": "^0.6.0",
     "react": "^16.9.0",
-    "react-native": "^0.61.5"
+    "react-native": "^0.61.5",
+    "typescript": "^3.9.7"
   }
 }
