@@ -74,8 +74,8 @@ export! {
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_encryptStr
-    fn encrypt(pk_info: String, data: String, aad: String) -> String {
-        wallet::encrypt(&pk_info, &data, &aad)
+    fn encrypt(key: String, key_type: String, data: String, aad: String) -> String {
+        wallet::encrypt(&key, &key_type, &data, &aad)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_decryptStr

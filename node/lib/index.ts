@@ -172,11 +172,13 @@ export const cryptoUtils: CryptoUtils = {
     ),
 
     encrypt: async (
-        pkInfo: string,
+        key: string,
+        type: string,
         data: string,
         aad?: string
     ): Promise<string> => await addon.encrypt(
-        pkInfo,
+        key,
+        type,
         data,
         aad
     ),

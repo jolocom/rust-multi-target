@@ -336,12 +336,9 @@ pub fn decrypt(
     base64::encode_config(decrypted, base64::URL_SAFE)
 }
 
-pub fn encrypt(pk_info_str: &str, data: &str, aad: &str) -> String {
-    let pk: PublicKeyInfo = match serde_json::from_str::<ContentEntity>(pk_info_str) {
-        Ok(k) => match k.content {
-            Content::PublicKey(cpk) => cpk,
-            _ => return "Wrong Key Type".to_string(),
-        },
+pub fn encrypt(key: &str, key_type: &str, data: &str, aad: &str) -> String {
+    let key_bytes = match base64::decode_config(key, base64::URL_SAFE) {
+        Ok(k) => k,
         Err(e) => return e.to_string(),
     };
 
@@ -354,8 +351,15 @@ pub fn encrypt(pk_info_str: &str, data: &str, aad: &str) -> String {
         Ok(s) => s,
         Err(e) => return e.to_string(),
     };
-
-    match pk.encrypt(&data_bytes, &aad_bytes) {
+    match PublicKeyInfo::new(
+        match KeyType::from_str(key_type) {
+            Ok(t) => t,
+            Err(e) => return e.to_string(),
+        },
+        &key_bytes,
+    )
+    .encrypt(&data_bytes, &aad_bytes)
+    {
         Ok(v) => base64::encode_config(v, base64::URL_SAFE),
         Err(e) => e.to_string(),
     }

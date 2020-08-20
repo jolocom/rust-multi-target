@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@jolocom/vaulted-key-provider@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.4.0.tgz#900df1006dc320946b4e305e649d71990e89ab00"
-  integrity sha512-HOR62conj1AiUHHqiDHdZ1XHtpSK4bpKAeHxz68+PpUz3QVeQlFXpKP4h3bTjBZEXG69FcaSIChIM1thG1TdNA==
+"@jolocom/vaulted-key-provider@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.6.0.tgz#56e67e2393a6b82deb1eea849b2d78798b2bdd10"
+  integrity sha512-w3pse8rlmwfp3/5aoiu1kuLbXIFxhYFIgaIojsPcOANHhxZIY5hf1LFvgyat/92ekmegEhUxpDPIySE5V85EsQ==
   dependencies:
-    base64url "^3.0.1"
+    rfc4648 "^1.4.0"
 
 "@types/node@^14.0.23":
   version "14.0.23"
@@ -66,11 +66,6 @@ balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
-
-base64url@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/base64url/-/base64url-3.0.1.tgz#6399d572e2bc3f90a9a8b22d5dbb0a32d33f788d"
-  integrity sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -422,6 +417,11 @@ restore-cursor@^2.0.0:
   dependencies:
     onetime "^2.0.0"
     signal-exit "^3.0.2"
+
+rfc4648@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.4.0.tgz#c75b2856ad2e2d588b6ddb985d556f1f7f2a2abd"
+  integrity sha512-3qIzGhHlMHA6PoT6+cdPKZ+ZqtxkIvg8DZGKA5z6PQ33/uuhoJ+Ws/D/J9rXW6gXodgH8QYlz2UCl+sdUDmNIg==
 
 rimraf@^2.6.1:
   version "2.7.1"

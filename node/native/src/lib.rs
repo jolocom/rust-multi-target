@@ -56,7 +56,7 @@ fn add_content(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let content = cx.argument::<JsString>(4)?.value();
+    let content = cx.argument::<JsString>(3)?.value();
     Ok(cx.string(wallet::add_content(&ew, &id, &pass, &content)))
 }
 
@@ -116,13 +116,14 @@ fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
 }
 
 fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
-    let pk_info = cx.argument::<JsString>(0)?.value();
-    let data = cx.argument::<JsString>(1)?.value();
-    let aad = match cx.argument::<JsString>(2) {
+    let key = cx.argument::<JsString>(0)?.value();
+    let key_type = cx.argument::<JsString>(1)?.value();
+    let data = cx.argument::<JsString>(2)?.value();
+    let aad = match cx.argument::<JsString>(3) {
         Ok(s) => s.value(),
         Err(_) => "".to_string(),
     };
-    Ok(cx.string(wallet::encrypt(&pk_info, &data, &aad)))
+    Ok(cx.string(wallet::encrypt(&key, &key_type, &data, &aad)))
 }
 
 fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -158,6 +159,8 @@ register_module!(mut cx, {
     cx.export_function("getKeys", get_keys)?;
     cx.export_function("sign", sign)?;
     cx.export_function("verify", verify)?;
+    cx.export_function("encrypt", encrypt)?;
+    cx.export_function("decrypt", decrypt)?;
     cx.export_function("getRandom", get_random)?;
     Ok(())
 });
