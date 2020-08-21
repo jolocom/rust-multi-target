@@ -1,3 +1,6 @@
+try { require('@jolocom/native-core-node-linux-x64/native') } catch { }
+try { require('@jolocom/native-core-node-darwin-x64/native') } catch { }
+
 var addon = require(`@jolocom/native-core-node-${process.platform}-${process.arch}/native`);
 import { CryptoUtils, EncryptedWalletUtils } from "@jolocom/vaulted-key-provider"
 

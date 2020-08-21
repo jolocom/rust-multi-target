@@ -17,6 +17,7 @@ const outPkgJsonPath = path.join(outDir, 'package.json')
 const pkgJson = JSON.parse(fs.readFileSync(tmplPkgJsonPath).toString())
 
 const platformArch = `${process.platform}-${process.arch}`
+pkgJson.main = 'native/index.node'
 pkgJson.cpu = [process.arch]
 pkgJson.os = [process.platform]
 pkgJson.name += `-${platformArch}`
