@@ -55,5 +55,7 @@ pkgJson.files.forEach(p => {
 
 console.log(
   'Generated at ' + outDir +
-  '\n\n\n'
+  '\n\n\n' +
+  'please do: cd platform-arch-pkg && npm publish' +
+  '\n'
 )
