@@ -27,6 +27,6 @@
   "scripts": {
     "prepare": "yarn build",
     "build": "rm -rf js; neon build --release && tsc -p .",
-    "publish:native": "yarn build && node prepare-platform-arch-pkg.js && cd platform-arch-pkg && npm publish"
+    "publish:native": "yarn build && node prepare-platform-arch-pkg.js && cd platform-arch-pkg && npm publish --access public"
   }
 }
