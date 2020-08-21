@@ -1,7 +1,7 @@
 {
-  "name": "jolocom-native-utils",
-  "title": "Jolocom Native Utils",
-  "version": "1.0.4",
+  "name": "@jolocom/native-core-react-native",
+  "description": "Neon based react native bindings for the rust jolocom/wallet-rs",
+  "version": "1.0.5",
   "main": "index.js",
   "author": {
     "name": "Dev",
@@ -16,10 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/parity-tech/react-native-substrate-sign.git",
-    "baseUrl": "https://github.com/github_account/react-native-substrate-sign"
+    "url": "git+https://github.com/jolocom/rust-multi-target.git",
+    "baseUrl": "https://github.com/jolocom/rust-multi-target.git"
   },
   "keywords": [
+    "jolocom",
+    "jolocom sdk",
+    "rust",
+    "ssi",
     "react-native",
     "crypto"
   ],
