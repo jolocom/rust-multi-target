@@ -33,7 +33,7 @@ delete pkgJson.optionalDependencies
 delete pkgJson.scripts
 
 // add the 'index.node' binary file to the packaged files
-pkgJson.files.push('native/index.node', 'README', 'LICENSE', 'CONTRIBUTING')
+pkgJson.files = ['native/index.node', 'README', 'LICENSE', 'CONTRIBUTING']
 
 // clear out the output directory
 fs.removeSync(outDir)

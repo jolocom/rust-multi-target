@@ -1,4 +1,4 @@
-var addon = require('../native');
+var addon = require(`@jolocom/native-core-node-${process.platform}-${process.arch}/native`);
 import { CryptoUtils, EncryptedWalletUtils } from "@jolocom/vaulted-key-provider"
 
 export const validateEvents = async (
