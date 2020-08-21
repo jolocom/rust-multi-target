@@ -8,6 +8,12 @@
   ],
   "author": "Jolocom Dev <dev@jolocom.io>",
   "license": "Apache-2.0",
+  "keywords": [
+    "jolocom",
+    "jolocom sdk",
+    "crypto",
+    "rust"
+  ],
 
   "devDependencies": {
     "@jolocom/vaulted-key-provider": "^0.6.0",
