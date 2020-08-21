@@ -1,6 +1,6 @@
 {
   "name": "@jolocom/native-core-node",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "Neon based node bindings for the rust jolocom/wallet-rs",
   "main": "js/index.js",
   "files": [
@@ -14,7 +14,6 @@
     "crypto",
     "rust"
   ],
-
   "devDependencies": {
     "@jolocom/vaulted-key-provider": "^0.6.0",
     "@types/node": "^14.0.23",
@@ -24,12 +23,10 @@
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
   },
-
   "optionalDependencies": {
-    "@jolocom/native-core-node-linux-x64": "^0.7.4",
-    "@jolocom/native-core-node-darwin-x64": "^0.7.4"
+    "@jolocom/native-core-node-linux-x64": "^0.7.5",
+    "@jolocom/native-core-node-darwin-x64": "^0.7.5"
   },
-
   "scripts": {
     "prepare": "yarn build",
     "build": "rm -rf js; neon build --release && tsc -p .",
