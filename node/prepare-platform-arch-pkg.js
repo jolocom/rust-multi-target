@@ -30,7 +30,7 @@ delete pkgJson.optionalDependencies
 delete pkgJson.scripts
 
 // add the 'index.node' binary file to the packaged files
-pkgJson.files.append('native/index.node')
+pkgJson.files.push('native/index.node')
 
 // write out platform-arch-pkg/package.json
 fs.writeFileSync(outPkgJsonPath, JSON.stringify(pkgJson, null, 2))
