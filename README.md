@@ -1,27 +1,11 @@
-# react-native-substrate-sign
+# Jolocom Native Core Bindings
 
-[![npm version](https://badge.fury.io/js/react-native-substrate-sign.svg)](https://badge.fury.io/js/react-native-substrate-sign)
+This package contains Node and React Native bindings for
+[jolocom/wallet-rs](https://github.com/jolocom/wallet-rs) and
+[jolocom/keriox](https://github.com/jolocom/keriox)
 
-This React Native library packages practical crypto functions written in Rust for Substrate, Polkadot and Ethereum. Originally used for [Parity Signer](https://github.com/paritytech/parity-signer/).
-
-## Getting started
-
-```shell script
-yarn add react-native-substrate-sign
-cd ios && pod install && cd ..
-```
-
-## Usage
-
-All the functions could be find in the `index.d.ts` file. They are wrapped with async behaviors, since we need access to Rust runtime, be sure to use `await` or `then` to access the result.
-
-```javascript
-import SubstrateSign from 'react-native-substrate-sign';
-
-async function getRandomPhrase(){
-  const newRandomPhrase = SubstrateSign.randomPhrase(12);
-}
-```
+This is meant to be used through
+[jolocom/jolocom-lib](https://github.com/jolocom/jolocom-lib)
 
 ## Build and Develop
 
