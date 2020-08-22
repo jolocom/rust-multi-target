@@ -1,27 +1,28 @@
 use jolocom_native_utils::{get_id_from_event_str, validate_events_str, wallet};
 use neon::prelude::*;
+use neon::result::Throw;
 
 fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(validate_events_str(&str)))
+    Ok(cx.string(validate_events_str(&str).map_err(|e| Throw)?))
 }
 
 fn get_id_from_event(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(get_id_from_event_str(&str)))
+    Ok(cx.string(get_id_from_event_str(&str).map_err(|e| Throw)?))
 }
 
 fn new_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(0)?.value();
     let pass = cx.argument::<JsString>(1)?.value();
-    Ok(cx.string(wallet::new_wallet(&id, &pass)))
+    Ok(cx.string(wallet::new_wallet(&id, &pass).map_err(|e| Throw)?))
 }
 
 fn keri_incept_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    Ok(cx.string(wallet::incept_wallet(&ew, &id, &pass)))
+    Ok(cx.string(wallet::incept_wallet(&ew, &id, &pass).map_err(|e| Throw)?))
 }
 
 fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -29,7 +30,7 @@ fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let old_pass = cx.argument::<JsString>(2)?.value();
     let new_pass = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::change_pass(&ew, &id, &old_pass, &new_pass)))
+    Ok(cx.string(wallet::change_pass(&ew, &id, &old_pass, &new_pass).map_err(|e| Throw)?))
 }
 
 fn change_id(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -37,7 +38,7 @@ fn change_id(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let new_id = cx.argument::<JsString>(2)?.value();
     let pass = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::change_id(&ew, &id, &new_id, &pass)))
+    Ok(cx.string(wallet::change_id(&ew, &id, &new_id, &pass).map_err(|e| Throw)?))
 }
 
 fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -49,7 +50,7 @@ fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
         Ok(s) => Some(vec![s.value()]),
         Err(e) => None,
     };
-    Ok(cx.string(wallet::new_key(&ew, &id, &pass, &key_type, controller)))
+    Ok(cx.string(wallet::new_key(&ew, &id, &pass, &key_type, controller).map_err(|e| Throw)?))
 }
 
 fn add_content(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -57,7 +58,7 @@ fn add_content(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
     let content = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::add_content(&ew, &id, &pass, &content)))
+    Ok(cx.string(wallet::add_content(&ew, &id, &pass, &content).map_err(|e| Throw)?))
 }
 
 fn set_key_controller(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -66,13 +67,9 @@ fn set_key_controller(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let key_ref = cx.argument::<JsString>(3)?.value();
     let controller = cx.argument::<JsString>(4)?.value();
-    Ok(cx.string(wallet::set_key_controller(
-        &ew,
-        &id,
-        &pass,
-        &key_ref,
-        &controller,
-    )))
+    Ok(cx.string(
+        wallet::set_key_controller(&ew, &id, &pass, &key_ref, &controller).map_err(|e| Throw)?,
+    ))
 }
 
 fn get_key(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -80,7 +77,7 @@ fn get_key(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
     let key_ref = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::get_key(&ew, &id, &pass, &key_ref)))
+    Ok(cx.string(wallet::get_key(&ew, &id, &pass, &key_ref).map_err(|e| Throw)?))
 }
 
 fn get_key_by_controller(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -88,14 +85,14 @@ fn get_key_by_controller(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
     let controller = cx.argument::<JsString>(3)?.value();
-    Ok(cx.string(wallet::get_key_by_controller(&ew, &id, &pass, &controller)))
+    Ok(cx.string(wallet::get_key_by_controller(&ew, &id, &pass, &controller).map_err(|e| Throw)?))
 }
 
 fn get_keys(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    Ok(cx.string(wallet::get_keys(&ew, &id, &pass)))
+    Ok(cx.string(wallet::get_keys(&ew, &id, &pass).map_err(|e| Throw)?))
 }
 
 fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -104,7 +101,7 @@ fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let data = cx.argument::<JsString>(3)?.value();
     let key_ref = cx.argument::<JsString>(4)?.value();
-    Ok(cx.string(wallet::sign_by_controller(&ew, &id, &pass, &data, &key_ref)))
+    Ok(cx.string(wallet::sign_by_controller(&ew, &id, &pass, &data, &key_ref).map_err(|e| Throw)?))
 }
 
 fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
@@ -112,7 +109,7 @@ fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
     let key_type = cx.argument::<JsString>(1)?.value();
     let data = cx.argument::<JsString>(2)?.value();
     let signature = cx.argument::<JsString>(3)?.value();
-    Ok(cx.boolean(wallet::verify(&key, &key_type, &data, &signature)))
+    Ok(cx.boolean(wallet::verify(&key, &key_type, &data, &signature).map_err(|e| Throw)?))
 }
 
 fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -123,7 +120,7 @@ fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
         Ok(s) => s.value(),
         Err(_) => "".to_string(),
     };
-    Ok(cx.string(wallet::encrypt(&key, &key_type, &data, &aad)))
+    Ok(cx.string(wallet::encrypt(&key, &key_type, &data, &aad).map_err(|e| Throw)?))
 }
 
 fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -136,12 +133,15 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
         Ok(s) => s.value(),
         Err(_) => "".to_string(),
     };
-    Ok(cx.string(wallet::decrypt_by_controller(&ew, &id, &pass, &controller, &data, &aad)))
+    Ok(cx.string(
+        wallet::decrypt_by_controller(&ew, &id, &pass, &controller, &data, &aad)
+            .map_err(|e| Throw)?,
+    ))
 }
 
 fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
     let len = cx.argument::<JsNumber>(0)?.value() as usize;
-    Ok(cx.string(wallet::get_random_b64(len.into())))
+    Ok(cx.string(wallet::get_random_b64(len.into()).map_err(|e| Throw)?))
 }
 
 register_module!(mut cx, {
