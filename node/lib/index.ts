@@ -1,7 +1,4 @@
-try { require('@jolocom/native-core-node-linux-x64/native') } catch { }
-try { require('@jolocom/native-core-node-darwin-x64/native') } catch { }
-
-var addon = require(`@jolocom/native-core-node-${process.platform}-${process.arch}/native`);
+var addon = require(`@jolocom/native-core-node-${process.platform}-${process.arch}`);
 import { CryptoUtils, EncryptedWalletUtils } from "@jolocom/vaulted-key-provider"
 
 export const validateEvents = async (
@@ -81,7 +78,7 @@ export const walletUtils: EncryptedWalletUtils = {
         pass,
         content
     ),
-    
+
     getKey: async (
         encryptedWallet: string,
         id: string,
@@ -129,7 +126,7 @@ export const walletUtils: EncryptedWalletUtils = {
         id,
         pass
     ),
-    
+
     sign: async (
         encryptedWallet: string,
         id: string,
@@ -185,7 +182,7 @@ export const cryptoUtils: CryptoUtils = {
         data,
         aad
     ),
-    
+
     getRandom: async (
         len: number
     ): Promise<string> => await addon.getRandom(len),

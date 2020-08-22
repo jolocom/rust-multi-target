@@ -1,10 +1,13 @@
 {
-  "name": "@jolocom/native-core-node",
-  "version": "0.7.11",
+  "name": "@jolocom/native-core-node-",
+  "version": "1.0.0-rc0",
   "description": "Neon based node bindings for the rust jolocom/wallet-rs",
-  "main": "js/index.js",
+  "main": "index.node",
   "files": [
-    "js"
+    "index.node",
+    "README",
+    "LICENSE",
+    "CONTRIBUTING"
   ],
   "author": "Jolocom Dev <dev@jolocom.io>",
   "license": "Apache-2.0",
@@ -22,17 +25,5 @@
     "neon-cli": "^0.4.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
-  },
-
-  "os": [ "linux", "darwin" ],
-  "cpu": [ "x64" ],
-
-  "optionalDependencies": {
-    "@jolocom/native-core-node-linux-x64": "^1.0.0-rc0",
-    "@jolocom/native-core-node-darwin-x64": "^1.0.0-rc0"
-  },
-  "scripts": {
-    "prepare": "yarn build",
-    "build": "rm -rf js; neon build --release && tsc -p . && node prepare-native-pkg.js"
   }
 }
