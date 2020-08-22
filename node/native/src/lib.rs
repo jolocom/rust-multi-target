@@ -130,13 +130,13 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let key_ref = cx.argument::<JsString>(4)?.value();
+    let controller = cx.argument::<JsString>(4)?.value();
     let data = cx.argument::<JsString>(3)?.value();
     let aad = match cx.argument::<JsString>(2) {
         Ok(s) => s.value(),
         Err(_) => "".to_string(),
     };
-    Ok(cx.string(wallet::decrypt(&ew, &id, &pass, &key_ref, &data, &aad)))
+    Ok(cx.string(wallet::decrypt_by_controller(&ew, &id, &pass, &controller, &data, &aad)))
 }
 
 fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
