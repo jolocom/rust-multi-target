@@ -305,6 +305,42 @@ pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> bool {
     }
 }
 
+pub fn decrypt_by_controller(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    controller: &str,
+    data: &str,
+    aad: &str,
+) -> String {
+    let uw = match wallet_from(encrypted_wallet, id, &pass) {
+        Ok(w) => w,
+        Err(e) => return e.to_string(),
+    };
+
+    let data_bytes = match base64::decode_config(data, base64::URL_SAFE) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    let aad_bytes = match base64::decode_config(aad, base64::URL_SAFE) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    let key_ref = match uw.get_key_by_controller(controller) {
+        Some(c) => c.id,
+        None => return "No Key Found".to_string(),
+    };
+
+    let decrypted = match uw.decrypt(&key_ref, &data_bytes, &aad_bytes) {
+        Ok(s) => s,
+        Err(e) => return e.to_string(),
+    };
+
+    base64::encode_config(decrypted, base64::URL_SAFE)
+}
+
 pub fn decrypt(
     encrypted_wallet: &str,
     id: &str,
