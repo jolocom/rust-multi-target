@@ -1,6 +1,6 @@
 {
   "name": "@jolocom/native-core-node-",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "description": "Neon based node bindings for the rust jolocom/wallet-rs",
   "main": "index.node",
   "files": [
