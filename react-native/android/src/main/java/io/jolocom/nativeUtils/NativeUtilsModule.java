@@ -156,10 +156,10 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void sign(String ew, String id, String pass, String data,
-                   String controller, Promise promise) {
+  public void sign(String ew, String id, String pass, String controller,
+                   String data, Promise promise) {
     try {
-      String result = signStr(ew, id, pass, data, controller);
+      String result = signStr(ew, id, pass, controller, data);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "signing a message", e);
@@ -178,9 +178,10 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void encrypt(String pkInfo, String data, String aad, Promise promise) {
+  public void encrypt(String key, String keyType, String data, String aad,
+                      Promise promise) {
     try {
-      String result = encryptStr(pkInfo, data, aad);
+      String result = encryptStr(key, keyType, data, aad);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "encrypting a message", e);
@@ -189,9 +190,9 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void decrypt(String ew, String id, String pass, String keyRef,
-                      String aad, Promise promise) {
+                      String data, String aad, Promise promise) {
     try {
-      String result = decryptStr(ew, id, pass, keyRef, aad);
+      String result = decryptStr(ew, id, pass, keyRef, data, aad);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "decrypting a message", e);
@@ -231,11 +232,11 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
                                                      String controller);
   private static native String getKeysStr(String ew, String id, String pass);
   private static native String signStr(String ew, String id, String pass,
-                                       String data, String controller);
+                                       String controller, String data);
   private static native String verifyStr(String key, String keyType,
                                          String data, String signature);
-  private static native String encryptStr(String pkInfo, String data,
-                                          String aad);
+  private static native String encryptStr(String key, String keyType,
+                                          String data, String aad);
   private static native String decryptStr(String ew, String id, String pass,
                                           String keyRef, String data,
                                           String aad);

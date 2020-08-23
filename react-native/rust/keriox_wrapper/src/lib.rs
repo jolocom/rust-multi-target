@@ -64,8 +64,8 @@ export! {
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_signStr
-    fn sign(ew: String, id: String, pass: String, data: String, controller: String) -> Result<String, String> {
-        wallet::sign(&ew, &id, &pass, &data, &controller)
+    fn sign(ew: String, id: String, pass: String, controller: String, data: String) -> Result<String, String> {
+        wallet::sign(&ew, &id, &pass, &controller, &data)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_verifyStr
