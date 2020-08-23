@@ -71,7 +71,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void changePass(String ew, String id, String oldPass,
-                         String newPass Promise promise) {
+                         String newPass, Promise promise) {
     try {
       String result = changePassStr(ew, id, oldPass, newPass);
       promise.resolve(result);
@@ -127,7 +127,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void getKey(String ew, String id, String pass, Promise promise) {
     try {
-      String result = getKeyStr(event);
+      String result = getKeyStr(ew, id, pass, keyRef);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "getting a public key", e);
@@ -170,7 +170,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void verify(String key, String keyType, String data, String signature,
                      Promise promise) {
     try {
-      Bool result = verifyStr(key, keyType, data, signature);
+      String result = verifyStr(key, keyType, data, signature);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "verifying a signature", e);
@@ -200,9 +200,9 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getRandom(UInt len) {
+  public void getRandom(String ew, String id, String pass, Promise promise) {
     try {
-      String result = getRandomStr(len);
+      String result = getRandomStr(ew, id, pass);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "generating random bytes", e);
