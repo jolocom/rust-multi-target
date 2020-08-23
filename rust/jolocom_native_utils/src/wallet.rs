@@ -209,9 +209,7 @@ pub fn sign_by_controller(
         None => return Err("No Key Found".to_string()),
     };
 
-    let sig = uw.sign_raw(&key_ref, &data_bytes)?;
-
-    let sig_bytes = base64::decode_config(sig, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let sig_bytes = uw.sign_raw(&key_ref, &data_bytes)?;
 
     Ok(base64::encode_config(sig_bytes, base64::URL_SAFE))
 }

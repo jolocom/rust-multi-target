@@ -99,11 +99,7 @@ fn sign(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let key_ref = cx.argument::<JsString>(3)?.value();
     let data = cx.argument::<JsString>(4)?.value();
-    Ok(cx.string(
-        wallet::sign_by_controller(&ew, &id, &pass, &key_ref, &data)
-            .map_err(|e| panic!(e.to_string()))
-            .unwrap(),
-    ))
+    Ok(cx.string(wallet::sign_by_controller(&ew, &id, &pass, &key_ref, &data).unwrap()))
 }
 
 fn verify(mut cx: FunctionContext) -> JsResult<JsBoolean> {
@@ -129,9 +125,9 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let controller = cx.argument::<JsString>(4)?.value();
-    let data = cx.argument::<JsString>(3)?.value();
-    let aad = match cx.argument::<JsString>(2) {
+    let controller = cx.argument::<JsString>(3)?.value();
+    let data = cx.argument::<JsString>(4)?.value();
+    let aad = match cx.argument::<JsString>(5) {
         Ok(s) => s.value(),
         Err(_) => "".to_string(),
     };

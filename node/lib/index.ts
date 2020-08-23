@@ -145,8 +145,8 @@ export const walletUtils: EncryptedWalletUtils = {
         encryptedWallet: string,
         id: string,
         pass: string,
-        data: string,
         keyRef: string,
+        data: string,
         aad?: string
     ): Promise<string> => await addon.decrypt(
         encryptedWallet,
