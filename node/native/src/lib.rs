@@ -46,10 +46,15 @@ fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
     let key_type = cx.argument::<JsString>(3)?.value();
-    let controller = match cx.argument::<JsString>(4) {
-        Ok(s) => Some(vec![s.value()]),
-        Err(e) => None,
+
+    let controller = match cx.argument_opt(4) {
+        Some(optional_controller) => match optional_controller.downcast::<JsString>() {
+            Ok(controller) => Some(vec!(controller.value())),
+            Err(_) => None
+        },
+        None => None
     };
+
     Ok(cx.string(wallet::new_key(&ew, &id, &pass, &key_type, controller).unwrap()))
 }
 
