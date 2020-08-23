@@ -36,6 +36,7 @@ build/
 .gradle
 local.properties
 *.iml
+react-native/android/src/main/jniLibs/*
 
 ios/.DS_Store
 android.iml
