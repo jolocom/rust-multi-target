@@ -32,11 +32,7 @@ impl From<IdentifierState> for DIDDocument {
 
 fn pref_to_vm(pref: &Prefix, controller: &Prefix) -> Result<VerificationMethod, &'static str> {
     Ok(VerificationMethod {
-        id: [
-            "#".to_string(),
-            base64::encode_config(pref.derivative(), base64::URL_SAFE),
-        ]
-        .join(""),
+        id: ["#".to_string(), pref.to_string()].join(""),
         key_type: match pref {
             Prefix::PubKeyEd25519NT(_) | Prefix::PubKeyEd25519(_) => {
                 KeyTypes::Ed25519VerificationKey2018
