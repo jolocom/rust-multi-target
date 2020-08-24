@@ -125,7 +125,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getKey(String ew, String id, String pass, Promise promise) {
+  public void getKey(String ew, String id, String pass, String keyRef, Promise promise) {
     try {
       String result = getKeyStr(ew, id, pass, keyRef);
       promise.resolve(result);
