@@ -412,7 +412,8 @@ fn test_incept() -> Result<(), String> {
 
     let uw = LockedWallet::new(
         &nid,
-        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)?,
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)
+            .map_err(|e| e.to_string())?,
     )
     .unlock(p.as_bytes())?;
 
@@ -421,13 +422,9 @@ fn test_incept() -> Result<(), String> {
     let kel_str =
         serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
 
-    let ddo: DIDDocument =
-        serde_json::from_str(&validate_events_str(&kel_str)?).map_err(|e| e.to_string())?;
+    let ddo_str = validate_events_str(&kel_str)?;
 
-    println!(
-        "{}",
-        serde_json::to_string(&ddo).map_err(|e| e.to_string())?
-    );
+    let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| e.to_string())?;
 
     assert_eq!(ddo.verification_methods.len(), 2);
 

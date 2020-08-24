@@ -49,7 +49,7 @@ fn pref_to_vm(
             BasicPrefix::X25519(_) => KeyTypes::X25519KeyAgreementKey2019,
             _ => return Err("bad key type".to_string()),
         },
-        controller: ["did:un:".to_string(), controller.to_str()].join(""),
+        controller: ["did:jun:".to_string(), controller.to_str()].join(""),
         key: VerificationMethodProperties::Base64(base64::encode_config(
             pref.derivative(),
             base64::URL_SAFE,
