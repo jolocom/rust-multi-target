@@ -2,20 +2,20 @@
 # yarn lockfile v1
 
 
-"@jolocom/native-core-node-darwin-x64@^1.0.0-rc4":
-  version "1.0.0-rc4"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc4.tgz#78dbe342a1499d8f5f4302ff7e69c6890bb9aad8"
-  integrity sha512-suaIxsx+TkSVxTTaGShHZYyvptfECP7RSwU9WsaHTGXE1Gj3+jM2n1wOAguq2JVUvxYhkU6qsS6RwsC4Z8+tEQ==
+"@jolocom/native-core-node-darwin-x64@^1.0.0-rc5":
+  version "1.0.0-rc5"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc5.tgz#4721ce2e99f1e22aa00ccec108dd5fb1927cc9a6"
+  integrity sha512-9uIkpog+LEBxZws1nqPJhkXoxtCz1xtiwKZdqGDpEpLMqda4mXmlUOlfklg+8u3mNrYsJR4lkaU86OMr2tc39g==
 
-"@jolocom/native-core-node-linux-x64@^1.0.0-rc4":
-  version "1.0.0-rc2.1"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc2.1.tgz#1711e2f7d3445ec4100b900c8dd1a01114e268e9"
-  integrity sha512-SCHcBeGeiFnqck8HqaZB1EIG5epGW69ZVrERH8vCyLq340PRyIDE7pTwQXL0w3QUjg/I+tefUWYWngjfL5hdXQ==
+"@jolocom/native-core-node-linux-x64@^1.0.0-rc5":
+  version "1.0.0-rc3"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc3.tgz#b41a3f9662d1525563eea64d874c15050188fcda"
+  integrity sha512-RJLgRlmRliRLDzNItnCLIHbbp/K7LsysJpFSX6HqTR15KA7Rfk6mKKkHvlWD26bmItrzvatL8KXVigRpctaVqA==
 
-"@jolocom/vaulted-key-provider@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.6.0.tgz#56e67e2393a6b82deb1eea849b2d78798b2bdd10"
-  integrity sha512-w3pse8rlmwfp3/5aoiu1kuLbXIFxhYFIgaIojsPcOANHhxZIY5hf1LFvgyat/92ekmegEhUxpDPIySE5V85EsQ==
+"@jolocom/vaulted-key-provider@^0.7.2":
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.7.3.tgz#4dea978c4b816efd7d0a9dd8974f3e1994e0440e"
+  integrity sha512-1EwKWDT0X62mggmQchphf30wrfaybmls3L9Xb284ZGof9/RVlKtjLEsDKx3QwoMW4AF31rFlxcBP5i3xMevSuA==
   dependencies:
     rfc4648 "^1.4.0"
 
