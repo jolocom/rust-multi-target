@@ -7,9 +7,11 @@ use keriox::{
         sections::{InceptionWitnessConfig, KeyConfig},
         Event,
     },
-    event_message::{serialize_signed_message, EventMessage, VersionedEventMessage},
-    prefix::Prefix,
-    util::dfs_serializer,
+    event_message::serialize_signed_message_json,
+    prefix::{
+        AttachedSignaturePrefix, BasicPrefix, IdentifierPrefix, Prefix, SelfAddressingPrefix,
+        SelfSigningPrefix,
+    },
 };
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -51,60 +53,93 @@ pub fn new_wallet(id: &str, pass: &str) -> Result<String, String> {
 pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<String, String> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let nk0 = uw.new_key(KeyType::Ed25519VerificationKey2018, None)?;
+    let sig_key_0 = uw.new_key(KeyType::Ed25519VerificationKey2018, None)?;
+    let enc_key_0 = uw.new_key(KeyType::X25519KeyAgreementKey2019, None)?;
 
-    let pref0 = match &nk0.content {
-        Content::PublicKey(pk) => Prefix::PubKeyEd25519(pk.public_key.clone()),
+    let sig_key_1 = uw.new_key(KeyType::Ed25519VerificationKey2018, None)?;
+    let enc_key_1 = uw.new_key(KeyType::X25519KeyAgreementKey2019, None)?;
+
+    let sig_pref_0 = match &sig_key_0.content {
+        Content::PublicKey(pk) => BasicPrefix::Ed25519(pk.public_key.clone()),
+        _ => return Err("Wrong Content Type".to_string()),
+    };
+    let enc_pref_0 = match &enc_key_0.content {
+        Content::PublicKey(pk) => BasicPrefix::X25519(pk.public_key.clone()),
         _ => return Err("Wrong Content Type".to_string()),
     };
 
-    uw.id = ["did:un", &pref0.to_string()].join(":");
-    uw.set_key_controller(&nk0.id, &[uw.id.clone(), pref0.to_string()].join("#"));
-
-    let nk1 = uw.new_key(KeyType::Ed25519VerificationKey2018, None)?;
-
-    let pref1 = match &nk1.content {
-        Content::PublicKey(pk) => Prefix::Blake2B256(blake2b_256_digest(pk.public_key.as_ref())),
+    let sig_pref_1 = match &sig_key_1.content {
+        Content::PublicKey(pk) => BasicPrefix::Ed25519(pk.public_key.clone()),
+        _ => return Err("Wrong Content Type".to_string()),
+    };
+    let enc_pref_1 = match &enc_key_1.content {
+        Content::PublicKey(pk) => BasicPrefix::X25519(pk.public_key.clone()),
         _ => return Err("Wrong Content Type".to_string()),
     };
 
-    let icp = VersionedEventMessage::V0_0(EventMessage {
-        event: Event {
-            prefix: pref0.clone(),
-            sn: 0,
-            event_data: EventData::Icp(InceptionEvent {
-                key_config: KeyConfig {
-                    threshold: 1,
-                    public_keys: vec![pref0.clone()],
-                    threshold_key_digest: pref1.clone(),
-                },
-                witness_config: InceptionWitnessConfig {
-                    tally: 0,
-                    initial_witnesses: vec![],
-                },
-            }),
-        },
-        sig_config: vec![0],
-        signatures: vec![],
-    });
+    let nexter_pref = SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+        [sig_pref_1.to_str(), enc_pref_1.to_str()]
+            .join("")
+            .as_bytes(),
+    ));
 
-    let sed = dfs_serializer::to_string(&icp).map_err(|e| e.to_string())?;
-
-    let sig = uw.sign_raw(&nk0.id, sed.as_bytes())?;
-
-    let sig_pref = Prefix::SigEd25519Sha512(sig);
-
-    let signed_event = match icp {
-        VersionedEventMessage::V0_0(ev) => VersionedEventMessage::V0_0(EventMessage {
-            signatures: vec![sig_pref],
-            ..ev
+    let icp_data = Event {
+        prefix: IdentifierPrefix::default(),
+        sn: 0,
+        event_data: EventData::Icp(InceptionEvent {
+            key_config: KeyConfig {
+                threshold: 1,
+                public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
+                threshold_key_digest: nexter_pref,
+            },
+            witness_config: InceptionWitnessConfig::default(),
+            inception_configuration: vec![],
         }),
     };
+
+    let pref =
+        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+            icp_data
+                .extract_serialized_data_set()
+                .map_err(|_| "failed to extract data set".to_string())?
+                .as_bytes(),
+        )));
+
+    let icp_event = Event {
+        prefix: pref,
+        ..icp_data
+    };
+
+    uw.id = ["did:un", &icp_event.prefix.to_str()].join(":");
+    uw.set_key_controller(
+        &sig_key_0.id,
+        &[uw.id.clone(), sig_pref_0.to_str()].join("#"),
+    );
+    uw.set_key_controller(
+        &enc_key_0.id,
+        &[uw.id.clone(), enc_pref_0.to_str()].join("#"),
+    );
+
+    let sed = icp_event
+        .extract_serialized_data_set()
+        .map_err(|_| "failed to extract data set".to_string())?;
+
+    let sig = uw.sign_raw(&sig_key_0.id, sed.as_bytes())?;
+
+    let sig_pref = AttachedSignaturePrefix {
+        index: 0,
+        sig: SelfSigningPrefix::Ed25519Sha512(sig),
+    };
+
+    let signed_event = icp_event
+        .sign(vec![sig_pref])
+        .map_err(|_| "failed to sign".to_string())?;
 
     serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
         encrypted_wallet: export_wallet(uw, pass)?,
-        inception_event: serialize_signed_message(&signed_event),
+        inception_event: serialize_signed_message_json(&signed_event)
+            .map_err(|_| "failed to serialize".to_string())?,
     })
     .map_err(|e| e.to_string())
 }

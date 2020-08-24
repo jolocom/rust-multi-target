@@ -1,4 +1,7 @@
-use keriox::{prefix::Prefix, state::IdentifierState};
+use keriox::{
+    prefix::{BasicPrefix, IdentifierPrefix, Prefix},
+    state::IdentifierState,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -20,7 +23,7 @@ impl From<IdentifierState> for DIDDocument {
                 .signers
                 .iter()
                 .map(|pref| pref_to_vm(pref, &state.prefix))
-                .collect::<Result<Vec<VerificationMethod>, &'static str>>()
+                .collect::<Result<Vec<VerificationMethod>, String>>()
             {
                 Ok(vms) => vms,
                 // TODO not clean
@@ -30,28 +33,27 @@ impl From<IdentifierState> for DIDDocument {
     }
 }
 
-fn pref_to_vm(pref: &Prefix, controller: &Prefix) -> Result<VerificationMethod, &'static str> {
+fn pref_to_vm(
+    pref: &BasicPrefix,
+    controller: &IdentifierPrefix,
+) -> Result<VerificationMethod, String> {
     Ok(VerificationMethod {
-        id: ["#".to_string(), pref.to_string()].join(""),
+        id: ["#".to_string(), pref.to_str()].join(""),
         key_type: match pref {
-            Prefix::PubKeyEd25519NT(_) | Prefix::PubKeyEd25519(_) => {
+            BasicPrefix::Ed25519NT(_) | BasicPrefix::Ed25519(_) => {
                 KeyTypes::Ed25519VerificationKey2018
             }
-            Prefix::PubKeyECDSAsecp256k1NT(_) | Prefix::PubKeyECDSAsecp256k1(_) => {
+            BasicPrefix::ECDSAsecp256k1NT(_) | BasicPrefix::ECDSAsecp256k1(_) => {
                 KeyTypes::EcdsaSecp256k1VerificationKey2019
             }
-            Prefix::PubKeyX25519(_) => KeyTypes::X25519KeyAgreementKey2019,
-            _ => return Err("bad key type"),
+            BasicPrefix::X25519(_) => KeyTypes::X25519KeyAgreementKey2019,
+            _ => return Err("bad key type".to_string()),
         },
-        controller: ["did:un:".to_string(), controller.to_string()].join(""),
-        key: VerificationMethodProperties::Base64(match pref {
-            Prefix::PubKeyEd25519NT(p)
-            | Prefix::PubKeyEd25519(p)
-            | Prefix::PubKeyECDSAsecp256k1NT(p)
-            | Prefix::PubKeyECDSAsecp256k1(p)
-            | Prefix::PubKeyX25519(p) => base64::encode_config(&p.0, base64::URL_SAFE),
-            _ => return Err("bad key type"),
-        }),
+        controller: ["did:un:".to_string(), controller.to_str()].join(""),
+        key: VerificationMethodProperties::Base64(base64::encode_config(
+            pref.derivative(),
+            base64::URL_SAFE,
+        )),
     })
 }
 

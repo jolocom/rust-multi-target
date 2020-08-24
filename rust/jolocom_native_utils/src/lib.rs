@@ -3,7 +3,8 @@ pub mod wallet;
 use did_document::DIDDocument;
 use keriox::{
     error::Error,
-    event_message::{parse_signed_message, validate_events, VersionedEventMessage},
+    event_message::{parse_signed_message_json, validate_events, EventMessage},
+    prefix::Prefix,
 };
 
 pub fn validate_events_str(kel_str: &str) -> Result<String, String> {
@@ -11,11 +12,11 @@ pub fn validate_events_str(kel_str: &str) -> Result<String, String> {
         Ok(k) => k,
         Err(e) => return Err(e.to_string()),
     };
-    let kel: Vec<VersionedEventMessage> = match str_events
+    let kel: Vec<EventMessage> = match str_events
         .iter()
-        .map(|e| parse_signed_message(e))
-        .collect::<Result<Vec<VersionedEventMessage>, Error>>(
-    ) {
+        .map(|e| parse_signed_message_json(e))
+        .collect::<Result<Vec<EventMessage>, Error>>()
+    {
         Ok(k) => k,
         Err(e) => return Err(e.to_string()),
     };
@@ -32,10 +33,8 @@ pub fn validate_events_str(kel_str: &str) -> Result<String, String> {
 }
 
 pub fn get_id_from_event_str(event: &str) -> Result<String, String> {
-    match parse_signed_message(event) {
-        Ok(vem) => match vem {
-            VersionedEventMessage::V0_0(ev) => Ok(ev.event.prefix.to_str()),
-        },
+    match parse_signed_message_json(event) {
+        Ok(ev) => Ok(ev.event.prefix.to_str()),
         Err(e) => Err(e.to_string()),
     }
 }
