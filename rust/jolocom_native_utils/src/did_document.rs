@@ -7,17 +7,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 pub struct DIDDocument {
     #[serde(rename = "@context")]
-    context: String,
-    id: String,
+    pub context: String,
+    pub id: String,
     #[serde(rename = "verificationMethod")]
-    verification_methods: Vec<VerificationMethod>,
+    pub verification_methods: Vec<VerificationMethod>,
 }
 
 impl From<IdentifierState> for DIDDocument {
     fn from(state: IdentifierState) -> Self {
         DIDDocument {
             context: "https://www.w3.org/ns/did/v1".to_string(),
-            id: ["did:un:".to_string(), state.prefix.to_str()].join(""),
+            id: ["did:jun:".to_string(), state.prefix.to_str()].join(""),
             verification_methods: match state
                 .current
                 .signers

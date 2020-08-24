@@ -1,3 +1,5 @@
+use super::did_document::DIDDocument;
+use super::validate_events_str;
 use base64;
 use core::str::FromStr;
 use keriox::{
@@ -375,23 +377,65 @@ pub fn get_key_by_controller(
 }
 
 #[test]
-fn test() -> Result<(), String> {
+fn test_create() -> Result<(), String> {
     let id = "my_did".to_string();
     let p = "my_password".to_string();
 
-    let ew = new_wallet(&id, &p);
+    let ew = new_wallet(&id, &p)?;
 
-    let ew_k1 = new_key(&ew, &id, &p, "EcdsaSecp256k1VerificationKey2019", None);
+    let res: AddKeyResultRep = serde_json::from_str(&new_key(
+        &ew,
+        &id,
+        &p,
+        "EcdsaSecp256k1VerificationKey2019",
+        None,
+    )?)
+    .map_err(|e| e.to_string())?;
 
-    let keys = get_keys(&ew_k1, &id, &p);
-
+    let keys = get_keys(&res.new_encrypted_state, &id, &p)?;
     assert!(keys.len() > 16);
 
     Ok(())
 }
 
 #[test]
-fn test2() -> Result<(), String> {
+fn test_incept() -> Result<(), String> {
+    let id = "my_did";
+    let p = "my_password";
+
+    let ew = new_wallet(id, p)?;
+
+    let res_str: WalletInceptionRep =
+        serde_json::from_str(&incept_wallet(&ew, id, p)?).map_err(|e| e.to_string())?;
+
+    let nid: String = res_str.id.clone();
+
+    let uw = LockedWallet::new(
+        &nid,
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)?,
+    )
+    .unlock(p.as_bytes())?;
+
+    assert_eq!(uw.get_keys().len(), 4);
+
+    let kel_str =
+        serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+
+    let ddo: DIDDocument =
+        serde_json::from_str(&validate_events_str(&kel_str)?).map_err(|e| e.to_string())?;
+
+    println!(
+        "{}",
+        serde_json::to_string(&ddo).map_err(|e| e.to_string())?
+    );
+
+    assert_eq!(ddo.verification_methods.len(), 2);
+
+    Ok(())
+}
+
+#[test]
+fn test_rt_sign() -> Result<(), String> {
     let id = "my_did";
     let pass = "my_pass";
     let message = base64::encode_config("hello there", base64::URL_SAFE);
@@ -418,20 +462,20 @@ fn test2() -> Result<(), String> {
         pass,
         &k1.id,
         &message,
-    );
+    )?;
 
     assert!(verify(
         &pks,
         "EcdsaSecp256k1VerificationKey2019",
         &message,
         &sig
-    ));
+    )?);
 
     Ok(())
 }
 
 #[test]
-fn test3() -> Result<(), String> {
+fn test_sign() -> Result<(), String> {
     let kt = "EcdsaSecp256k1VerificationKey2019";
     let key = "Aw2CKxqxbAH5CJK5fo0LqnREgJQYYsFcAocCKX7TrUmp";
     let message = base64::encode_config("hello there".as_bytes(), base64::URL_SAFE);
@@ -439,10 +483,10 @@ fn test3() -> Result<(), String> {
     let sig =
         "dxolMmEAt56BaIgqTdAZ17QmmNcOA9wkmiVNwtVLr_0Ob3r0R2v9lqDMQxF8Pt--Jl9BDDyaxIsYsbAybZv3rw==";
     let wrong_sig =
-        "rX1+vdS4/OelZZZZq/+2PJc70P2ZD2wu/eJINet5es9QVkDf7P70whQ84qvyF7Qp/wxVGbW/HWpTqjDCxrJDiA==";
+        "dxolAAAAt56BaIgqTdAZ17QmmNcOA9wkmiVNwtVLr_0Ob3r0R2v9lqDMQxF8Pt--Jl9BDDyaxIsYsbAybZv3rw==";
 
-    assert!(verify(key, kt, &message, sig));
-    assert!(!verify(key, kt, &message, wrong_sig));
+    assert!(verify(key, kt, &message, sig)?);
+    assert!(!verify(key, kt, &message, wrong_sig)?);
 
     Ok(())
 }
