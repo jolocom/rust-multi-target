@@ -1,11 +1,10 @@
 {
   "name": "@jolocom/native-core-react-native",
   "description": "Neon based react native bindings for the rust jolocom/wallet-rs",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "index.js",
   "files": [
     "index.js",
-    "index.d.ts",
     "android",
     "ios"
   ],
@@ -18,7 +17,7 @@
     "clean": "(cd ../rust/jolocom_native_utils && cargo clean)",
     "clean:wrapper": "(cd ./rust/keriox_wrapper && cargo clean)",
     "clean:android": "rm -rf ./android/src/main/jniLibs/*",
-    "build": "(cd ../scripts && ./build.sh) && tsc -p ."
+    "build": "(cd ../scripts && ./build-mobile.sh) # && tsc -p ."
   },
   "repository": {
     "type": "git",
