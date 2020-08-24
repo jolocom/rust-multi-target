@@ -200,9 +200,9 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getRandom(String ew, String id, String pass, Promise promise) {
+  public void getRandom(int length, Promise promise) {
     try {
-      String result = getRandomStr(ew, id, pass);
+      String result = getRandomStr(length);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "generating random bytes", e);
@@ -240,5 +240,5 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   private static native String decryptStr(String ew, String id, String pass,
                                           String keyRef, String data,
                                           String aad);
-  private static native String getRandomStr(String ew, String id, String pass);
+  private static native String getRandomStr(int length);
 }
