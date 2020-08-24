@@ -1,7 +1,7 @@
 {
-  "name": "@jolocom/native-core-node",
+  "name": "@jolocom/native-core",
   "version": "0.7.18",
-  "description": "Neon based node bindings for the rust jolocom/wallet-rs",
+  "description": "jolocom/wallet-rs javascript bindings based on Neon",
   "main": "js/index.js",
   "files": [
     "js"
