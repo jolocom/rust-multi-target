@@ -59,14 +59,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     };
 
     uw.id = ["did:un", &pref0.to_string()].join(":");
-    uw.set_key_controller(
-        &nk0.id,
-        &[
-            uw.id.clone(),
-            base64::encode_config(pref0.derivative(), base64::URL_SAFE),
-        ]
-        .join("#"),
-    );
+    uw.set_key_controller(&nk0.id, &[uw.id.clone(), pref0.to_string()].join("#"));
 
     let nk1 = uw.new_key(KeyType::Ed25519VerificationKey2018, None)?;
 
