@@ -8,7 +8,7 @@ export! {
         validate_events_str(&kel_string)
     }
 
-    @Java_io_jolocom_nativeUtils_NativeUtilsModule_extractIdFromEventStr
+    @Java_io_jolocom_nativeUtils_NativeUtilsModule_getIdFromEvent
     fn get_id_from_event(event_string: String) -> Result<String, String> {
         get_id_from_event_str(&event_string)
     }
