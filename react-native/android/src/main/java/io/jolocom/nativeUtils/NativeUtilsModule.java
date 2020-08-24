@@ -95,7 +95,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void newKey(String ew, String id, String pass, String keyType,
                      String controller, Promise promise) {
     try {
-      String result = newKeyStr(ew, id, pass, keyType, controller);
+      String result = newKeyStr(ew, id, pass, keyType, controller != null ? controller : "");
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "adding a new key pair to a wallet", e);
