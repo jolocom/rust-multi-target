@@ -209,6 +209,11 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
     }
   }
 
+  /**
+   * Rust functions that will be exposed by the JNI libs
+   *
+   * WARNING: mismatches in return type or argument types WILL LEAD TO SEGFAULTS
+   */
   private static native String validateEventsStr(String events);
   private static native String getIdFromEvent(String event);
   private static native String newWalletStr(String id, String pass);
@@ -233,7 +238,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   private static native String getKeysStr(String ew, String id, String pass);
   private static native String signStr(String ew, String id, String pass,
                                        String controller, String data);
-  private static native String verifyStr(String key, String keyType,
+  private static native bool verifyStr(String key, String keyType,
                                          String data, String signature);
   private static native String encryptStr(String key, String keyType,
                                           String data, String aad);
