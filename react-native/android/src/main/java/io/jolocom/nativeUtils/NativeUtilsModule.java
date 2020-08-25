@@ -170,7 +170,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void verify(String key, String keyType, String data, String signature,
                      Promise promise) {
     try {
-      String result = verifyStr(key, keyType, data, signature);
+      boolean result = verifyStr(key, keyType, data, signature);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "verifying a signature", e);
@@ -238,7 +238,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   private static native String getKeysStr(String ew, String id, String pass);
   private static native String signStr(String ew, String id, String pass,
                                        String controller, String data);
-  private static native bool verifyStr(String key, String keyType,
+  private static native boolean verifyStr(String key, String keyType,
                                          String data, String signature);
   private static native String encryptStr(String key, String keyType,
                                           String data, String aad);
