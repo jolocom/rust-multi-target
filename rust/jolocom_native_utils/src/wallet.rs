@@ -202,9 +202,9 @@ pub fn add_content(
 ) -> Result<String, String> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let content_entity: ContentEntity = serde_json::from_str(content).map_err(|e| e.to_string())?;
+    let content_entity: Content = serde_json::from_str(content).map_err(|e| e.to_string())?;
 
-    uw.import_content(content_entity);
+    uw.import_content(&content_entity);
 
     export_wallet(uw, pass)
 }
