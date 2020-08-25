@@ -759,13 +759,6 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
-"@jolocom/vaulted-key-provider@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.7.2.tgz#52619651c4bb08dc0d77728ebcfcc808a1de5d44"
-  integrity sha512-wSbXDkI7UlfIums81wTyLNGyKdVf87YQwv3TFEhHIK9GxsftMXa4savMH4LnkGcb30bbqHQfhOENqf4AP+zspA==
-  dependencies:
-    rfc4648 "^1.4.0"
-
 "@react-native-community/cli-debugger-ui@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-debugger-ui/-/cli-debugger-ui-3.0.0.tgz#d01d08d1e5ddc1633d82c7d84d48fff07bd39416"
@@ -3739,11 +3732,6 @@ ret@~0.1.10:
   version "0.1.15"
   resolved "https://registry.yarnpkg.com/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
   integrity sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==
-
-rfc4648@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.4.0.tgz#c75b2856ad2e2d588b6ddb985d556f1f7f2a2abd"
-  integrity sha512-3qIzGhHlMHA6PoT6+cdPKZ+ZqtxkIvg8DZGKA5z6PQ33/uuhoJ+Ws/D/J9rXW6gXodgH8QYlz2UCl+sdUDmNIg==
 
 rimraf@^2.5.4:
   version "2.7.1"
