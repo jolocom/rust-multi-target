@@ -63,9 +63,9 @@ export! {
         wallet::get_keys(&ew, &id, &pass)
     }
 
-    @Java_io_jolocom_nativeUtils_NativeUtilsModule_signStr
+    @Java_io_jolocom_nativeUtils_NativeUtilsModule_signByControllerStr
     fn sign(ew: String, id: String, pass: String, controller: String, data: String) -> Result<String, String> {
-        wallet::sign(&ew, &id, &pass, &controller, &data)
+        wallet::sign_by_controller(&ew, &id, &pass, &controller, &data)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_verifyStr

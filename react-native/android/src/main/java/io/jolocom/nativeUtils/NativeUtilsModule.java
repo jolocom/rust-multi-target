@@ -159,7 +159,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void sign(String ew, String id, String pass, String controller,
                    String data, Promise promise) {
     try {
-      String result = signStr(ew, id, pass, controller, data);
+      String result = signByControllerStr(ew, id, pass, controller, data);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "signing a message", e);
@@ -236,7 +236,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
                                                      String pass,
                                                      String controller);
   private static native String getKeysStr(String ew, String id, String pass);
-  private static native String signStr(String ew, String id, String pass,
+  private static native String signByControllerStr(String ew, String id, String pass,
                                        String controller, String data);
   private static native boolean verifyStr(String key, String keyType,
                                          String data, String signature);
