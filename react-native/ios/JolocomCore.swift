@@ -13,7 +13,7 @@ func handle_error<T, U>(
     resolve(success(res))
   } else {
     let val = String(cString: err_ptr.pointee.message)
-    signer_destroy_string(err_ptr.pointee.message)
+    jolo_destroy_string(err_ptr.pointee.message)
     reject(String(describing: err_ptr.pointee.code), val, nil)
   }
 }
@@ -27,271 +27,207 @@ class JolocomCore: NSObject {
 
 // validates a key event log,
 // see ./core.h:34
-  @objc func validateEvents(_ kelString: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func validateEvents(_ kelString: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
       get_result: { validate_events($0, kelString) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func keriInceptWallet(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { ethkey_brainwallet_sign($0, seed, message) },
+      get_result: { keri_incept_wallet($0, ew, id, pass) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
+        return val
+    })
+
+  @objc func getIdFromEvent(_ event: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { get_id_from_event($0, event) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func rlpItem(_ rlp: String, position: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func newWallet(_ id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { rlp_item($0, rlp, position) },
+      get_result: { new_wallet($0, id, pass) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func keccak(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func changePass(_ ew: String, id: String, oldPass: String, newPass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { keccak256($0, data) },
+      get_result: { change_pass($0, ew, id, oldPass, newPass) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func blake2b(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+
+  @objc func changeId(_ ew: String, id: String, newId: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { blake($0, data) },
+      get_result: { change_id($0, ew, id, new_id, pass) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func newKey(_ ew: String, id: String, pass: String, keyType: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { eth_sign($0, data) },
+      get_result: { new_key($0, ew, id, pass, keyType, controller) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func blockiesIcon(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func addContent(_ ew: String, id: String, pass: String, content: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { blockies_icon($0, seed) },
+      get_result: { add_content($0, ew, id, pass, content) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func randomPhrase(_ wordsNumber:NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func getKey(_ ew: String, id: String, pass: String, keyRef: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { random_phrase($0, Int32(wordsNumber)) },
+      get_result: { get_key($0, ew, id, pass, keyRef) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func encryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func getKeyByController(_ ew: String, id: String, pass: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { encrypt_data($0, data, password) },
+      get_result: { get_key_by_controller($0, ew, id, pass, controller) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func decryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func setKeyByController(_ ew: String, id: String, pass: String, keyRef: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { decrypt_data($0, data, password) },
+      get_result: { set_key_by_controller($0, ew, id, pass, keyRef, controller) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func qrCode(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func getKeys(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { qrcode($0, data) },
+      get_result: { get_keys($0, ew, id, pass) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func qrCodeHex(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func sign(_ ew: String, id: String, pass: String, controller: string, data: string, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { qrcode_hex($0, data) },
+      get_result: { sign($0, ew, id, pass, controller, data) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func substrateAddress(_ seed: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func decrypt(_ ew: String, id: String, pass: String, controller: string, data: string, aad: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { substrate_brainwallet_address($0, seed, prefix) },
+      get_result: { decrypt($0, ew, id, pass, controller, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func substrateSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func verify(_ key: String, keyType: String, data: String, signature: string, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { substrate_brainwallet_sign($0, seed, message) },
+      get_result: { verify($0, key, keyType, data, signature) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func schnorrkelVerify(_ seed: String, message: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func encrypt(_ key: String, keyType: String, data: String, aad: string, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { schnorrkel_verify($0, seed, message, signature) },
-      // return a bool. no cleanup
-      success: { return $0 })
-  }
-
-  @objc func decryptDataRef(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { decrypt_data_ref($0, data, password) },
-      // return a long. no cleanup
-      success: { return $0 })
-  }
-
-  @objc func destroyDataRef(_ data_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { destroy_data_ref($0, data_ref) },
-      // return zero. no cleanup
-      success: { return 0 })
-  }
-
-  @objc func brainWalletSignWithRef(_ seed_ref: Int64, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { ethkey_brainwallet_sign_with_ref($0, seed_ref, message) },
+      get_result: { encrypt($0, key, keyType, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 
-  @objc func substrateSignWithRef(_ seed_ref: Int64, suri_suffix: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func getRandom(_ len: NSUInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { substrate_brainwallet_sign_with_ref($0, seed_ref, suri_suffix, message) },
+      get_result: { get_random($0, len) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
-        signer_destroy_string(res!)
-        return val
-    })
-  }
-
-  @objc func brainWalletAddressWithRef(_ seed_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { brain_wallet_address_with_ref($0, seed_ref) },
-      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
-        let val = String(cString: res!)
-        signer_destroy_string(res!)
-        return val
-    })
-  }
-
-  @objc func substrateAddressWithRef(_ seed_ref: Int64, suri_suffix: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { substrate_address_with_ref($0, seed_ref, suri_suffix, prefix) },
-      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
-        let val = String(cString: res!)
-        signer_destroy_string(res!)
-        return val
-    })
-  }
-
-  @objc func substrateSecret(_ suri: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { substrate_mini_secret_key($0, suri) },
-      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
-        let val = String(cString: res!)
-        signer_destroy_string(res!)
-        return val
-    })
-  }
-
-  @objc func substrateSecretWithRef(_ seed_ref: Int64, suri_suffix: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    handle_error(
-      resolve: resolve,
-      reject: reject,
-      get_result: { substrate_mini_secret_key_with_ref($0, seed_ref, suri_suffix) },
-      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
-        let val = String(cString: res!)
-        signer_destroy_string(res!)
+        jolo_destroy_string(res!)
         return val
     })
   }
 }
-
