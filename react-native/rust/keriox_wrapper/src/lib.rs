@@ -5,7 +5,7 @@ use std::convert::TryInto;
 export! {
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_validateEventsStr
     fn validate_events(kel_string: String) -> Result<String, String> {
-        validate_events_str(&kel_string)
+        validate_events_str(&kel_string, "jun")
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_getIdFromEvent

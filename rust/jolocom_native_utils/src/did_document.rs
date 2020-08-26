@@ -1,4 +1,4 @@
-use keriox::{
+use keri::{
     prefix::{BasicPrefix, IdentifierPrefix, Prefix},
     state::IdentifierState,
 };
@@ -13,29 +13,28 @@ pub struct DIDDocument {
     pub verification_methods: Vec<VerificationMethod>,
 }
 
-impl From<IdentifierState> for DIDDocument {
-    fn from(state: IdentifierState) -> Self {
-        DIDDocument {
-            context: "https://www.w3.org/ns/did/v1".to_string(),
-            id: ["did:jun:".to_string(), state.prefix.to_str()].join(""),
-            verification_methods: match state
-                .current
-                .signers
-                .iter()
-                .map(|pref| pref_to_vm(pref, &state.prefix))
-                .collect::<Result<Vec<VerificationMethod>, String>>()
-            {
-                Ok(vms) => vms,
-                // TODO not clean
-                Err(_) => vec![],
-            },
-        }
+pub fn state_to_did_document(state: IdentifierState, method_prefix: &str) -> DIDDocument {
+    DIDDocument {
+        context: "https://www.w3.org/ns/did/v1".to_string(),
+        id: ["did", method_prefix, &state.prefix.to_str()].join(":"),
+        verification_methods: match state
+            .current
+            .signers
+            .iter()
+            .map(|pref| pref_to_vm(pref, &state.prefix, method_prefix))
+            .collect::<Result<Vec<VerificationMethod>, String>>()
+        {
+            Ok(vms) => vms,
+            // TODO not clean
+            Err(_) => vec![],
+        },
     }
 }
 
 fn pref_to_vm(
     pref: &BasicPrefix,
     controller: &IdentifierPrefix,
+    method_prefix: &str,
 ) -> Result<VerificationMethod, String> {
     Ok(VerificationMethod {
         id: ["#".to_string(), pref.to_str()].join(""),
@@ -49,7 +48,7 @@ fn pref_to_vm(
             BasicPrefix::X25519(_) => KeyTypes::X25519KeyAgreementKey2019,
             _ => return Err("bad key type".to_string()),
         },
-        controller: ["did:jun:".to_string(), controller.to_str()].join(""),
+        controller: ["did", method_prefix, &controller.to_str()].join(":"),
         key: VerificationMethodProperties::Base64(base64::encode_config(
             pref.derivative(),
             base64::URL_SAFE,

@@ -2,7 +2,7 @@ use super::did_document::DIDDocument;
 use super::validate_events_str;
 use base64;
 use core::str::FromStr;
-use keriox::{
+use keri::{
     derivation::blake2b_256_digest,
     event::{
         event_data::{inception::InceptionEvent, EventData},
@@ -17,7 +17,7 @@ use keriox::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json;
-use wallet_rs::{get_random, prelude::*};
+use universal_wallet::{get_random, prelude::*};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -422,7 +422,7 @@ fn test_incept() -> Result<(), String> {
     let kel_str =
         serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
 
-    let ddo_str = validate_events_str(&kel_str)?;
+    let ddo_str = validate_events_str(&kel_str, "jun")?;
 
     let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| e.to_string())?;
 

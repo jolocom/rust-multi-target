@@ -1,13 +1,13 @@
 pub mod did_document;
 pub mod wallet;
-use did_document::DIDDocument;
-use keriox::{
+use did_document::{state_to_did_document, DIDDocument};
+use keri::{
     error::Error,
     event_message::{parse_signed_message_json, validate_events, EventMessage},
     prefix::Prefix,
 };
 
-pub fn validate_events_str(kel_str: &str) -> Result<String, String> {
+pub fn validate_events_str(kel_str: &str, method_name: &str) -> Result<String, String> {
     let str_events: Vec<String> = match serde_json::from_str(&kel_str) {
         Ok(k) => k,
         Err(e) => return Err(e.to_string()),
@@ -22,7 +22,7 @@ pub fn validate_events_str(kel_str: &str) -> Result<String, String> {
     };
 
     let ddo: DIDDocument = match validate_events(&kel) {
-        Ok(s) => s.into(),
+        Ok(s) => state_to_did_document(s, method_name),
         Err(e) => return Err(e.to_string()),
     };
 

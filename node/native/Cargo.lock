@@ -544,10 +544,10 @@ name = "jolocom_native_utils"
 version = "0.1.0"
 dependencies = [
  "base64",
- "keriox",
+ "keri",
  "serde",
  "serde_json",
- "wallet_rs",
+ "universal_wallet",
 ]
 
 [[package]]
@@ -557,8 +557,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 
 [[package]]
-name = "keriox"
+name = "keri"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9ce6a06cb22fd1d1a0a9b34eed6356f35b0c29ff31fc3c17d92cc906c924e98"
 dependencies = [
  "base64",
  "serde",
@@ -1208,6 +1210,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "universal_wallet"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e98b4efac2639d215c0500a1ca9de7850996a86d9728aff86558bce4844045a"
+dependencies = [
+ "aead",
+ "base64",
+ "bs58",
+ "hex",
+ "rust-crypto",
+ "secp256k1",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "ursa",
+ "uuid",
+ "xsalsa20poly1305",
+]
+
+[[package]]
 name = "ursa"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1262,24 +1284,6 @@ name = "version_check"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5a972e5669d67ba988ce3dc826706fb0a8b01471c088cb0b6110b805cc36aed"
-
-[[package]]
-name = "wallet_rs"
-version = "0.1.0"
-dependencies = [
- "aead",
- "base64",
- "bs58",
- "hex",
- "rust-crypto",
- "secp256k1",
- "serde",
- "serde_json",
- "thiserror",
- "ursa",
- "uuid",
- "xsalsa20poly1305",
-]
 
 [[package]]
 name = "wasi"

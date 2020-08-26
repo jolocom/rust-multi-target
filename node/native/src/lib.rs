@@ -3,7 +3,7 @@ use neon::prelude::*;
 
 fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(validate_events_str(&str).unwrap()))
+    Ok(cx.string(validate_events_str(&str, "jun").unwrap()))
 }
 
 fn get_id_from_event(mut cx: FunctionContext) -> JsResult<JsString> {
