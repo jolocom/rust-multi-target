@@ -17,111 +17,111 @@ RCT_EXTERN_METHOD(validateEvents
                   : (NSString *)kelString resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(brainWalletSecret
-                  : (NSString *)seed resolve
+RCT_EXTERN_METHOD(getIdFromEvent
+                  : (NSString *)event resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(brainWalletSign
-                  : (NSString *)seed message
-                  : (NSString *)message resolve
+RCT_EXTERN_METHOD(newWallet
+                  : (NSString *)id pass
+                  : (NSString *)pass resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(rlpItem
-                  : (NSString *)rlp position
-                  : (NSUInteger)position resolve
+RCT_EXTERN_METHOD(keriInceptWallet
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(keccak
+RCT_EXTERN_METHOD(changePass
+                  : (NSString *)ew id
+                  : (NSString *)id oldPass
+                  : (NSString *)oldPass newPass
+                  : (NSString *)newPass resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(changeId
+                  : (NSString *)ew id
+                  : (NSString *)id newId
+                  : (NSString *)newId pass
+                  : (NSString *)pass resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(newKey
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass type
+                  : (NSString *)type controller
+                  : (NSString *)controller resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(addContent
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass content
+                  : (NSString *)content resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setKeyController
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass keyRef
+                  : (NSString *)keyRef controller
+                  : (NSString *)controller resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getKey
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass keyRef
+                  : (NSString *)keyRef resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getKeyByController
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass controller
+                  : (NSString *)controller resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getKeys
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(sign
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass controller
+                  : (NSString *)controller data
                   : (NSString *)data resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(ethSign
-                  : (NSString *)data resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(blockiesIcon
-                  : (NSString *)seed resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(randomPhrase
-                  : (NSInteger *)wordsNumber resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(encryptData
-                  : (NSString *)data password
-                  : (NSString *)password resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(decryptData
-                  : (NSString *)data password
-                  : (NSString *)password resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(qrCode
-                  : (NSString *)data resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(qrCodeHex
-                  : (NSString *)data resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(substrateAddress
-                  : (NSString *)seed prefix
-                  : (NSUInteger *)prefix resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(substrateSign
-                  : (NSString *)seed message
-                  : (NSString *)message resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(blake2b
-                  : (NSString *)data resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(schnorrkelVerify
-                  : (NSString *)seed message
-                  : (NSString *)message signature
+RCT_EXTERN_METHOD(verify
+                  : (NSString *)key type
+                  : (NSString *)type data
+                  : (NSString *)data signature
                   : (NSString *)signature resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(decryptDataRef
-                  : (NSString *)data password
-                  : (NSString *)password resolve
+RCT_EXTERN_METHOD(encrypt
+                  : (NSString *)key type
+                  : (NSString *)type data
+                  : (NSString *)data aad
+                  : (NSString *)aad resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(destroyDataRef
-                  : (int64_t)dataRef resolve
+RCT_EXTERN_METHOD(decrypt
+                  : (NSString *)ew id
+                  : (NSString *)id pass
+                  : (NSString *)pass keyRef
+                  : (NSString *)keyRef data
+                  : (NSString *)data aad
+                  : (NSString *)aad resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(brainWalletSignWithRef
-                  : (int64_t)seedRef message
-                  : (NSString *)message resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(substrateSignWithRef
-                  : (int64_t)seedRef suri_suffix
-                  : (NSString *)suri_suffix message
-                  : (NSString *)message resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(substrateAddressWithRef
-                  : (int64_t)seedRef suri_suffix
-                  : (NSString *)suri_suffix prefix
-                  : (NSUInteger *)prefix resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(brainWalletAddressWithRef
-                  : (int64_t)seedRef resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(substrateSecret
-                  : (NSString *)suri resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(substrateSecretWithRef
-                  : (int64_t *)seedRef suri_suffix
-                  : (NSString *)suri_suffix resolve
+RCT_EXTERN_METHOD(getRandom
+                  : (NSUInteger *)len resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
 @end
