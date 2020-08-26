@@ -33,74 +33,51 @@ void signer_destroy_string(const char *cstring);
 // see /react-native/rust/keriox-wrapper/src/lib.rs:7
 const char *validate_events(struct ExternError *, const char *kel_str);
 
-// return keypair address from BIP39 phrase
-const char *ethkey_brainwallet_bip39_address(struct ExternError *,
-                                             const char *seed);
+const char *get_id_from_event(struct ExternError *, const char *event);
 
-// returns message signed with keypair
-const char *ethkey_brainwallet_sign(struct ExternError *, const char *seed,
-                                    const char *message);
+// returns a new encrypted walet
+const char *new_wallet(struct ExternError *, const char *id, const char *pass);
 
-// returns rlp item at given position
-const char *rlp_item(struct ExternError *, const char *rlp,
-                     const unsigned position);
+const char *keri_incept_wallet(struct ExternError *, const char *ew,
+                               const char *id, const char *pass);
 
-const char *keccak256(struct ExternError *, const char *data);
+const char *change_pass(struct ExternError *, const char *ew, const char *id,
+                        const char *old_pass, const char *new_pass);
 
-const char *blake(struct ExternError *, const char *data);
+const char *change_id(struct ExternError *, const char *ew, const char *id,
+                      const char *new_id, const char *pass);
 
-const char *eth_sign(struct ExternError *, const char *data);
+const char *new_key(struct ExternError *, const char *ew, const char *id,
+                    const char *pass, const char *type, const char *controller);
 
-const char *blockies_icon(struct ExternError *, const char *blockies_seed);
+const char *add_content(struct ExternError *, const char *ew, const char *id,
+                        const char *pass, const char *content);
 
-const char *random_phrase(struct ExternError *, int words_number);
+const char *set_key_controller(struct ExternError *, const char *ew,
+                               const char *id, const char *pass,
+                               const char *key_ref, const char *controller);
 
-const char *encrypt_data(struct ExternError *, const char *data,
-                         const char *password);
+const char *get_key(struct ExternError *, const char *ew, const char *id,
+                    const char *pass, const char *key_ref);
 
-const char *decrypt_data(struct ExternError *, const char *encrypted_data,
-                         const char *password);
+const char *get_key_by_controller(struct ExternError *, const char *ew,
+                                  const char *id, const char *pass,
+                                  const char *controller);
 
-// qr code generator for utf-8 strings
-const char *qrcode(struct ExternError *, const char *data);
+const char *get_keys(struct ExternError *, const char *ew, const char *id,
+                     const char *pass);
 
-// qr code generator for hex-encoded binary
-const char *qrcode_hex(struct ExternError *, const char *data);
+const char *sign(struct ExternError *, const char *ew, const char *id,
+                 const char *pass, const char *controller, const char *data);
 
-// ss58 address (including prefix) for sr25519 key generated out of BIP39 phrase
-const char *substrate_brainwallet_address(struct ExternError *,
-                                          const char *seed,
-                                          const unsigned prefix);
+const char *verify(struct ExternError *, const char *key, const char *type,
+                   const char *data, const char *signature);
 
-const char *substrate_brainwallet_sign(struct ExternError *err,
-                                       const char *seed, const char *data);
+const char *encrypt(struct ExternError *, const char *key, const char *type,
+                    const char *data, const char *aad);
 
-const char *schnorrkel_verify(struct ExternError *, const char *seed,
-                              const char *msg, const char *signature);
+const char *decrypt(struct ExternError *, const char *ew, const char *id,
+                    const char *pass, const char *key_ref, const char *data,
+                    const char *aad);
 
-int64_t decrypt_data_ref(struct ExternError *, const char *encrypted_data,
-                         const char *password);
-
-void destroy_data_ref(struct ExternError *, int64_t data_ref);
-
-const char *ethkey_brainwallet_sign_with_ref(struct ExternError *,
-                                             int64_t seed_ref,
-                                             const char *message);
-
-const char *substrate_brainwallet_sign_with_ref(struct ExternError *,
-                                                int64_t seed_ref,
-                                                const char *suri_suffix,
-                                                const char *data);
-
-const char *substrate_address_with_ref(struct ExternError *, int64_t seed_ref,
-                                       const char *suri_suffix,
-                                       const unsigned prefix);
-
-const char *brain_wallet_address_with_ref(struct ExternError *,
-                                          int64_t seed_ref);
-
-const char *substrate_mini_secret_key_with_ref(struct ExternError *,
-                                               int64_t seed_ref,
-                                               const char *suri_suffix);
-
-const char *substrate_mini_secret_key(struct ExternError *, const char *suri);
+const char *get_random(struct ExternError *, const unsigned len);
