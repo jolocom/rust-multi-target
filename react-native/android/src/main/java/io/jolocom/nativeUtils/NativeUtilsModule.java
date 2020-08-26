@@ -181,7 +181,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void encrypt(String key, String keyType, String data, String aad,
                       Promise promise) {
     try {
-      String result = encryptStr(key, keyType, data, aad ? aad : "");
+      String result = encryptStr(key, keyType, data, aad != null ? aad : "");
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "encrypting a message", e);
@@ -192,7 +192,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void decrypt(String ew, String id, String pass, String keyRef,
                       String data, String aad, Promise promise) {
     try {
-      String result = decryptStr(ew, id, pass, keyRef, data, aad ? aad : "");
+      String result = decryptStr(ew, id, pass, keyRef, data, aad != null ? aad : "");
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "decrypting a message", e);
