@@ -18,18 +18,20 @@ func handle_error<T, U>(
   }
 }
 
-@objc(SubstrateSign)
-class SubstrateSign: NSObject {
+@objc(JolocomCore)
+class JolocomCore: NSObject {
 
   public static func requiresMainQueueSetup() -> Bool {
     return true;
   }
 
-  @objc func brainWalletAddress(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+// validates a key event log,
+// see ./core.h:34
+  @objc func validateEvents(_ kelString: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { ethkey_brainwallet_address($0, seed) },
+      get_result: { validate_events($0, kelString) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         signer_destroy_string(res!)
