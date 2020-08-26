@@ -80,7 +80,7 @@ export! {
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_decryptStr
     fn decrypt(ew: String, id: String, pass: String, key_ref: String, data: String, aad: String) -> Result<String, String> {
-        wallet::decrypt(&ew, &id, &pass, &key_ref, &data, &aad)
+        wallet::decrypt_by_controller(&ew, &id, &pass, &key_ref, &data, &aad)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_getRandomStr
