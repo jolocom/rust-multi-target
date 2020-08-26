@@ -1,6 +1,5 @@
 use jolocom_native_utils::{get_id_from_event_str, validate_events_str, wallet};
 use neon::prelude::*;
-use neon::result::Throw;
 
 fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
@@ -49,10 +48,10 @@ fn new_key(mut cx: FunctionContext) -> JsResult<JsString> {
 
     let controller = match cx.argument_opt(4) {
         Some(optional_controller) => match optional_controller.downcast::<JsString>() {
-            Ok(controller) => Some(vec!(controller.value())),
-            Err(_) => None
+            Ok(controller) => Some(vec![controller.value()]),
+            Err(_) => None,
         },
-        None => None
+        None => None,
     };
 
     Ok(cx.string(wallet::new_key(&ew, &id, &pass, &key_type, controller).unwrap()))
@@ -119,10 +118,15 @@ fn encrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     let key = cx.argument::<JsString>(0)?.value();
     let key_type = cx.argument::<JsString>(1)?.value();
     let data = cx.argument::<JsString>(2)?.value();
-    let aad = match cx.argument::<JsString>(3) {
-        Ok(s) => s.value(),
-        Err(_) => "".to_string(),
+
+    let aad = match cx.argument_opt(5) {
+        Some(aad_arg) => match aad_arg.downcast::<JsString>() {
+            Ok(aad_str) => aad_str.value(),
+            Err(_) => "".to_string(),
+        },
+        None => "".to_string(),
     };
+
     Ok(cx.string(wallet::encrypt(&key, &key_type, &data, &aad).unwrap()))
 }
 
@@ -132,10 +136,15 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let controller = cx.argument::<JsString>(3)?.value();
     let data = cx.argument::<JsString>(4)?.value();
-    let aad = match cx.argument::<JsString>(5) {
-        Ok(s) => s.value(),
-        Err(_) => "".to_string(),
+
+    let aad = match cx.argument_opt(5) {
+        Some(aad_arg) => match aad_arg.downcast::<JsString>() {
+            Ok(aad_str) => aad_str.value(),
+            Err(_) => "".to_string(),
+        },
+        None => "".to_string(),
     };
+
     Ok(
         cx.string(
             wallet::decrypt_by_controller(&ew, &id, &pass, &controller, &data, &aad).unwrap(),
