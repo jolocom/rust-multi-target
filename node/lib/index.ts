@@ -131,13 +131,13 @@ export const walletUtils: EncryptedWalletUtils = {
         encryptedWallet: string,
         id: string,
         pass: string,
-        keyRef: string,
+        controller: string,
         data: string
     ): Promise<string> => await addon.sign(
         encryptedWallet,
         id,
         pass,
-        keyRef,
+        controller,
         data
     ),
 
@@ -145,14 +145,14 @@ export const walletUtils: EncryptedWalletUtils = {
         encryptedWallet: string,
         id: string,
         pass: string,
-        keyRef: string,
+        controller: string,
         data: string,
         aad?: string
     ): Promise<string> => await addon.decrypt(
         encryptedWallet,
         id,
         pass,
-        keyRef,
+        controller,
         data,
         aad
     )

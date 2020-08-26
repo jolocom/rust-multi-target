@@ -30,7 +30,7 @@ export! {
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_changeIdStr
     fn change_id(ew: String, id: String, new_id: String, pass: String) -> Result<String, String> {
-        wallet::change_pass(&ew, &id, &new_id, &pass)
+        wallet::change_id(&ew, &id, &new_id, &pass)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_newKeyStr
@@ -87,5 +87,6 @@ export! {
     fn get_random(len: u32) -> Result<String, String> {
         wallet::get_random_b64(len.try_into().unwrap())
     }
-
 }
+
+ffi_support::define_string_destructor!(jolo_destroy_string);
