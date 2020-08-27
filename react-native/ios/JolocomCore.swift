@@ -100,11 +100,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func newKey(_ ew: String, id: String, pass: String, keyType: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func newKey(_ ew: String, id: String, pass: String, type: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { new_key($0, ew, id, pass, keyType, controller) },
+      get_result: { new_key($0, ew, id, pass, type, controller) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -196,23 +196,19 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func verify(_ key: String, keyType: String, data: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func verify(_ key: String, type: String, data: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { jc_verify($0, key, keyType, data, signature) },
-      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
-        let val = String(cString: res!)
-        jolo_destroy_string(res!)
-        return val
-    })
+      get_result: { jc_verify($0, key, type, data, signature) },
+      success: { return $0 })
   }
 
-  @objc func encrypt(_ key: String, keyType: String, data: String, aad: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func encrypt(_ key: String, type: String, data: String, aad: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { jc_encrypt($0, key, keyType, data, aad) },
+      get_result: { jc_encrypt($0, key, type, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)

@@ -70,7 +70,7 @@ const char *get_keys(struct ExternError *, const char *ew, const char *id,
 const char *sign_by_controller(struct ExternError *, const char *ew, const char *id,
                  const char *pass, const char *controller, const char *data);
 
-const char *jc_verify(struct ExternError *, const char *key, const char *type,
+const bool jc_verify(struct ExternError *, const char *key, const char *type,
                    const char *data, const char *signature);
 
 const char *jc_encrypt(struct ExternError *, const char *key, const char *type,

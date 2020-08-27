@@ -114,8 +114,8 @@ RCT_EXTERN_METHOD(encrypt
 RCT_EXTERN_METHOD(decrypt
                   : (NSString *)ew id
                   : (NSString *)id pass
-                  : (NSString *)pass keyRef
-                  : (NSString *)keyRef data
+                  : (NSString *)pass controller
+                  : (NSString *)controller data
                   : (NSString *)data aad
                   : (NSString *)aad resolve
                   : (RCTPromiseResolveBlock)resolve reject
