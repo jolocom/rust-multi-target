@@ -4,8 +4,10 @@ This package contains Node and React Native bindings for
 [jolocom/wallet-rs](https://github.com/jolocom/wallet-rs) and
 [jolocom/keriox](https://github.com/jolocom/keriox)
 
-This is meant to be used through
-[jolocom/jolocom-lib](https://github.com/jolocom/jolocom-lib)
+This is intended to be used through
+[jolocom/vaulted-key-provider](https://github.com/jolocom/vaulted-key-provider)
+
+It was originally based on the amazing[React Native Substrate Sign](https://github.com/paritytech/react-native-substrate-sign), from Parity.
 
 ## Build and Develop
 
@@ -33,10 +35,10 @@ This is meant to be used through
 ### Develop
 After update the rust code, you need to change the following files for updating the interface to native android and ios code.
 
-- ios/signer.h
-- ios/SubstrateSign.m
-- ios/SubstrateSign.swift
-- android/src/main/java/com/reactlibrary/SubstrateSignModule.java
+- ios/core.h
+- ios/JolocomCore.m
+- ios/JolocomCore.swift
+- android/src/main/java/io/jolocom/JolocomCoreModule.java
 - index.js
 - index.d.ts
 
