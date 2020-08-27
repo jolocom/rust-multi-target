@@ -1,5 +1,3 @@
-use super::did_document::DIDDocument;
-use super::validate_events_str;
 use base64;
 use core::str::FromStr;
 use keri::{
@@ -52,10 +50,12 @@ pub fn new_wallet(id: &str, pass: &str) -> Result<String, String> {
     export_wallet(UnlockedWallet::new(&id), &pass)
 }
 
-pub fn incept_populated_wallet(signing_enc_keys: Vec<&str>, pre_rotated_keys: Vec<&str>, pass: &str) -> Result<String, String> {
+pub fn incept_populated_wallet(signing_enc_keys_str: &str, pre_rotated_keys: &str, pass: &str) -> Result<String, String> {
     let mut uw = UnlockedWallet::new("");
 
-    println!("{:?}", &base64::decode_config(signing_enc_keys[0], base64::URL_SAFE).unwrap().len());
+    let signing_enc_keys: Vec<&str> = serde_json::from_str(signing_enc_keys_str).map_err(|e| e.to_string())?;
+    let pre_rotated_keys: Vec<&str> = serde_json::from_str(pre_rotated_keys).map_err(|e| e.to_string())?;
+
     let sig_key_0 = KeyPair::new(
         KeyType::Ed25519VerificationKey2018, 
         &base64::decode_config(signing_enc_keys[0], base64::URL_SAFE).unwrap()
@@ -68,7 +68,7 @@ pub fn incept_populated_wallet(signing_enc_keys: Vec<&str>, pre_rotated_keys: Ve
 
     let enc_key_0 = KeyPair::new(
         KeyType::X25519KeyAgreementKey2019,
-        &base64::decode_config(pre_rotated_keys[0], base64::URL_SAFE).unwrap()
+        &base64::decode_config(signing_enc_keys[1], base64::URL_SAFE).unwrap()
     ).unwrap();
 
     let enc_key_1 = KeyPair::new(
@@ -600,7 +600,7 @@ fn test_sign() -> Result<(), String> {
 
 #[test]
 fn test_incept_from_keys() -> Result<(), String> {
-    let sign_enc_keys = vec![ "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==","qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg=="];
+    let sign_enc_keys = "[\"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==\",\"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==\"]";
     let pre_rot_sign_enc_keys = sign_enc_keys.clone();
     println!("{}", incept_populated_wallet(sign_enc_keys, pre_rot_sign_enc_keys, "secret").unwrap());
     Ok(())
