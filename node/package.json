@@ -1,6 +1,6 @@
 {
   "name": "@jolocom/native-core",
-  "version": "0.7.27",
+  "version": "1.0.0-rc0",
   "description": "jolocom/wallet-rs javascript bindings based on Neon",
   "main": "js/index.js",
   "files": [
