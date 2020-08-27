@@ -1,4 +1,4 @@
-package io.jolocom.nativeUtils;
+package io.jolocom.jolocomCore;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class NativeUtilsPackage implements ReactPackage {
+public class JolocomCorePackage implements ReactPackage {
   @Override
   public List<NativeModule>
   createNativeModules(ReactApplicationContext reactContext) {
-    return Arrays.<NativeModule>asList(new NativeUtilsModule(reactContext));
+    return Arrays.<NativeModule>asList(new JolocomCoreModule(reactContext));
   }
 
   @Override

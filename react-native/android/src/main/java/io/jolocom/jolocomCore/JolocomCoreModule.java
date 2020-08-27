@@ -1,17 +1,17 @@
-package io.jolocom.nativeUtils;
+package io.jolocom.jolocomCore;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
-public class NativeUtilsModule extends ReactContextBaseJavaModule {
+public class JolocomCoreModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
 
   static { System.loadLibrary("keriox_wrapper"); }
 
-  public NativeUtilsModule(ReactApplicationContext reactContext) {
+  public JolocomCoreModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
   }
@@ -24,7 +24,7 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
 
   @Override
   public String getName() {
-    return "NativeUtils";
+    return "JolocomCore";
   }
 
   @ReactMethod
@@ -70,20 +70,20 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void keriInceptWalletFromKeys(String liveKeys, String preRotatedKeys, String pass,
-                               Promise promise) {
+  public void keriInceptWalletFromKeys(String liveKeys, String preRotatedKeys,
+                                       String pass, Promise promise) {
     try {
-      String result = keriInceptWalletFromKeysStr(liveKeys, preRotatedKeys, pass);
+      String result =
+          keriInceptWalletFromKeysStr(liveKeys, preRotatedKeys, pass);
       promise.resolve(result);
     } catch (Exception e) {
-      rejectWithException(promise, "incepting a KERI identity from keys",
-                          e);
+      rejectWithException(promise, "incepting a KERI identity from keys", e);
     }
   }
 
   @ReactMethod
-  public void changePass(String ew, String id, String oldPass,
-                         String newPass, Promise promise) {
+  public void changePass(String ew, String id, String oldPass, String newPass,
+                         Promise promise) {
     try {
       String result = changePassStr(ew, id, oldPass, newPass);
       promise.resolve(result);
@@ -107,7 +107,8 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void newKey(String ew, String id, String pass, String keyType,
                      String controller, Promise promise) {
     try {
-      String result = newKeyStr(ew, id, pass, keyType, controller != null ? controller : "");
+      String result = newKeyStr(ew, id, pass, keyType,
+                                controller != null ? controller : "");
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "adding a new key pair to a wallet", e);
@@ -137,7 +138,8 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getKey(String ew, String id, String pass, String keyRef, Promise promise) {
+  public void getKey(String ew, String id, String pass, String keyRef,
+                     Promise promise) {
     try {
       String result = getKeyStr(ew, id, pass, keyRef);
       promise.resolve(result);
@@ -204,7 +206,8 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   public void decrypt(String ew, String id, String pass, String keyRef,
                       String data, String aad, Promise promise) {
     try {
-      String result = decryptStr(ew, id, pass, keyRef, data, aad != null ? aad : "");
+      String result =
+          decryptStr(ew, id, pass, keyRef, data, aad != null ? aad : "");
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "decrypting a message", e);
@@ -229,8 +232,8 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   private static native String validateEventsStr(String events);
   private static native String getIdFromEvent(String event);
   private static native String newWalletStr(String id, String pass);
-  private static native String keriInceptWalletFromKeysStr(String liveKeys, String preRotatedKeys,
-                                                   String pass);
+  private static native String keriInceptWalletFromKeysStr(
+      String liveKeys, String preRotatedKeys, String pass);
   private static native String keriInceptWalletStr(String ew, String id,
                                                    String pass);
   private static native String changePassStr(String ew, String id,
@@ -250,10 +253,12 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
                                                      String pass,
                                                      String controller);
   private static native String getKeysStr(String ew, String id, String pass);
-  private static native String signByControllerStr(String ew, String id, String pass,
-                                       String controller, String data);
+  private static native String signByControllerStr(String ew, String id,
+                                                   String pass,
+                                                   String controller,
+                                                   String data);
   private static native boolean verifyStr(String key, String keyType,
-                                         String data, String signature);
+                                          String data, String signature);
   private static native String encryptStr(String key, String keyType,
                                           String data, String aad);
   private static native String decryptStr(String ew, String id, String pass,
