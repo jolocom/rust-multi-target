@@ -23,6 +23,11 @@ export! {
         wallet::incept_wallet(&ew, &id, &pass)
     }
 
+    @Java_io_jolocom_nativeUtils_NativeUtilsModule_keriInceptWalletFromKeysStr
+    fn keri_incept_wallet(liveKeys: String, preRotatedKeys: String, pass: String) -> Result<String, String> {
+        wallet::incept_wallet(&liveKeys, &preRotatedKeys, &pass)
+    }
+
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_changePassStr
     fn change_pass(ew: String, id: String, old_pass: String, new_pass: String) -> Result<String, String> {
         wallet::change_pass(&ew, &id, &old_pass, &new_pass)
