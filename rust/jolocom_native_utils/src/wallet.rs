@@ -16,6 +16,7 @@ use keri::{
 use serde::{Deserialize, Serialize};
 use serde_json;
 use universal_wallet::{get_random, prelude::*};
+use crate::{DIDDocument, validate_events_str, did_document::KeyTypes};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -117,23 +118,22 @@ pub fn incept_populated_wallet(signing_enc_keys_str: &str, pre_rotated_keys: &st
     };
 
     uw.id = ["did:jun", &icp_event.prefix.to_str()].join(":");
-
-    let sig_0_controller = vec![[uw.id.clone(), base64::encode_config(&sig_key_0.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    let sig_0_controller = vec![[uw.id.clone(), sig_pref_0.to_str()].join("#").to_string()];
     let key_id = uw.import_content(&Content::KeyPair(
         sig_key_0.controller(sig_0_controller)
     )).unwrap().id;
 
-    let sig_1_controller = vec![[uw.id.clone(), base64::encode_config(&sig_key_1.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    let sig_1_controller = vec![[uw.id.clone(), sig_pref_1.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
         sig_key_1.controller(sig_1_controller)
     ));
 
-    let enc_key_0_controller = vec![[uw.id.clone(), base64::encode_config(&enc_key_0.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    let enc_key_0_controller = vec![[uw.id.clone(), enc_pref_0.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
             enc_key_0.controller(enc_key_0_controller)
     ));
 
-    let enc_key_1_controller = vec![[uw.id.clone(), base64::encode_config(&enc_key_1.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    let enc_key_1_controller = vec![[uw.id.clone(), enc_pref_1.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
         enc_key_1.controller(enc_key_1_controller)
     ));
@@ -529,14 +529,15 @@ fn test_incept() -> Result<(), String> {
 
     assert_eq!(uw.get_keys().len(), 4);
 
-    let kel_str =
-        serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+    let kel_str = serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
 
     let ddo_str = validate_events_str(&kel_str, "jun")?;
 
     let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| e.to_string())?;
 
     assert_eq!(ddo.verification_methods.len(), 2);
+    assert_eq!(ddo.verification_methods[0].key_type, KeyTypes::Ed25519VerificationKey2018);
+    assert_eq!(ddo.verification_methods[1].key_type, KeyTypes::X25519KeyAgreementKey2019);
 
     Ok(())
 }
@@ -600,8 +601,37 @@ fn test_sign() -> Result<(), String> {
 
 #[test]
 fn test_incept_from_keys() -> Result<(), String> {
-    let sign_enc_keys = "[\"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==\",\"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==\"]";
+    let pass = "secret";
+    let sign_enc_keys = "[\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\",\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\"]";
     let pre_rot_sign_enc_keys = sign_enc_keys.clone();
-    println!("{}", incept_populated_wallet(sign_enc_keys, pre_rot_sign_enc_keys, "secret").unwrap());
+    let res_str: WalletInceptionRep = serde_json::from_str(&incept_populated_wallet(sign_enc_keys, pre_rot_sign_enc_keys, pass)?)
+        .map_err(|e| e.to_string())?;
+
+    let wallet = LockedWallet::new(
+        &res_str.id,
+        base64::decode_config(res_str.encrypted_wallet, base64::URL_SAFE).unwrap()
+    );
+
+    let uw = wallet.unlock(pass.as_bytes()).unwrap();
+    let kel_str = serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+    let ddo_str = validate_events_str(&kel_str, "jun")?;
+    assert_eq!(ddo_str, "{\
+        \"@context\":\"https://www.w3.org/ns/did/v1\",\
+        \"id\":\"did:jun:Fz4uNHVr-hlx-NhYJm20j6ouhCn_unuK3oxeaJPmsuEfdL8EzPztuT4FEoKUXeKk9Vlq79ENu_g1LTiSIR2ymPA\",\
+        \"verificationMethod\":[\
+        {\
+            \"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\
+            \"type\":\"Ed25519VerificationKey2018\",\
+            \"controller\":\"did:jun:Fz4uNHVr-hlx-NhYJm20j6ouhCn_unuK3oxeaJPmsuEfdL8EzPztuT4FEoKUXeKk9Vlq79ENu_g1LTiSIR2ymPA\",\
+            \"publicKeyBase64\":\"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"\
+        },{\
+            \"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\
+            \"type\":\"X25519KeyAgreementKey2019\",\
+            \"controller\":\"did:jun:Fz4uNHVr-hlx-NhYJm20j6ouhCn_unuK3oxeaJPmsuEfdL8EzPztuT4FEoKUXeKk9Vlq79ENu_g1LTiSIR2ymPA\",\
+            \"publicKeyBase64\":\"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"\
+        }]\
+    }");
+
+    assert_eq!(uw.get_keys().len(), 4);
     Ok(())
 }
