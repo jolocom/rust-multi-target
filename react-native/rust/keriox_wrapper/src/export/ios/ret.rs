@@ -35,7 +35,7 @@ impl Return<'static> for String {
 }
 
 impl<Inner: Return<'static, Env = &'static mut ExternError> + Default> Return<'static>
-	for anyhow::Result<Inner>
+	for Result<Inner, String>
 {
 	type Ext = Inner::Ext;
 	type Env = Inner::Env;

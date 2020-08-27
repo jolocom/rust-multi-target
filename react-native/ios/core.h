@@ -67,17 +67,19 @@ const char *get_key_by_controller(struct ExternError *, const char *ew,
 const char *get_keys(struct ExternError *, const char *ew, const char *id,
                      const char *pass);
 
-const char *sign(struct ExternError *, const char *ew, const char *id,
+const char *jolo_sign(struct ExternError *, const char *ew, const char *id,
                  const char *pass, const char *controller, const char *data);
 
-const char *verify(struct ExternError *, const char *key, const char *type,
+const char *jolo_verify(struct ExternError *, const char *key, const char *type,
                    const char *data, const char *signature);
 
-const char *encrypt(struct ExternError *, const char *key, const char *type,
+const char *jolo_encrypt(struct ExternError *, const char *key, const char *type,
                     const char *data, const char *aad);
 
-const char *decrypt(struct ExternError *, const char *ew, const char *id,
+const char *jolo_decrypt(struct ExternError *, const char *ew, const char *id,
                     const char *pass, const char *key_ref, const char *data,
                     const char *aad);
 
 const char *get_random(struct ExternError *, const unsigned len);
+
+const void jolo_destroy_string(const char *);

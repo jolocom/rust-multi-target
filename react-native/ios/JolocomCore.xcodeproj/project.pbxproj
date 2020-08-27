@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6784635124ADE8D3000990D6 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6784635024ADE8D3000990D6 /* libsigner.a */; };
-		6784635424ADF355000990D6 /* libSubstrateSign.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 134814201AA4EA6300B7C361 /* libSubstrateSign.a */; };
-		67E5C7DF247AC14D00801670 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 67E5C7DE247AC14D00801670 /* libresolv.tbd */; };
+		6784635124ADE8D3000990D6 /* libkeriox_wrapper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6784635024ADE8D3000990D6 /* libkeriox_wrapper.a */; };
+		6784635424ADF355000990D6 /* libJolocomCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 134814201AA4EA6300B7C361 /* libJolocomCore.a */; };
+		797D874824F7DE3E0048D4FE /* JolocomCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797D874424F7DE3E0048D4FE /* JolocomCore.swift */; };
+		797D874924F7DE3E0048D4FE /* JolocomCore.m in Sources */ = {isa = PBXBuildFile; fileRef = 797D874724F7DE3E0048D4FE /* JolocomCore.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,9 +26,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		134814201AA4EA6300B7C361 /* libSubstrateSign.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSubstrateSign.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		6784635024ADE8D3000990D6 /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
-		67E5C7DE247AC14D00801670 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/lib/libresolv.tbd; sourceTree = DEVELOPER_DIR; };
+		134814201AA4EA6300B7C361 /* libJolocomCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libJolocomCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6784635024ADE8D3000990D6 /* libkeriox_wrapper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libkeriox_wrapper.a; sourceTree = "<group>"; };
+		797D874224F7DE3E0048D4FE /* JolocomCore.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JolocomCore.podspec; sourceTree = "<group>"; };
+		797D874324F7DE3E0048D4FE /* JolocomCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JolocomCore.h; sourceTree = "<group>"; };
+		797D874424F7DE3E0048D4FE /* JolocomCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JolocomCore.swift; sourceTree = "<group>"; };
+		797D874524F7DE3E0048D4FE /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
+		797D874624F7DE3E0048D4FE /* JolocomCore-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "JolocomCore-Bridging-Header.h"; sourceTree = "<group>"; };
+		797D874724F7DE3E0048D4FE /* JolocomCore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JolocomCore.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,9 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6784635124ADE8D3000990D6 /* libsigner.a in Frameworks */,
-				67E5C7DF247AC14D00801670 /* libresolv.tbd in Frameworks */,
-				6784635424ADF355000990D6 /* libSubstrateSign.a in Frameworks */,
+				6784635124ADE8D3000990D6 /* libkeriox_wrapper.a in Frameworks */,
+				6784635424ADF355000990D6 /* libJolocomCore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +52,7 @@
 		134814211AA4EA7D00B7C361 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				134814201AA4EA6300B7C361 /* libSubstrateSign.a */,
+				134814201AA4EA6300B7C361 /* libJolocomCore.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,6 +60,12 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				797D874524F7DE3E0048D4FE /* core.h */,
+				797D874624F7DE3E0048D4FE /* JolocomCore-Bridging-Header.h */,
+				797D874324F7DE3E0048D4FE /* JolocomCore.h */,
+				797D874724F7DE3E0048D4FE /* JolocomCore.m */,
+				797D874224F7DE3E0048D4FE /* JolocomCore.podspec */,
+				797D874424F7DE3E0048D4FE /* JolocomCore.swift */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				675298932476D5BE00387331 /* Frameworks */,
 			);
@@ -63,8 +74,7 @@
 		675298932476D5BE00387331 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6784635024ADE8D3000990D6 /* libsigner.a */,
-				67E5C7DE247AC14D00801670 /* libresolv.tbd */,
+				6784635024ADE8D3000990D6 /* libkeriox_wrapper.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -72,9 +82,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		58B511DA1A9E6C8500147676 /* SubstrateSign */ = {
+		58B511DA1A9E6C8500147676 /* JolocomCore */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "SubstrateSign" */;
+			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "JolocomCore" */;
 			buildPhases = (
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
@@ -84,9 +94,9 @@
 			);
 			dependencies = (
 			);
-			name = SubstrateSign;
+			name = JolocomCore;
 			productName = RCTDataManager;
-			productReference = 134814201AA4EA6300B7C361 /* libSubstrateSign.a */;
+			productReference = 134814201AA4EA6300B7C361 /* libJolocomCore.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +105,7 @@
 		58B511D31A9E6C8500147676 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
@@ -104,7 +114,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "SubstrateSign" */;
+			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "JolocomCore" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -117,7 +127,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				58B511DA1A9E6C8500147676 /* SubstrateSign */,
+				58B511DA1A9E6C8500147676 /* JolocomCore */,
 			);
 		};
 /* End PBXProject section */
@@ -127,6 +137,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				797D874924F7DE3E0048D4FE /* JolocomCore.m in Sources */,
+				797D874824F7DE3E0048D4FE /* JolocomCore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,8 +201,9 @@
 					"$(PROJECT_DIR)",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
 			};
 			name = Debug;
@@ -245,6 +258,8 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
 			};
@@ -269,9 +284,9 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = SubstrateSign;
+				PRODUCT_NAME = JolocomCore;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "SubstrateSign-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "JolocomCore-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -296,9 +311,9 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = SubstrateSign;
+				PRODUCT_NAME = JolocomCore;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "SubstrateSign-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "JolocomCore-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -306,7 +321,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "SubstrateSign" */ = {
+		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "JolocomCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511ED1A9E6C8500147676 /* Debug */,
@@ -315,7 +330,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "SubstrateSign" */ = {
+		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "JolocomCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,

@@ -27,7 +27,7 @@ class JolocomCore: NSObject {
 
 // validates a key event log,
 // see ./core.h:34
-  @objc func validateEvents(_ kelString: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func validateEvents(_ kelString: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -39,7 +39,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func keriInceptWallet(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func keriInceptWallet(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -49,8 +49,9 @@ class JolocomCore: NSObject {
         jolo_destroy_string(res!)
         return val
     })
+  }
 
-  @objc func getIdFromEvent(_ event: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func getIdFromEvent(_ event: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -62,7 +63,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func newWallet(_ id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func newWallet(_ id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -74,7 +75,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func changePass(_ ew: String, id: String, oldPass: String, newPass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func changePass(_ ew: String, id: String, oldPass: String, newPass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -87,11 +88,11 @@ class JolocomCore: NSObject {
   }
 
 
-  @objc func changeId(_ ew: String, id: String, newId: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func changeId(_ ew: String, id: String, newId: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { change_id($0, ew, id, new_id, pass) },
+      get_result: { change_id($0, ew, id, newId, pass) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -99,7 +100,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func newKey(_ ew: String, id: String, pass: String, keyType: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func newKey(_ ew: String, id: String, pass: String, keyType: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -111,7 +112,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func addContent(_ ew: String, id: String, pass: String, content: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func addContent(_ ew: String, id: String, pass: String, content: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -123,7 +124,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func getKey(_ ew: String, id: String, pass: String, keyRef: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func getKey(_ ew: String, id: String, pass: String, keyRef: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -135,7 +136,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func getKeyByController(_ ew: String, id: String, pass: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func getKeyByController(_ ew: String, id: String, pass: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -147,11 +148,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func setKeyByController(_ ew: String, id: String, pass: String, keyRef: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func setKeyController(_ ew: String, id: String, pass: String, keyRef: String, controller: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { set_key_by_controller($0, ew, id, pass, keyRef, controller) },
+      get_result: { set_key_controller($0, ew, id, pass, keyRef, controller) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -159,7 +160,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func getKeys(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func getKeys(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -171,11 +172,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func sign(_ ew: String, id: String, pass: String, controller: string, data: string, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func sign(_ ew: String, id: String, pass: String, controller: String, data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { sign($0, ew, id, pass, controller, data) },
+      get_result: { jolo_sign($0, ew, id, pass, controller, data) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -183,11 +184,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func decrypt(_ ew: String, id: String, pass: String, controller: string, data: string, aad: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func decrypt(_ ew: String, id: String, pass: String, controller: String, data: String, aad: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { decrypt($0, ew, id, pass, controller, data, aad) },
+      get_result: { jolo_decrypt($0, ew, id, pass, controller, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -195,11 +196,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func verify(_ key: String, keyType: String, data: String, signature: string, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func verify(_ key: String, keyType: String, data: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { verify($0, key, keyType, data, signature) },
+      get_result: { jolo_verify($0, key, keyType, data, signature) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -207,11 +208,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func encrypt(_ key: String, keyType: String, data: String, aad: string, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func encrypt(_ key: String, keyType: String, data: String, aad: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { encrypt($0, key, keyType, data, aad) },
+      get_result: { jolo_encrypt($0, key, keyType, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -219,7 +220,7 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func getRandom(_ len: NSUInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> String {
+  @objc func getRandom(_ len: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
