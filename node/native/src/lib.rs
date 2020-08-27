@@ -24,6 +24,14 @@ fn keri_incept_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(wallet::incept_wallet(&ew, &id, &pass).unwrap()))
 }
 
+fn keri_incept_wallet_from_keys(mut cx: FunctionContext) -> JsResult<JsString> {
+    let keys_0 = cx.argument::<JsString>(0)?.value();
+    let keys_1 = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+
+    Ok(cx.string(wallet::incept_populated_wallet(&keys_0, &keys_1, &pass).unwrap()))
+}
+
 fn change_pass(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
@@ -161,6 +169,7 @@ register_module!(mut cx, {
     cx.export_function("validateEvents", validate_events)?;
     cx.export_function("getIdFromEvent", get_id_from_event)?;
     cx.export_function("newWallet", new_wallet)?;
+    cx.export_function("keriInceptWalletFromKeys", keri_incept_wallet_from_keys)?;
     cx.export_function("keriInceptWallet", keri_incept_wallet)?;
     cx.export_function("changePass", change_pass)?;
     cx.export_function("changeId", change_id)?;

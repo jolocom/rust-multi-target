@@ -58,17 +58,17 @@ fn pref_to_vm(
 
 #[derive(Serialize, Deserialize)]
 pub struct VerificationMethod {
-    id: String,
+    pub id: String,
 
     #[serde(rename = "type")]
-    key_type: KeyTypes,
-    controller: String,
+    pub key_type: KeyTypes,
+    pub controller: String,
 
     #[serde(flatten)]
-    key: VerificationMethodProperties,
+    pub key: VerificationMethodProperties,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum KeyTypes {
     JwsVerificationKey2020,
     EcdsaSecp256k1VerificationKey2019,

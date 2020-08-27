@@ -5,6 +5,20 @@ export const validateEvents = async (
     events: string
 ): Promise<string> => await addon.validateEvents(events);
 
+export const getIcpFromKeySet = async (config: {
+    live_keys: string,
+    pre_rotated_keys: string,
+    password: string
+}): Promise<{
+    id: string,
+    encryptedWallet: string,
+    inceptionEvent: string
+}> => JSON.parse(await addon.keriInceptWalletFromKeys(
+  config.live_keys,
+  config.pre_rotated_keys,
+  config.password
+));
+
 export const getIcp = async (config: {
     encryptedWallet: string,
     id: string,

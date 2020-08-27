@@ -70,6 +70,18 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void keriInceptWalletFromKeys(String liveKeys, String preRotatedKeys, String pass,
+                               Promise promise) {
+    try {
+      String result = keriInceptWalletFromKeysStr(liveKeys, preRotatedKeys, pass);
+      promise.resolve(result);
+    } catch (Exception e) {
+      rejectWithException(promise, "incepting a KERI identity from keys",
+                          e);
+    }
+  }
+
+  @ReactMethod
   public void changePass(String ew, String id, String oldPass,
                          String newPass, Promise promise) {
     try {
@@ -217,6 +229,8 @@ public class NativeUtilsModule extends ReactContextBaseJavaModule {
   private static native String validateEventsStr(String events);
   private static native String getIdFromEvent(String event);
   private static native String newWalletStr(String id, String pass);
+  private static native String keriInceptWalletFromKeysStr(String liveKeys, String preRotatedKeys,
+                                                   String pass);
   private static native String keriInceptWalletStr(String ew, String id,
                                                    String pass);
   private static native String changePassStr(String ew, String id,
