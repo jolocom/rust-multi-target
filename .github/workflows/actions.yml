@@ -39,7 +39,7 @@ jobs:
         run:            pwsh scripts/actions/install-sccache.ps1 ${{ runner.os}}
       - name:           Rust Unit Test
         run:            |
-          cd ./rust/signer
+          cd ./rust/jolocom_native_utils
           cargo test
       - name:           Stop sccache
         if:             always()
