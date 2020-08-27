@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set base dir to the rust-multi-target top level
+BASE_DIR=$(realpath $(dirname "$0")/..)
+
 # Change this name to the rust library name
 LIB_NAME=keriox_wrapper
 API_LEVEL=29
@@ -9,7 +12,7 @@ NDK_HOME=/opt/android-sdk/ndk/21.3.6528147
 ANDROID_ARCHS=(aarch64-linux-android armv7-linux-androideabi i686-linux-android)
 ANDROID_FOLDER=(arm64-v8a armeabi-v7a x86)
 ANDROID_BIN_PREFIX=(aarch64-linux-android armv7a-linux-androideabi i686-linux-android)
-IOS_ARCHS=(aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios)
+IOS_ARCHS=(aarch64-apple-ios x86_64-apple-ios) # armv7-apple-ios armv7s-apple-ios)
 OS_ARCH=$(uname | tr '[:upper:]' '[:lower:]')
 
 ANDROID_PREBUILD_BIN=${NDK_HOME}/toolchains/llvm/prebuilt/${OS_ARCH}-x86_64/bin

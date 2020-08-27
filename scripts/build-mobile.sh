@@ -1,8 +1,9 @@
 #!/bin/bash
 
+set -ex
 source ./variables.sh
 
-cd ../react-native/rust/keriox_wrapper/
+cd $BASE_DIR/react-native/rust/keriox_wrapper/
 
 # Build android
 
@@ -32,21 +33,25 @@ AR_i686_linux_android="${ANDROID_PREBUILD_BIN}/i686-linux-android-ar" \
   cargo  build --target i686-linux-android --release
 
 
-
 for i in "${!ANDROID_ARCHS[@]}";
   do
     mkdir -p -v "../../android/src/main/jniLibs/${ANDROID_FOLDER[$i]}"
     cp "./target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
 done
 
-# printf "Building iOS targets...";
 
-# for i in "${IOS_ARCHS[@]}";
-#   do
-#     rustup target add "$i";
-#     cargo build --target "$i" --release --no-default-features
-# done
+if [ "$(uname | tr '[:upper:]' '[:lower:]')" == "darwin" ]; then
+  printf "Building iOS targets...";
 
-# lipo -create -output "../react-native/ios/lib${LIB_NAME}.a" target/x86_64-apple-ios/release/libsigner.a target/armv7-apple-ios/release/libsigner.a target/armv7s-apple-ios/release/libsigner.a target/aarch64-apple-ios/release/libsigner.a
+  for i in "${IOS_ARCHS[@]}";
+    do
+      cargo build --target "$i" --release --no-default-features
+  done
+
+  LIPO_LIBS=$(for T in ${IOS_ARCHS[@]}; do echo target/${T}/release/lib${LIB_NAME}.a; done)
+  lipo -create -output "$BASE_DIR/react-native/ios/lib${LIB_NAME}.a" $LIPO_LIBS
+else
+  printf "skipping iOS target, please use a Mac for those"
+fi
 
 printf "Build Complete"
