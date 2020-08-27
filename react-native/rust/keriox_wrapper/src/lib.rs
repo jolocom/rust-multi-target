@@ -64,22 +64,22 @@ export! {
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_signByControllerStr
-    fn sign(ew: String, id: String, pass: String, controller: String, data: String) -> Result<String, String> {
+    fn sign_by_controller(ew: String, id: String, pass: String, controller: String, data: String) -> Result<String, String> {
         wallet::sign_by_controller(&ew, &id, &pass, &controller, &data)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_verifyStr
-    fn verify(key: String, key_type: String, data: String, signature: String) -> Result<bool, String> {
+    fn jc_verify(key: String, key_type: String, data: String, signature: String) -> Result<bool, String> {
         wallet::verify(&key, &key_type, &data, &signature)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_encryptStr
-    fn encrypt(key: String, key_type: String, data: String, aad: String) -> Result<String, String> {
+    fn jc_encrypt(key: String, key_type: String, data: String, aad: String) -> Result<String, String> {
         wallet::encrypt(&key, &key_type, &data, &aad)
     }
 
     @Java_io_jolocom_nativeUtils_NativeUtilsModule_decryptStr
-    fn decrypt(ew: String, id: String, pass: String, key_ref: String, data: String, aad: String) -> Result<String, String> {
+    fn jc_decrypt(ew: String, id: String, pass: String, key_ref: String, data: String, aad: String) -> Result<String, String> {
         wallet::decrypt_by_controller(&ew, &id, &pass, &key_ref, &data, &aad)
     }
 

@@ -176,7 +176,7 @@ class JolocomCore: NSObject {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { jolo_sign($0, ew, id, pass, controller, data) },
+      get_result: { sign_by_controller($0, ew, id, pass, controller, data) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -188,7 +188,7 @@ class JolocomCore: NSObject {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { jolo_decrypt($0, ew, id, pass, controller, data, aad) },
+      get_result: { jc_decrypt($0, ew, id, pass, controller, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -200,7 +200,7 @@ class JolocomCore: NSObject {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { jolo_verify($0, key, keyType, data, signature) },
+      get_result: { jc_verify($0, key, keyType, data, signature) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -212,7 +212,7 @@ class JolocomCore: NSObject {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { jolo_encrypt($0, key, keyType, data, aad) },
+      get_result: { jc_encrypt($0, key, keyType, data, aad) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
