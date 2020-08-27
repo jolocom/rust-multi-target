@@ -52,6 +52,116 @@ pub fn new_wallet(id: &str, pass: &str) -> Result<String, String> {
     export_wallet(UnlockedWallet::new(&id), &pass)
 }
 
+pub fn incept_populated_wallet(signing_enc_keys: Vec<&str>, pre_rotated_keys: Vec<&str>, pass: &str) -> Result<String, String> {
+    let mut uw = UnlockedWallet::new("");
+
+    println!("{:?}", &base64::decode_config(signing_enc_keys[0], base64::URL_SAFE).unwrap().len());
+    let sig_key_0 = KeyPair::new(
+        KeyType::Ed25519VerificationKey2018, 
+        &base64::decode_config(signing_enc_keys[0], base64::URL_SAFE).unwrap()
+    ).unwrap();
+
+    let sig_key_1 = KeyPair::new(
+        KeyType::Ed25519VerificationKey2018, 
+        &base64::decode_config(pre_rotated_keys[0], base64::URL_SAFE).unwrap()
+    ).unwrap();
+
+    let enc_key_0 = KeyPair::new(
+        KeyType::X25519KeyAgreementKey2019,
+        &base64::decode_config(pre_rotated_keys[0], base64::URL_SAFE).unwrap()
+    ).unwrap();
+
+    let enc_key_1 = KeyPair::new(
+        KeyType::X25519KeyAgreementKey2019,
+        &base64::decode_config(pre_rotated_keys[1], base64::URL_SAFE).unwrap()
+    ).unwrap();
+
+    let sig_pref_0 = BasicPrefix::Ed25519(sig_key_0.public_key.public_key.clone());
+    let sig_pref_1 = BasicPrefix::Ed25519(sig_key_1.public_key.public_key.clone());
+    let enc_pref_0 = BasicPrefix::X25519(enc_key_0.public_key.public_key.clone());
+    let enc_pref_1 = BasicPrefix::X25519(enc_key_1.public_key.public_key.clone());
+
+    let nexter_pref = SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+        [sig_pref_1.to_str(), enc_pref_1.to_str()]
+            .join("")
+            .as_bytes(),
+    ));
+
+    let icp_data = Event {
+        prefix: IdentifierPrefix::default(),
+        sn: 0,
+        event_data: EventData::Icp(InceptionEvent {
+            key_config: KeyConfig {
+                threshold: 1,
+                public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
+                threshold_key_digest: nexter_pref,
+            },
+            witness_config: InceptionWitnessConfig::default(),
+            inception_configuration: vec![],
+        }),
+    };
+
+
+    let pref =
+        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+            icp_data
+                .extract_serialized_data_set()
+                .map_err(|_| "failed to extract data set".to_string())?
+                .as_bytes(),
+        )));
+
+
+    let icp_event = Event {
+        prefix: pref,
+        ..icp_data
+    };
+
+    uw.id = ["did:jun", &icp_event.prefix.to_str()].join(":");
+
+    let sig_0_controller = vec![[uw.id.clone(), base64::encode_config(&sig_key_0.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    let key_id = uw.import_content(&Content::KeyPair(
+        sig_key_0.controller(sig_0_controller)
+    )).unwrap().id;
+
+    let sig_1_controller = vec![[uw.id.clone(), base64::encode_config(&sig_key_1.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    uw.import_content(&Content::KeyPair(
+        sig_key_1.controller(sig_1_controller)
+    ));
+
+    let enc_key_0_controller = vec![[uw.id.clone(), base64::encode_config(&enc_key_0.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    uw.import_content(&Content::KeyPair(
+            enc_key_0.controller(enc_key_0_controller)
+    ));
+
+    let enc_key_1_controller = vec![[uw.id.clone(), base64::encode_config(&enc_key_1.public_key.public_key, base64::URL_SAFE)].join("#").to_string()];
+    uw.import_content(&Content::KeyPair(
+        enc_key_1.controller(enc_key_1_controller)
+    ));
+
+    let sed = icp_event
+        .extract_serialized_data_set()
+        .map_err(|_| "failed to extract data set".to_string())?;
+
+    let sig = uw.sign_raw(&key_id, sed.as_bytes())?;
+
+    let sig_pref = AttachedSignaturePrefix {
+        index: 0,
+        sig: SelfSigningPrefix::Ed25519Sha512(sig),
+    };
+
+    let signed_event = icp_event
+        .sign(vec![sig_pref])
+        .map_err(|_| "failed to sign".to_string())?;
+
+    serde_json::to_string(&WalletInceptionRep {
+        id: uw.id.clone(),
+        encrypted_wallet: export_wallet(uw, pass)?,
+        inception_event: serialize_signed_message_json(&signed_event)
+            .map_err(|_| "failed to serialize".to_string())?,
+    })
+    .map_err(|e| e.to_string())
+}
+
 pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<String, String> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
@@ -485,5 +595,13 @@ fn test_sign() -> Result<(), String> {
     assert!(verify(key, kt, &message, sig)?);
     assert!(!verify(key, kt, &message, wrong_sig)?);
 
+    Ok(())
+}
+
+#[test]
+fn test_incept_from_keys() -> Result<(), String> {
+    let sign_enc_keys = vec![ "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==","qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg=="];
+    let pre_rot_sign_enc_keys = sign_enc_keys.clone();
+    println!("{}", incept_populated_wallet(sign_enc_keys, pre_rot_sign_enc_keys, "secret").unwrap());
     Ok(())
 }
