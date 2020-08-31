@@ -1,3 +1,4 @@
+use crate::{did_document::KeyTypes, validate_events_str, DIDDocument};
 use base64;
 use core::str::FromStr;
 use keri::{
@@ -7,7 +8,7 @@ use keri::{
         sections::{InceptionWitnessConfig, KeyConfig},
         Event,
     },
-    event_message::serialize_signed_message_json,
+    event_message::{serialization_info::SerializationFormats, serialize_signed_message_json},
     prefix::{
         AttachedSignaturePrefix, BasicPrefix, IdentifierPrefix, Prefix, SelfAddressingPrefix,
         SelfSigningPrefix,
@@ -16,7 +17,6 @@ use keri::{
 use serde::{Deserialize, Serialize};
 use serde_json;
 use universal_wallet::{get_random, prelude::*};
-use crate::{DIDDocument, validate_events_str, did_document::KeyTypes};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -51,31 +51,41 @@ pub fn new_wallet(id: &str, pass: &str) -> Result<String, String> {
     export_wallet(UnlockedWallet::new(&id), &pass)
 }
 
-pub fn incept_populated_wallet(signing_enc_keys_str: &str, pre_rotated_keys: &str, pass: &str) -> Result<String, String> {
+pub fn incept_populated_wallet(
+    signing_enc_keys_str: &str,
+    pre_rotated_keys: &str,
+    pass: &str,
+) -> Result<String, String> {
     let mut uw = UnlockedWallet::new("");
 
-    let signing_enc_keys: Vec<&str> = serde_json::from_str(signing_enc_keys_str).map_err(|e| e.to_string())?;
-    let pre_rotated_keys: Vec<&str> = serde_json::from_str(pre_rotated_keys).map_err(|e| e.to_string())?;
+    let signing_enc_keys: Vec<&str> =
+        serde_json::from_str(signing_enc_keys_str).map_err(|e| e.to_string())?;
+    let pre_rotated_keys: Vec<&str> =
+        serde_json::from_str(pre_rotated_keys).map_err(|e| e.to_string())?;
 
     let sig_key_0 = KeyPair::new(
-        KeyType::Ed25519VerificationKey2018, 
-        &base64::decode_config(signing_enc_keys[0], base64::URL_SAFE).unwrap()
-    ).unwrap();
+        KeyType::Ed25519VerificationKey2018,
+        &base64::decode_config(signing_enc_keys[0], base64::URL_SAFE).unwrap(),
+    )
+    .unwrap();
 
     let sig_key_1 = KeyPair::new(
-        KeyType::Ed25519VerificationKey2018, 
-        &base64::decode_config(pre_rotated_keys[0], base64::URL_SAFE).unwrap()
-    ).unwrap();
+        KeyType::Ed25519VerificationKey2018,
+        &base64::decode_config(pre_rotated_keys[0], base64::URL_SAFE).unwrap(),
+    )
+    .unwrap();
 
     let enc_key_0 = KeyPair::new(
         KeyType::X25519KeyAgreementKey2019,
-        &base64::decode_config(signing_enc_keys[1], base64::URL_SAFE).unwrap()
-    ).unwrap();
+        &base64::decode_config(signing_enc_keys[1], base64::URL_SAFE).unwrap(),
+    )
+    .unwrap();
 
     let enc_key_1 = KeyPair::new(
         KeyType::X25519KeyAgreementKey2019,
-        &base64::decode_config(pre_rotated_keys[1], base64::URL_SAFE).unwrap()
-    ).unwrap();
+        &base64::decode_config(pre_rotated_keys[1], base64::URL_SAFE).unwrap(),
+    )
+    .unwrap();
 
     let sig_pref_0 = BasicPrefix::Ed25519(sig_key_0.public_key.public_key.clone());
     let sig_pref_1 = BasicPrefix::Ed25519(sig_key_1.public_key.public_key.clone());
@@ -100,8 +110,9 @@ pub fn incept_populated_wallet(signing_enc_keys_str: &str, pre_rotated_keys: &st
             witness_config: InceptionWitnessConfig::default(),
             inception_configuration: vec![],
         }),
-    };
-
+    }
+    .to_message(&SerializationFormats::JSON)
+    .map_err(|_| "failed to create inception message".to_string())?;
 
     let pref =
         IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
@@ -111,31 +122,31 @@ pub fn incept_populated_wallet(signing_enc_keys_str: &str, pre_rotated_keys: &st
                 .as_bytes(),
         )));
 
-
     let icp_event = Event {
         prefix: pref,
-        ..icp_data
-    };
+        ..icp_data.event
+    }
+    .to_message(&SerializationFormats::JSON)
+    .map_err(|_| "failed to create inception message".to_string())?;
 
-    uw.id = ["did:jun", &icp_event.prefix.to_str()].join(":");
+    uw.id = ["did:jun", &icp_event.event.prefix.to_str()].join(":");
     let sig_0_controller = vec![[uw.id.clone(), sig_pref_0.to_str()].join("#").to_string()];
-    let key_id = uw.import_content(&Content::KeyPair(
-        sig_key_0.controller(sig_0_controller)
-    )).unwrap().id;
+    let key_id = uw
+        .import_content(&Content::KeyPair(sig_key_0.controller(sig_0_controller)))
+        .unwrap()
+        .id;
 
     let sig_1_controller = vec![[uw.id.clone(), sig_pref_1.to_str()].join("#").to_string()];
-    uw.import_content(&Content::KeyPair(
-        sig_key_1.controller(sig_1_controller)
-    ));
+    uw.import_content(&Content::KeyPair(sig_key_1.controller(sig_1_controller)));
 
     let enc_key_0_controller = vec![[uw.id.clone(), enc_pref_0.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
-            enc_key_0.controller(enc_key_0_controller)
+        enc_key_0.controller(enc_key_0_controller),
     ));
 
     let enc_key_1_controller = vec![[uw.id.clone(), enc_pref_1.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
-        enc_key_1.controller(enc_key_1_controller)
+        enc_key_1.controller(enc_key_1_controller),
     ));
 
     let sed = icp_event
@@ -149,9 +160,7 @@ pub fn incept_populated_wallet(signing_enc_keys_str: &str, pre_rotated_keys: &st
         sig: SelfSigningPrefix::Ed25519Sha512(sig),
     };
 
-    let signed_event = icp_event
-        .sign(vec![sig_pref])
-        .map_err(|_| "failed to sign".to_string())?;
+    let signed_event = icp_event.sign(vec![sig_pref]);
 
     serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
@@ -207,7 +216,9 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
             witness_config: InceptionWitnessConfig::default(),
             inception_configuration: vec![],
         }),
-    };
+    }
+    .to_message(&SerializationFormats::JSON)
+    .map_err(|_| "failed to create inception message".to_string())?;
 
     let pref =
         IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
@@ -219,10 +230,12 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
 
     let icp_event = Event {
         prefix: pref,
-        ..icp_data
-    };
+        ..icp_data.event
+    }
+    .to_message(&SerializationFormats::JSON)
+    .map_err(|_| "failed to create inception message".to_string())?;
 
-    uw.id = ["did:jun", &icp_event.prefix.to_str()].join(":");
+    uw.id = ["did:jun", &icp_event.event.prefix.to_str()].join(":");
     uw.set_key_controller(
         &sig_key_0.id,
         &[uw.id.clone(), sig_pref_0.to_str()].join("#"),
@@ -243,9 +256,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
         sig: SelfSigningPrefix::Ed25519Sha512(sig),
     };
 
-    let signed_event = icp_event
-        .sign(vec![sig_pref])
-        .map_err(|_| "failed to sign".to_string())?;
+    let signed_event = icp_event.sign(vec![sig_pref]);
 
     serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
@@ -529,15 +540,22 @@ fn test_incept() -> Result<(), String> {
 
     assert_eq!(uw.get_keys().len(), 4);
 
-    let kel_str = serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+    let kel_str =
+        serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
 
     let ddo_str = validate_events_str(&kel_str, "jun")?;
 
     let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| e.to_string())?;
 
     assert_eq!(ddo.verification_methods.len(), 2);
-    assert_eq!(ddo.verification_methods[0].key_type, KeyTypes::Ed25519VerificationKey2018);
-    assert_eq!(ddo.verification_methods[1].key_type, KeyTypes::X25519KeyAgreementKey2019);
+    assert_eq!(
+        ddo.verification_methods[0].key_type,
+        KeyTypes::Ed25519VerificationKey2018
+    );
+    assert_eq!(
+        ddo.verification_methods[1].key_type,
+        KeyTypes::X25519KeyAgreementKey2019
+    );
 
     Ok(())
 }
@@ -604,16 +622,21 @@ fn test_incept_from_keys() -> Result<(), String> {
     let pass = "secret";
     let sign_enc_keys = "[\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\",\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\"]";
     let pre_rot_sign_enc_keys = sign_enc_keys.clone();
-    let res_str: WalletInceptionRep = serde_json::from_str(&incept_populated_wallet(sign_enc_keys, pre_rot_sign_enc_keys, pass)?)
-        .map_err(|e| e.to_string())?;
+    let res_str: WalletInceptionRep = serde_json::from_str(&incept_populated_wallet(
+        sign_enc_keys,
+        pre_rot_sign_enc_keys,
+        pass,
+    )?)
+    .map_err(|e| e.to_string())?;
 
     let wallet = LockedWallet::new(
         &res_str.id,
-        base64::decode_config(res_str.encrypted_wallet, base64::URL_SAFE).unwrap()
+        base64::decode_config(res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
     );
 
     let uw = wallet.unlock(pass.as_bytes()).unwrap();
-    let kel_str = serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+    let kel_str =
+        serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
     let ddo_str = validate_events_str(&kel_str, "jun")?;
     assert_eq!(ddo_str, "{\
         \"@context\":\"https://www.w3.org/ns/did/v1\",\
