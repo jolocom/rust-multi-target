@@ -571,9 +571,9 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 
 [[package]]
 name = "keri"
-version = "0.1.0"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9ce6a06cb22fd1d1a0a9b34eed6356f35b0c29ff31fc3c17d92cc906c924e98"
+checksum = "ab6fc693ae5506f720a1470cb77b7fb05595b1ecd29c75ed710d80e3a02091ad"
 dependencies = [
  "base64",
  "serde",
