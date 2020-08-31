@@ -1,12 +1,13 @@
 {
   "name": "@jolocom/native-core-react-native",
-  "description": "Neon based react native bindings for the rust jolocom/wallet-rs",
-  "version": "1.1.0-rc1",
+  "description": "Jolocom Core React Native bindings for jolocom/wallet-rs",
+  "version": "1.1.0-rc5",
   "main": "index.js",
   "files": [
     "index.js",
     "android",
-    "ios"
+    "ios",
+    "JolocomCore.podspec"
   ],
   "author": {
     "name": "Jolocom Dev",
@@ -31,7 +32,8 @@
     "rust",
     "ssi",
     "react-native",
-    "crypto"
+    "crypto",
+    "universal wallet"
   ],
   "readmeFilename": "README.md",
   "peerDependencies": {
