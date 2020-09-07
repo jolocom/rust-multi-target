@@ -1,7 +1,7 @@
 {
   "name": "@jolocom/native-core-react-native",
   "description": "Jolocom Core React Native bindings for jolocom/wallet-rs",
-  "version": "1.1.0-rc6",
+  "version": "1.2.0",
   "main": "index.js",
   "files": [
     "index.js",
