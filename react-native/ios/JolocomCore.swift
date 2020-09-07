@@ -51,6 +51,18 @@ class JolocomCore: NSObject {
     })
   }
 
+  @objc func keriInceptWalletFromKeys(_ liveKeys: String, preRotatedKeys: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { keri_incept_wallet_from_keys($0, liveKeys, preRotatedKeys, pass) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        jolo_destroy_string(res!)
+        return val
+    })
+  }
+
   @objc func getIdFromEvent(_ event: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,

@@ -32,6 +32,12 @@ RCT_EXTERN_METHOD(keriInceptWallet
                   : (NSString *)pass resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(keriInceptWalletFromKeys
+                  : (NSString *)liveKeys preRotatedKeys
+                  : (NSString *)preRotatedKeys pass
+                  : (NSString *)pass resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(changePass
                   : (NSString *)ew id
                   : (NSString *)id oldPass

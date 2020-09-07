@@ -25,6 +25,9 @@ const char *new_wallet(struct ExternError *, const char *id, const char *pass);
 const char *keri_incept_wallet(struct ExternError *, const char *ew,
                                const char *id, const char *pass);
 
+const char *keri_incept_wallet_from_keys(struct ExternError *, const char *live_keys,
+                               const char *pre_rotated_keys, const char *pass);
+
 const char *change_pass(struct ExternError *, const char *ew, const char *id,
                         const char *old_pass, const char *new_pass);
 
