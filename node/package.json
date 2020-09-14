@@ -20,16 +20,24 @@
     "fs-extra": "^9.0.1",
     "local-did-resolver": "^0.2.2",
     "neon-cli": "^0.4.0",
+    "semver": "^7.3.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
   },
-
-  "os": [ "linux", "darwin" ],
-  "cpu": [ "x64" ],
-
+  "os": [
+    "linux",
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
   "optionalDependencies": {
-    "@jolocom/native-core-node-linux-x64": "^1.0.0-rc15",
-    "@jolocom/native-core-node-darwin-x64": "^1.0.0-rc15"
+    "@jolocom/native-core-node-8-darwin-x64": "^1.0.0-rc15",
+    "@jolocom/native-core-node-8-linux-x64": "^1.0.0-rc15",
+    "@jolocom/native-core-node-10-darwin-x64": "^1.0.0-rc15",
+    "@jolocom/native-core-node-10-linux-x64": "^1.0.0-rc15",
+    "@jolocom/native-core-node-12-darwin-x64": "^1.0.0-rc15",
+    "@jolocom/native-core-node-12-linux-x64": "^1.0.0-rc15"
   },
   "scripts": {
     "prepare": "yarn build",

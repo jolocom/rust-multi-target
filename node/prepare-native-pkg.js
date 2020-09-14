@@ -6,6 +6,7 @@
 
 const path = require('path')
 const fs = require('fs-extra')
+const svMajor = require('semver/functions/major')
 
 const baseDir = path.resolve(__dirname)
 process.chdir(baseDir)
@@ -17,9 +18,16 @@ const outPkgJsonPath = path.join(nativeDir, 'package.json')
 const pkgJson = JSON.parse(fs.readFileSync(tmplPkgJsonPath).toString())
 
 const platformArch = `${process.platform}-${process.arch}`
+const majorVersion = svMajor(`${process.version}`)
+
+if (majorVersion > 14 || majorVersion < 8) {
+  throw new Error(`Invalid Node Version: ${majorVersion}`)
+}
+
 pkgJson.cpu = [process.arch]
 pkgJson.os = [process.platform]
-pkgJson.name += `${platformArch}`
+pkgJson.engines = { node: `^${majorVersion}.0.0` }
+pkgJson.name += `${majorVersion}-${platformArch}`
 pkgJson.description += ` [${platformArch}]`
 
 console.log(
