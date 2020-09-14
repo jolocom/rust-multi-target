@@ -2,13 +2,13 @@ use crate::{did_document::KeyTypes, validate_events_str, DIDDocument};
 use base64;
 use core::str::FromStr;
 use keri::{
-    derivation::blake2b_256_digest,
+    derivation::blake3_256_digest,
     event::{
         event_data::{inception::InceptionEvent, EventData},
         sections::{InceptionWitnessConfig, KeyConfig},
         Event,
     },
-    event_message::{serialization_info::SerializationFormats, serialize_signed_message_json},
+    event_message::serialization_info::SerializationFormats,
     prefix::{
         AttachedSignaturePrefix, BasicPrefix, IdentifierPrefix, Prefix, SelfAddressingPrefix,
         SelfSigningPrefix,
@@ -92,7 +92,7 @@ pub fn incept_populated_wallet(
     let enc_pref_0 = BasicPrefix::X25519(enc_key_0.public_key.public_key.clone());
     let enc_pref_1 = BasicPrefix::X25519(enc_key_1.public_key.public_key.clone());
 
-    let nexter_pref = SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+    let nexter_pref = SelfAddressingPrefix::Blake3_256(blake3_256_digest(
         [sig_pref_1.to_str(), enc_pref_1.to_str()]
             .join("")
             .as_bytes(),
@@ -115,7 +115,7 @@ pub fn incept_populated_wallet(
     .map_err(|_| "failed to create inception message".to_string())?;
 
     let pref =
-        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake3_256(blake3_256_digest(
             icp_data
                 .extract_serialized_data_set()
                 .map_err(|_| "failed to extract data set".to_string())?
@@ -165,7 +165,8 @@ pub fn incept_populated_wallet(
     serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
         encrypted_wallet: export_wallet(uw, pass)?,
-        inception_event: serialize_signed_message_json(&signed_event)
+        // the serialized json event is guarenteed to be valid utf-8
+        inception_event: String::from_utf8(signed_event.serialize().map_err(|e| e.to_string())?)
             .map_err(|_| "failed to serialize".to_string())?,
     })
     .map_err(|e| e.to_string())
@@ -198,7 +199,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
         _ => return Err("Wrong Content Type".to_string()),
     };
 
-    let nexter_pref = SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+    let nexter_pref = SelfAddressingPrefix::Blake3_256(blake3_256_digest(
         [sig_pref_1.to_str(), enc_pref_1.to_str()]
             .join("")
             .as_bytes(),
@@ -221,7 +222,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     .map_err(|_| "failed to create inception message".to_string())?;
 
     let pref =
-        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake2B256(blake2b_256_digest(
+        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake3_256(blake3_256_digest(
             icp_data
                 .extract_serialized_data_set()
                 .map_err(|_| "failed to extract data set".to_string())?
@@ -261,7 +262,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
         encrypted_wallet: export_wallet(uw, pass)?,
-        inception_event: serialize_signed_message_json(&signed_event)
+        inception_event: String::from_utf8(signed_event.serialize().map_err(|e| e.to_string())?)
             .map_err(|_| "failed to serialize".to_string())?,
     })
     .map_err(|e| e.to_string())
@@ -540,8 +541,7 @@ fn test_incept() -> Result<(), String> {
 
     assert_eq!(uw.get_keys().len(), 4);
 
-    let kel_str =
-        serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+    let kel_str = res_str.inception_event;
 
     let ddo_str = validate_events_str(&kel_str, "jun")?;
 
@@ -635,25 +635,27 @@ fn test_incept_from_keys() -> Result<(), String> {
     );
 
     let uw = wallet.unlock(pass.as_bytes()).unwrap();
-    let kel_str =
-        serde_json::to_string(&vec![res_str.inception_event]).map_err(|e| e.to_string())?;
+    let kel_str = res_str.inception_event;
     let ddo_str = validate_events_str(&kel_str, "jun")?;
-    assert_eq!(ddo_str, "{\
+    assert_eq!(
+        ddo_str,
+        "{\
         \"@context\":\"https://www.w3.org/ns/did/v1\",\
-        \"id\":\"did:jun:Fz4uNHVr-hlx-NhYJm20j6ouhCn_unuK3oxeaJPmsuEfdL8EzPztuT4FEoKUXeKk9Vlq79ENu_g1LTiSIR2ymPA\",\
+        \"id\":\"did:jun:EPmmZbgkb4F6lzK1D2BDJQx7llT_8I_v9dHtcL8O3RWE\",\
         \"verificationMethod\":[\
         {\
             \"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\
             \"type\":\"Ed25519VerificationKey2018\",\
-            \"controller\":\"did:jun:Fz4uNHVr-hlx-NhYJm20j6ouhCn_unuK3oxeaJPmsuEfdL8EzPztuT4FEoKUXeKk9Vlq79ENu_g1LTiSIR2ymPA\",\
+            \"controller\":\"did:jun:EPmmZbgkb4F6lzK1D2BDJQx7llT_8I_v9dHtcL8O3RWE\",\
             \"publicKeyBase64\":\"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"\
         },{\
             \"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\
             \"type\":\"X25519KeyAgreementKey2019\",\
-            \"controller\":\"did:jun:Fz4uNHVr-hlx-NhYJm20j6ouhCn_unuK3oxeaJPmsuEfdL8EzPztuT4FEoKUXeKk9Vlq79ENu_g1LTiSIR2ymPA\",\
+            \"controller\":\"did:jun:EPmmZbgkb4F6lzK1D2BDJQx7llT_8I_v9dHtcL8O3RWE\",\
             \"publicKeyBase64\":\"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"\
         }]\
-    }");
+    }"
+    );
 
     assert_eq!(uw.get_keys().len(), 4);
     Ok(())
