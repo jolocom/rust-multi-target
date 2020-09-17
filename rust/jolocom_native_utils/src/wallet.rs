@@ -2,17 +2,20 @@ use crate::{did_document::KeyTypes, validate_events_str, DIDDocument};
 use base64;
 use core::str::FromStr;
 use keri::{
-    derivation::blake3_256_digest,
+    derivation::{
+        basic::Basic, self_addressing::SelfAddressing, self_signing::SelfSigning, DerivationCode,
+    },
     event::{
         event_data::{inception::InceptionEvent, EventData},
         sections::{InceptionWitnessConfig, KeyConfig},
         Event,
     },
-    event_message::serialization_info::SerializationFormats,
+    event_message::{serialization_info::SerializationFormats, EventMessage},
     prefix::{
         AttachedSignaturePrefix, BasicPrefix, IdentifierPrefix, Prefix, SelfAddressingPrefix,
         SelfSigningPrefix,
     },
+    util::dfs_serializer,
 };
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -87,21 +90,19 @@ pub fn incept_populated_wallet(
     )
     .unwrap();
 
-    let sig_pref_0 = BasicPrefix::Ed25519(sig_key_0.public_key.public_key.clone());
-    let sig_pref_1 = BasicPrefix::Ed25519(sig_key_1.public_key.public_key.clone());
-    let enc_pref_0 = BasicPrefix::X25519(enc_key_0.public_key.public_key.clone());
-    let enc_pref_1 = BasicPrefix::X25519(enc_key_1.public_key.public_key.clone());
+    let sig_pref_0 = Basic::Ed25519.derive(sig_key_0.public_key.public_key.clone());
+    let sig_pref_1 = Basic::Ed25519.derive(sig_key_1.public_key.public_key.clone());
+    let enc_pref_0 = Basic::X25519.derive(enc_key_0.public_key.public_key.clone());
+    let enc_pref_1 = Basic::X25519.derive(enc_key_1.public_key.public_key.clone());
 
-    let nexter_pref = SelfAddressingPrefix::Blake3_256(blake3_256_digest(
+    let nexter_pref = SelfAddressing::Blake3_256.derive(
         [sig_pref_1.to_str(), enc_pref_1.to_str()]
             .join("")
             .as_bytes(),
-    ));
+    );
 
-    let icp_data = Event {
-        prefix: IdentifierPrefix::default(),
-        sn: 0,
-        event_data: EventData::Icp(InceptionEvent {
+    let icp_data = EventMessage::get_inception_data(
+        &InceptionEvent {
             key_config: KeyConfig {
                 threshold: 1,
                 public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
@@ -109,18 +110,14 @@ pub fn incept_populated_wallet(
             },
             witness_config: InceptionWitnessConfig::default(),
             inception_configuration: vec![],
-        }),
-    }
-    .to_message(&SerializationFormats::JSON)
-    .map_err(|_| "failed to create inception message".to_string())?;
+        },
+        SelfAddressing::Blake3_256,
+        &SerializationFormats::JSON,
+    );
 
-    let pref =
-        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake3_256(blake3_256_digest(
-            icp_data
-                .extract_serialized_data_set()
-                .map_err(|_| "failed to extract data set".to_string())?
-                .as_bytes(),
-        )));
+    let pref = IdentifierPrefix::SelfAddressing(SelfAddressing::Blake3_256.derive(
+        &dfs_serializer::to_vec(&icp_data).map_err(|_| "failed to extract data set".to_string())?,
+    ));
 
     let icp_event = Event {
         prefix: pref,
@@ -149,16 +146,11 @@ pub fn incept_populated_wallet(
         enc_key_1.controller(enc_key_1_controller),
     ));
 
-    let sed = icp_event
-        .extract_serialized_data_set()
-        .map_err(|_| "failed to extract data set".to_string())?;
+    let serialized = icp_event.serialize().map_err(|e| e.to_string())?;
 
-    let sig = uw.sign_raw(&key_id, sed.as_bytes())?;
+    let sig = uw.sign_raw(&key_id, &serialized)?;
 
-    let sig_pref = AttachedSignaturePrefix {
-        index: 0,
-        sig: SelfSigningPrefix::Ed25519Sha512(sig),
-    };
+    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, sig, 0);
 
     let signed_event = icp_event.sign(vec![sig_pref]);
 
@@ -182,33 +174,31 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     let enc_key_1 = uw.new_key(KeyType::X25519KeyAgreementKey2019, None)?;
 
     let sig_pref_0 = match &sig_key_0.content {
-        Content::PublicKey(pk) => BasicPrefix::Ed25519(pk.public_key.clone()),
+        Content::PublicKey(pk) => Basic::Ed25519.derive(pk.public_key.clone()),
         _ => return Err("Wrong Content Type".to_string()),
     };
     let enc_pref_0 = match &enc_key_0.content {
-        Content::PublicKey(pk) => BasicPrefix::X25519(pk.public_key.clone()),
+        Content::PublicKey(pk) => Basic::X25519.derive(pk.public_key.clone()),
         _ => return Err("Wrong Content Type".to_string()),
     };
 
     let sig_pref_1 = match &sig_key_1.content {
-        Content::PublicKey(pk) => BasicPrefix::Ed25519(pk.public_key.clone()),
+        Content::PublicKey(pk) => Basic::Ed25519.derive(pk.public_key.clone()),
         _ => return Err("Wrong Content Type".to_string()),
     };
     let enc_pref_1 = match &enc_key_1.content {
-        Content::PublicKey(pk) => BasicPrefix::X25519(pk.public_key.clone()),
+        Content::PublicKey(pk) => Basic::X25519.derive(pk.public_key.clone()),
         _ => return Err("Wrong Content Type".to_string()),
     };
 
-    let nexter_pref = SelfAddressingPrefix::Blake3_256(blake3_256_digest(
+    let nexter_pref = SelfAddressing::Blake3_256.derive(
         [sig_pref_1.to_str(), enc_pref_1.to_str()]
             .join("")
             .as_bytes(),
-    ));
+    );
 
-    let icp_data = Event {
-        prefix: IdentifierPrefix::default(),
-        sn: 0,
-        event_data: EventData::Icp(InceptionEvent {
+    let icp_data = EventMessage::get_inception_data(
+        &InceptionEvent {
             key_config: KeyConfig {
                 threshold: 1,
                 public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
@@ -216,18 +206,14 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
             },
             witness_config: InceptionWitnessConfig::default(),
             inception_configuration: vec![],
-        }),
-    }
-    .to_message(&SerializationFormats::JSON)
-    .map_err(|_| "failed to create inception message".to_string())?;
+        },
+        SelfAddressing::Blake3_256,
+        &SerializationFormats::JSON,
+    );
 
-    let pref =
-        IdentifierPrefix::SelfAddressing(SelfAddressingPrefix::Blake3_256(blake3_256_digest(
-            icp_data
-                .extract_serialized_data_set()
-                .map_err(|_| "failed to extract data set".to_string())?
-                .as_bytes(),
-        )));
+    let pref = IdentifierPrefix::SelfAddressing(SelfAddressing::Blake3_256.derive(
+        &dfs_serializer::to_vec(&icp_data).map_err(|_| "failed to extract data set".to_string())?,
+    ));
 
     let icp_event = Event {
         prefix: pref,
@@ -246,16 +232,11 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
         &[uw.id.clone(), enc_pref_0.to_str()].join("#"),
     );
 
-    let sed = icp_event
-        .extract_serialized_data_set()
-        .map_err(|_| "failed to extract data set".to_string())?;
+    let serialized = icp_event.serialize().map_err(|e| e.to_string())?;
 
-    let sig = uw.sign_raw(&sig_key_0.id, sed.as_bytes())?;
+    let sig = uw.sign_raw(&sig_key_0.id, &serialized)?;
 
-    let sig_pref = AttachedSignaturePrefix {
-        index: 0,
-        sig: SelfSigningPrefix::Ed25519Sha512(sig),
-    };
+    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, sig, 0);
 
     let signed_event = icp_event.sign(vec![sig_pref]);
 
@@ -641,17 +622,17 @@ fn test_incept_from_keys() -> Result<(), String> {
         ddo_str,
         "{\
         \"@context\":\"https://www.w3.org/ns/did/v1\",\
-        \"id\":\"did:jun:EPmmZbgkb4F6lzK1D2BDJQx7llT_8I_v9dHtcL8O3RWE\",\
+        \"id\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
         \"verificationMethod\":[\
         {\
             \"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\
             \"type\":\"Ed25519VerificationKey2018\",\
-            \"controller\":\"did:jun:EPmmZbgkb4F6lzK1D2BDJQx7llT_8I_v9dHtcL8O3RWE\",\
+            \"controller\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
             \"publicKeyBase64\":\"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"\
         },{\
             \"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\
             \"type\":\"X25519KeyAgreementKey2019\",\
-            \"controller\":\"did:jun:EPmmZbgkb4F6lzK1D2BDJQx7llT_8I_v9dHtcL8O3RWE\",\
+            \"controller\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
             \"publicKeyBase64\":\"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"\
         }]\
     }"
