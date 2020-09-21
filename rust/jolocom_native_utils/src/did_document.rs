@@ -1,4 +1,5 @@
 use keri::{
+    derivation::basic::Basic,
     prefix::{BasicPrefix, IdentifierPrefix, Prefix},
     state::IdentifierState,
 };
@@ -38,14 +39,12 @@ fn pref_to_vm(
 ) -> Result<VerificationMethod, String> {
     Ok(VerificationMethod {
         id: ["#".to_string(), pref.to_str()].join(""),
-        key_type: match pref {
-            BasicPrefix::Ed25519NT(_) | BasicPrefix::Ed25519(_) => {
-                KeyTypes::Ed25519VerificationKey2018
-            }
-            BasicPrefix::ECDSAsecp256k1NT(_) | BasicPrefix::ECDSAsecp256k1(_) => {
+        key_type: match pref.derivation {
+            Basic::Ed25519NT | Basic::Ed25519 => KeyTypes::Ed25519VerificationKey2018,
+            Basic::ECDSAsecp256k1NT | Basic::ECDSAsecp256k1 => {
                 KeyTypes::EcdsaSecp256k1VerificationKey2019
             }
-            BasicPrefix::X25519(_) => KeyTypes::X25519KeyAgreementKey2019,
+            Basic::X25519 => KeyTypes::X25519KeyAgreementKey2019,
             _ => return Err("bad key type".to_string()),
         },
         controller: ["did", method_prefix, &controller.to_str()].join(":"),
