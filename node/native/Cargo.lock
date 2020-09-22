@@ -1263,9 +1263,9 @@ dependencies = [
 
 [[package]]
 name = "universal_wallet"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78b94a45e8416490667824a6165a0c7eeb8d128a30489987c62f4270fd47aee3"
+checksum = "0566ef47b31e9c86c09889f2935997cd5c80919ebc44d0c70c65e3dba3731e46"
 dependencies = [
  "aead",
  "base64",

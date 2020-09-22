@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 keri = "0.3.0"
-universal_wallet = "0.2.1"
+universal_wallet = "0.2.2"
 serde = "1.0"
 serde_json = "1.0"
 base64 = "0.12"

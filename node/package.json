@@ -1,6 +1,6 @@
 {
   "name": "@jolocom/native-core",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "description": "jolocom/wallet-rs javascript bindings based on Neon",
   "main": "js/index.js",
   "files": [
@@ -32,12 +32,12 @@
     "x64"
   ],
   "optionalDependencies": {
-    "@jolocom/native-core-node-8-darwin-x64": "^1.0.0-rc15",
-    "@jolocom/native-core-node-8-linux-x64": "^1.0.0-rc15",
-    "@jolocom/native-core-node-10-darwin-x64": "^1.0.0-rc15",
-    "@jolocom/native-core-node-10-linux-x64": "^1.0.0-rc15",
-    "@jolocom/native-core-node-12-darwin-x64": "^1.0.0-rc15",
-    "@jolocom/native-core-node-12-linux-x64": "^1.0.0-rc15"
+    "@jolocom/native-core-node-10-darwin-x64": "^1.0.0-rc1",
+    "@jolocom/native-core-node-10-linux-x64": "^1.0.0-rc1",
+    "@jolocom/native-core-node-12-darwin-x64": "^1.0.0-rc1",
+    "@jolocom/native-core-node-12-linux-x64": "^1.0.0-rc1",
+    "@jolocom/native-core-node-14-darwin-x64": "^1.0.0-rc1",
+    "@jolocom/native-core-node-14-linux-x64": "^1.0.0-rc1"
   },
   "scripts": {
     "prepare": "yarn build",
