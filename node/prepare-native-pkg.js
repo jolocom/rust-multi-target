@@ -20,8 +20,19 @@ const pkgJson = JSON.parse(fs.readFileSync(tmplPkgJsonPath).toString())
 const platformArch = `${process.platform}-${process.arch}`
 const majorVersion = svMajor(`${process.version}`)
 
-if (majorVersion > 14 || majorVersion < 8) {
+if (majorVersion > 14 || majorVersion < 10) {
   throw new Error(`Invalid Node Version: ${majorVersion}`)
+}
+
+try {
+  require('./native')
+} catch (err) {
+  console.error(err)
+  console.log(
+    'Could not load binary',
+    'Did you forget to `cargo clean` in between different node version builds?'
+  )
+  process.exit(1)
 }
 
 pkgJson.cpu = [process.arch]
@@ -41,6 +52,6 @@ fs.writeFileSync(outPkgJsonPath, JSON.stringify(pkgJson, null, 2))
 console.log(
   'Generated at ' + outPkgJsonPath +
   '\n\n\n' +
-  'please do: cd native && npm publish' +
+  'to publish:\n\tcd native && npm publish' +
   '\n'
 )
