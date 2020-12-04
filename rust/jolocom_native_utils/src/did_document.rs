@@ -20,7 +20,7 @@ pub fn state_to_did_document(state: IdentifierState, method_prefix: &str) -> DID
         id: ["did", method_prefix, &state.prefix.to_str()].join(":"),
         verification_methods: match state
             .current
-            .signers
+            .public_keys
             .iter()
             .map(|pref| pref_to_vm(pref, &state.prefix, method_prefix))
             .collect::<Result<Vec<VerificationMethod>, String>>()

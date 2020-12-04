@@ -1,21 +1,17 @@
-use crate::{did_document::KeyTypes, validate_events_str, DIDDocument, error::Error};
+use crate::{error::Error};
 use base64;
 use core::str::FromStr;
 use keri::{
     derivation::{
-        basic::{Basic, PublicKey}, self_addressing::SelfAddressing, self_signing::SelfSigning, DerivationCode,
-    },
+        basic::{Basic, PublicKey}, self_addressing::SelfAddressing, self_signing::SelfSigning},
     event::{
-        event_data::{inception::InceptionEvent, EventData},
-        sections::{InceptionWitnessConfig, KeyConfig},
-        Event,
+        event_data::{inception::InceptionEvent},
+        sections::{KeyConfig, nxt_commitment},
     },
-    event_message::{serialization_info::SerializationFormats, EventMessage},
+    event_message::{serialization_info::SerializationFormats},
     prefix::{
-        AttachedSignaturePrefix, BasicPrefix, IdentifierPrefix, Prefix, SelfAddressingPrefix,
-        SelfSigningPrefix,
+        AttachedSignaturePrefix, Prefix,
     },
-    util::dfs_serializer,
 };
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -97,64 +93,48 @@ pub fn incept_populated_wallet(
     let sig_pref_1 = Basic::Ed25519.derive(PublicKey{0: sig_key_1.public_key.public_key.clone()});
     let enc_pref_0 = Basic::X25519.derive(PublicKey{0: enc_key_0.public_key.public_key.clone()});
     let enc_pref_1 = Basic::X25519.derive(PublicKey{0: enc_key_1.public_key.public_key.clone()});
+    
+    // next key set pre-commitment
+    let nexter_pref = nxt_commitment(1, &[sig_pref_1.clone(), enc_pref_1.clone()], SelfAddressing::Blake3_256);
 
-    let nexter_pref = SelfAddressing::Blake3_256.derive(
-        [sig_pref_1.to_str(), enc_pref_1.to_str()]
-            .join("")
-            .as_bytes(),
-    );
+    let icp = InceptionEvent::new(
+        KeyConfig::new(
+            vec![sig_pref_0.clone(), enc_pref_0.clone()],
+            nexter_pref,
+            Some(1),
+        ),
+        None,
+        None,
+    )
+    .incept_self_addressing(SelfAddressing::Blake3_256, SerializationFormats::JSON)?;
 
-    let icp_data = EventMessage::get_inception_data(
-        &InceptionEvent {
-            key_config: KeyConfig {
-                threshold: 1,
-                public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
-                threshold_key_digest: nexter_pref,
-            },
-            witness_config: InceptionWitnessConfig::default(),
-            inception_configuration: vec![],
-        },
-        SelfAddressing::Blake3_256,
-        SerializationFormats::JSON,
-    )?;
-
-    let pref = IdentifierPrefix::SelfAddressing(SelfAddressing::Blake3_256.derive(
-        &dfs_serializer::to_vec(&icp_data)?
-    ));
-
-    let icp_event = Event {
-        prefix: pref,
-        ..icp_data.event
-    }
-    .to_message(SerializationFormats::JSON)?;
-
-    uw.id = ["did:jun", &icp_event.event.prefix.to_str()].join(":");
+    uw.id = ["did:jun", &icp.event.prefix.to_str()].join(":");
     let sig_0_controller = vec![[uw.id.clone(), sig_pref_0.to_str()].join("#").to_string()];
     let key_id = uw
-        .import_content(&Content::KeyPair(sig_key_0.controller(sig_0_controller)))
+        .import_content(&Content::KeyPair(sig_key_0.set_controller(sig_0_controller)))
         .unwrap()
         .id;
 
     let sig_1_controller = vec![[uw.id.clone(), sig_pref_1.to_str()].join("#").to_string()];
-    uw.import_content(&Content::KeyPair(sig_key_1.controller(sig_1_controller)));
+    uw.import_content(&Content::KeyPair(sig_key_1.set_controller(sig_1_controller)));
 
     let enc_key_0_controller = vec![[uw.id.clone(), enc_pref_0.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
-        enc_key_0.controller(enc_key_0_controller),
+        enc_key_0.set_controller(enc_key_0_controller),
     ));
 
     let enc_key_1_controller = vec![[uw.id.clone(), enc_pref_1.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
-        enc_key_1.controller(enc_key_1_controller),
+        enc_key_1.set_controller(enc_key_1_controller),
     ));
 
-    let serialized = icp_event.serialize().map_err(|e| e.to_string())?;
+    // serialised
+    let serialized = icp.serialize()?;
 
-    let sig = uw.sign_raw(&key_id, &serialized)?;
+    // sign
+    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, uw.sign_raw(&key_id, &serialized)?, 0);
 
-    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, sig, 0);
-
-    let signed_event = icp_event.sign(vec![sig_pref]);
+    let signed_event = icp.sign(vec![sig_pref]);
 
     Ok(serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
@@ -191,37 +171,28 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
         _ => return Err(Error::Generic("Wrong Content Type".to_string())),
     };
 
-    let nexter_pref = SelfAddressing::Blake3_256.derive(
-        [sig_pref_1.to_str(), enc_pref_1.to_str()]
-            .join("")
-            .as_bytes(),
-    );
+    // TODO: is this needed here?
+    // let nexter_pref = SelfAddressing::Blake3_256.derive(
+    //     [sig_pref_1.to_str(), enc_pref_1.to_str()]
+    //         .join("")
+    //         .as_bytes(),
+    // );
 
-    let icp_data = EventMessage::get_inception_data(
-        &InceptionEvent {
-            key_config: KeyConfig {
-                threshold: 1,
-                public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
-                threshold_key_digest: nexter_pref,
-            },
-            witness_config: InceptionWitnessConfig::default(),
-            inception_configuration: vec![],
-        },
-        SelfAddressing::Blake3_256,
-        SerializationFormats::JSON,
-    )?;
+    // next key set pre-commitment
+    let nexter_pref = nxt_commitment(1, &[sig_pref_1, enc_pref_1], SelfAddressing::Blake3_256);
 
-    let pref = IdentifierPrefix::SelfAddressing(SelfAddressing::Blake3_256.derive(
-        &dfs_serializer::to_vec(&icp_data)?
-    ));
+    let icp = InceptionEvent::new(
+        KeyConfig::new(
+            vec![sig_pref_0.clone(), enc_pref_0.clone()],
+            nexter_pref,
+            Some(1),
+        ),
+        None,
+        None,
+    )
+    .incept_self_addressing(SelfAddressing::Blake3_256, SerializationFormats::JSON)?;
 
-    let icp_event = Event {
-        prefix: pref,
-        ..icp_data.event
-    }
-    .to_message(SerializationFormats::JSON)?;
-
-    uw.id = ["did:jun", &icp_event.event.prefix.to_str()].join(":");
+    uw.id = ["did:jun", &icp.event.prefix.to_str()].join(":");
     uw.set_key_controller(
         &sig_key_0.id,
         &[uw.id.clone(), sig_pref_0.to_str()].join("#"),
@@ -231,13 +202,11 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
         &[uw.id.clone(), enc_pref_0.to_str()].join("#"),
     );
 
-    let serialized = icp_event.serialize()?;
+    let serialized = icp.serialize()?;
 
-    let sig = uw.sign_raw(&sig_key_0.id, &serialized)?;
+    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, uw.sign_raw(&sig_key_0.id, &serialized)?, 0);
 
-    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, sig, 0);
-
-    let signed_event = icp_event.sign(vec![sig_pref]);
+    let signed_event = icp.sign(vec![sig_pref]);
 
     Ok(serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
@@ -493,6 +462,8 @@ fn test_create() -> Result<(), Error> {
 
 #[test]
 fn test_incept() -> Result<(), Error> {
+    use crate::{validate_events_str, did_document::{KeyTypes, DIDDocument}};
+
     let id = "my_did";
     let p = "my_password";
 
@@ -510,9 +481,9 @@ fn test_incept() -> Result<(), Error> {
 
     assert_eq!(uw.get_keys().len(), 4);
 
-    let kel_str = res_str.inception_event;
+    let kel_bytes = res_str.inception_event.as_bytes();
 
-    let ddo_str = validate_events_str(&kel_str, "jun")?;
+    let ddo_str = validate_events_str(&kel_bytes, "jun")?;
 
     let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| UwError::Serde(e))?;
 
@@ -587,6 +558,8 @@ fn test_sign() -> Result<(), Error> {
 
 #[test]
 fn test_incept_from_keys() -> Result<(), Error> {
+    use crate::validate_events_str;
+
     let pass = "secret";
     let sign_enc_keys = "[\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\",\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\"]";
     let pre_rot_sign_enc_keys = sign_enc_keys.clone();
@@ -594,16 +567,16 @@ fn test_incept_from_keys() -> Result<(), Error> {
         sign_enc_keys,
         pre_rot_sign_enc_keys,
         pass,
-    )?)?;
+    )?).map_err(|e| UwError::Serde(e))?;
 
     let wallet = LockedWallet::new(
         &res_str.id,
-        base64::decode_config(res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
     );
 
     let uw = wallet.unlock(pass.as_bytes()).unwrap();
-    let kel_str = res_str.inception_event;
-    let ddo_str = validate_events_str(&kel_str, "jun")?;
+    let kel_bytes = &res_str.inception_event.as_bytes();
+    let ddo_str = validate_events_str(kel_bytes, "jun")?;
     assert_eq!(
         ddo_str,
         "{\
