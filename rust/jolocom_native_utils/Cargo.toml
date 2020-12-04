@@ -10,8 +10,9 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-keri = "0.3.0"
-universal_wallet = "0.2.2"
+keri = { git = "https://github.com/35359595/keriox", branch = "ursa_bump", version = "0.3.1" }
+universal_wallet = {git = "https://github.com/35359595/wallet-rs", branch = "master"}
 serde = "1.0"
 serde_json = "1.0"
 base64 = "0.12"
+thiserror = "1.0"
