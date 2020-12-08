@@ -606,24 +606,16 @@ fn test_incept_from_keys() -> Result<(), Error> {
     let uw = wallet.unlock(pass.as_bytes()).unwrap();
     let kel_bytes = &res_str.inception_event.as_bytes();
     let ddo_str = validate_events_str(kel_bytes, "jun")?;
+    let expected = "{\
+        \"@context\":\"https://www.w3.org/ns/did/v1\",\"id\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\
+        \"verificationMethod\":[{\"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\"type\":\"Ed25519VerificationKey2018\",\
+        \"controller\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\"publicKeyBase64\":\
+        \"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"},{\"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\"type\":\
+        \"X25519KeyAgreementKey2019\",\"controller\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\"publicKeyBase64\":\
+        \"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"}]}";
     assert_eq!(
         ddo_str,
-        "{\
-        \"@context\":\"https://www.w3.org/ns/did/v1\",\
-        \"id\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
-        \"verificationMethod\":[\
-        {\
-            \"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\
-            \"type\":\"Ed25519VerificationKey2018\",\
-            \"controller\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
-            \"publicKeyBase64\":\"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"\
-        },{\
-            \"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\
-            \"type\":\"X25519KeyAgreementKey2019\",\
-            \"controller\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
-            \"publicKeyBase64\":\"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"\
-        }]\
-    }"
+        expected
     );
 
     assert_eq!(uw.get_keys().len(), 4);
