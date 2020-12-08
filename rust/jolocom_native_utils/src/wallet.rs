@@ -1,6 +1,7 @@
 use crate::{error::Error};
 use base64;
 use core::str::FromStr;
+use std::convert::TryInto;
 use keri::{
     derivation::{
         basic::{Basic, PublicKey}, self_addressing::SelfAddressing, self_signing::SelfSigning},
@@ -252,8 +253,7 @@ pub fn new_key(
 ) -> Result<String, Error> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let nkt = KeyType::from_str(key_type)
-        .map_err(|e| Error::Generic(e))?;
+    let nkt = KeyType::from_str(key_type)?;
 
     let key = uw.new_key(nkt, controller)?;
 
@@ -330,16 +330,30 @@ pub fn sign(
     Ok(base64::encode_config(sig, base64::URL_SAFE))
 }
 
-pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> Result<bool, Error> {
-    // use url safe or not?
-    let key_bytes = base64::decode_config(key_str, base64::URL_SAFE)?;
+// pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> Result<bool, Error> {
+//     // use url safe or not?
+//     let key_bytes = base64::decode_config(key_str, base64::URL_SAFE)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
+//     let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
-    let sig_bytes = base64::decode_config(sig, base64::URL_SAFE)?;
+//     let sig_bytes = base64::decode_config(sig, base64::URL_SAFE)?;
 
-    Ok(PublicKeyInfo::new(KeyType::from_str(key_type).map_err(|e| Error::Generic(e))?, &key_bytes)
-        .verify(&data_bytes, &sig_bytes)?)
+//     let pk = PublicKeyInfo::new(key_type.try_into()?, &key_bytes);
+
+//     let verification_result = pk.verify(&data_bytes, &sig_bytes);
+
+//     Ok(verification_result?)
+// }
+
+pub fn verify(key_str: &str, key_type: &str, data: &str, signature: &str) -> Result<bool, Error> {
+    Ok(PublicKeyInfo::new(
+        key_type.try_into()?,
+        &decode_base64_url_safe(key_str)?
+    ).verify(&decode_base64_url_safe(data)?, &decode_base64_url_safe(signature)?)?)
+}
+
+fn decode_base64_url_safe(encoded: &str) -> Result<Vec<u8>, Error> {
+    Ok(base64::decode_config(encoded, base64::URL_SAFE)?)
 }
 
 pub fn decrypt_by_controller(
@@ -392,8 +406,7 @@ pub fn encrypt(key: &str, key_type: &str, data: &str, aad: &str) -> Result<Strin
 
     let aad_bytes = base64::decode_config(aad, base64::URL_SAFE)?;
 
-    let pki = PublicKeyInfo::new(KeyType::from_str(key_type)
-        .map_err(|e| Error::Generic(e))?, &key_bytes)
+    let pki = PublicKeyInfo::new(KeyType::from_str(key_type)?, &key_bytes)
         .encrypt(&data_bytes, Some(&aad_bytes))?;
     Ok(base64::encode_config(pki, base64::URL_SAFE))
 }
@@ -553,6 +566,22 @@ fn test_sign() -> Result<(), Error> {
     assert!(verify(key, kt, &message, sig)?);
     assert!(!verify(key, kt, &message, wrong_sig)?);
 
+    Ok(())
+}
+
+#[test]
+fn test_key_type() -> Result<(), Error> {
+    let kt = KeyType::from_str("EcdsaSecp256k1VerificationKey2019");
+    assert!(&kt.is_ok());
+    let kt = kt?;
+    let expected = KeyType::EcdsaSecp256k1VerificationKey2019;
+    assert_eq!(kt, expected);
+    let pki_1 = PublicKeyInfo::new(KeyType::from_str("EcdsaSecp256k1VerificationKey2019")?, b"nokey");
+    let pki_2 = PublicKeyInfo::new("EcdsaSecp256k1VerificationKey2019".try_into()?, b"nokey");
+    let pki_3 = PublicKeyInfo::new(kt, b"nokey");
+    assert_eq!(pki_1.key_type, KeyType::EcdsaSecp256k1VerificationKey2019);
+    assert_eq!(pki_2.key_type, KeyType::EcdsaSecp256k1VerificationKey2019);
+    assert_eq!(pki_3.key_type, KeyType::EcdsaSecp256k1VerificationKey2019);
     Ok(())
 }
 
