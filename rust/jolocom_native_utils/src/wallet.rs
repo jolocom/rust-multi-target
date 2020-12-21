@@ -1,25 +1,22 @@
-use crate::{did_document::KeyTypes, validate_events_str, DIDDocument};
+use crate::{error::Error};
 use base64;
 use core::str::FromStr;
+use std::convert::TryInto;
 use keri::{
     derivation::{
-        basic::Basic, self_addressing::SelfAddressing, self_signing::SelfSigning, DerivationCode,
-    },
+        basic::{Basic, PublicKey}, self_addressing::SelfAddressing, self_signing::SelfSigning},
     event::{
-        event_data::{inception::InceptionEvent, EventData},
-        sections::{InceptionWitnessConfig, KeyConfig},
-        Event,
+        event_data::{inception::InceptionEvent},
+        sections::{KeyConfig, nxt_commitment},
     },
-    event_message::{serialization_info::SerializationFormats, EventMessage},
+    event_message::{serialization_info::SerializationFormats},
     prefix::{
-        AttachedSignaturePrefix, BasicPrefix, IdentifierPrefix, Prefix, SelfAddressingPrefix,
-        SelfSigningPrefix,
+        AttachedSignaturePrefix, Prefix,
     },
-    util::dfs_serializer,
 };
 use serde::{Deserialize, Serialize};
 use serde_json;
-use universal_wallet::{get_random, prelude::*};
+use universal_wallet::{get_random, prelude::*, Error as UwError};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -36,21 +33,22 @@ pub struct WalletInceptionRep {
     pub inception_event: String,
 }
 
-pub fn get_random_b64(len: usize) -> Result<String, String> {
+pub fn get_random_b64(len: usize) -> Result<String, Error> {
     Ok(base64::encode_config(get_random(len)?, base64::URL_SAFE))
 }
 
-pub fn wallet_from(encrypted_wallet: &str, id: &str, pass: &str) -> Result<UnlockedWallet, String> {
-    let ew = match base64::decode_config(encrypted_wallet, base64::URL_SAFE) {
-        Ok(w) => w,
-        Err(e) => return Err(e.to_string()),
-    };
+pub fn wallet_from(encrypted_wallet: &str, id: &str, pass: &str) -> Result<UnlockedWallet, Error> {
+    let ew = base64::decode_config(encrypted_wallet, base64::URL_SAFE)?;
+    //  {
+    //     Ok(w) => w,
+    //     Err(e) => return Err(e.to_string()),
+    // };
     let lw = LockedWallet::new(id, ew);
 
-    lw.unlock(pass.as_bytes())
+    Ok(lw.unlock(pass.as_bytes())?)
 }
 
-pub fn new_wallet(id: &str, pass: &str) -> Result<String, String> {
+pub fn new_wallet(id: &str, pass: &str) -> Result<String, Error> {
     export_wallet(UnlockedWallet::new(&id), &pass)
 }
 
@@ -58,13 +56,15 @@ pub fn incept_populated_wallet(
     signing_enc_keys_str: &str,
     pre_rotated_keys: &str,
     pass: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let mut uw = UnlockedWallet::new("");
 
     let signing_enc_keys: Vec<&str> =
-        serde_json::from_str(signing_enc_keys_str).map_err(|e| e.to_string())?;
+        serde_json::from_str(signing_enc_keys_str)
+            .map_err(|e| UwError::Serde(e))?;
     let pre_rotated_keys: Vec<&str> =
-        serde_json::from_str(pre_rotated_keys).map_err(|e| e.to_string())?;
+        serde_json::from_str(pre_rotated_keys)
+            .map_err(|e| UwError::Serde(e))?;
 
     let sig_key_0 = KeyPair::new(
         KeyType::Ed25519VerificationKey2018,
@@ -90,81 +90,62 @@ pub fn incept_populated_wallet(
     )
     .unwrap();
 
-    let sig_pref_0 = Basic::Ed25519.derive(sig_key_0.public_key.public_key.clone());
-    let sig_pref_1 = Basic::Ed25519.derive(sig_key_1.public_key.public_key.clone());
-    let enc_pref_0 = Basic::X25519.derive(enc_key_0.public_key.public_key.clone());
-    let enc_pref_1 = Basic::X25519.derive(enc_key_1.public_key.public_key.clone());
+    let sig_pref_0 = Basic::Ed25519.derive(PublicKey{0: sig_key_0.public_key.public_key.clone()});
+    let sig_pref_1 = Basic::Ed25519.derive(PublicKey{0: sig_key_1.public_key.public_key.clone()});
+    let enc_pref_0 = Basic::X25519.derive(PublicKey{0: enc_key_0.public_key.public_key.clone()});
+    let enc_pref_1 = Basic::X25519.derive(PublicKey{0: enc_key_1.public_key.public_key.clone()});
+    
+    // next key set pre-commitment
+    let nexter_pref = nxt_commitment(1, &[sig_pref_1.clone(), enc_pref_1.clone()], SelfAddressing::Blake3_256);
 
-    let nexter_pref = SelfAddressing::Blake3_256.derive(
-        [sig_pref_1.to_str(), enc_pref_1.to_str()]
-            .join("")
-            .as_bytes(),
-    );
+    let icp = InceptionEvent::new(
+        KeyConfig::new(
+            vec![sig_pref_0.clone(), enc_pref_0.clone()],
+            nexter_pref,
+            Some(1),
+        ),
+        None,
+        None,
+    )
+    .incept_self_addressing(SelfAddressing::Blake3_256, SerializationFormats::JSON)?;
 
-    let icp_data = EventMessage::get_inception_data(
-        &InceptionEvent {
-            key_config: KeyConfig {
-                threshold: 1,
-                public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
-                threshold_key_digest: nexter_pref,
-            },
-            witness_config: InceptionWitnessConfig::default(),
-            inception_configuration: vec![],
-        },
-        SelfAddressing::Blake3_256,
-        &SerializationFormats::JSON,
-    );
-
-    let pref = IdentifierPrefix::SelfAddressing(SelfAddressing::Blake3_256.derive(
-        &dfs_serializer::to_vec(&icp_data).map_err(|_| "failed to extract data set".to_string())?,
-    ));
-
-    let icp_event = Event {
-        prefix: pref,
-        ..icp_data.event
-    }
-    .to_message(&SerializationFormats::JSON)
-    .map_err(|_| "failed to create inception message".to_string())?;
-
-    uw.id = ["did:jun", &icp_event.event.prefix.to_str()].join(":");
+    uw.id = ["did:jun", &icp.event.prefix.to_str()].join(":");
     let sig_0_controller = vec![[uw.id.clone(), sig_pref_0.to_str()].join("#").to_string()];
     let key_id = uw
-        .import_content(&Content::KeyPair(sig_key_0.controller(sig_0_controller)))
+        .import_content(&Content::KeyPair(sig_key_0.set_controller(sig_0_controller)))
         .unwrap()
         .id;
 
     let sig_1_controller = vec![[uw.id.clone(), sig_pref_1.to_str()].join("#").to_string()];
-    uw.import_content(&Content::KeyPair(sig_key_1.controller(sig_1_controller)));
+    uw.import_content(&Content::KeyPair(sig_key_1.set_controller(sig_1_controller)));
 
     let enc_key_0_controller = vec![[uw.id.clone(), enc_pref_0.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
-        enc_key_0.controller(enc_key_0_controller),
+        enc_key_0.set_controller(enc_key_0_controller),
     ));
 
     let enc_key_1_controller = vec![[uw.id.clone(), enc_pref_1.to_str()].join("#").to_string()];
     uw.import_content(&Content::KeyPair(
-        enc_key_1.controller(enc_key_1_controller),
+        enc_key_1.set_controller(enc_key_1_controller),
     ));
 
-    let serialized = icp_event.serialize().map_err(|e| e.to_string())?;
+    // serialised
+    let serialized = icp.serialize()?;
 
-    let sig = uw.sign_raw(&key_id, &serialized)?;
+    // sign
+    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, uw.sign_raw(&key_id, &serialized)?, 0);
 
-    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, sig, 0);
+    let signed_event = icp.sign(vec![sig_pref]);
 
-    let signed_event = icp_event.sign(vec![sig_pref]);
-
-    serde_json::to_string(&WalletInceptionRep {
+    Ok(serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
         encrypted_wallet: export_wallet(uw, pass)?,
         // the serialized json event is guarenteed to be valid utf-8
-        inception_event: String::from_utf8(signed_event.serialize().map_err(|e| e.to_string())?)
-            .map_err(|_| "failed to serialize".to_string())?,
-    })
-    .map_err(|e| e.to_string())
+        inception_event: String::from_utf8(signed_event.serialize()?)?,
+    }).map_err(|e| UwError::Serde(e))?)
 }
 
-pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<String, String> {
+pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<String, Error> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
     let sig_key_0 = uw.new_key(KeyType::Ed25519VerificationKey2018, None)?;
@@ -174,55 +155,45 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     let enc_key_1 = uw.new_key(KeyType::X25519KeyAgreementKey2019, None)?;
 
     let sig_pref_0 = match &sig_key_0.content {
-        Content::PublicKey(pk) => Basic::Ed25519.derive(pk.public_key.clone()),
-        _ => return Err("Wrong Content Type".to_string()),
+        Content::PublicKey(pk) => Basic::Ed25519.derive(PublicKey{0: pk.public_key.clone()}),
+        _ => return Err(Error::Generic("Wrong Content Type".to_string())),
     };
     let enc_pref_0 = match &enc_key_0.content {
-        Content::PublicKey(pk) => Basic::X25519.derive(pk.public_key.clone()),
-        _ => return Err("Wrong Content Type".to_string()),
+        Content::PublicKey(pk) => Basic::X25519.derive(PublicKey{0: pk.public_key.clone()}),
+        _ => return Err(Error::Generic("Wrong Content Type".to_string())),
     };
 
     let sig_pref_1 = match &sig_key_1.content {
-        Content::PublicKey(pk) => Basic::Ed25519.derive(pk.public_key.clone()),
-        _ => return Err("Wrong Content Type".to_string()),
+        Content::PublicKey(pk) => Basic::Ed25519.derive(PublicKey{0: pk.public_key.clone()}),
+        _ => return Err(Error::Generic("Wrong Content Type".to_string())),
     };
     let enc_pref_1 = match &enc_key_1.content {
-        Content::PublicKey(pk) => Basic::X25519.derive(pk.public_key.clone()),
-        _ => return Err("Wrong Content Type".to_string()),
+        Content::PublicKey(pk) => Basic::X25519.derive(PublicKey{0: pk.public_key.clone()}),
+        _ => return Err(Error::Generic("Wrong Content Type".to_string())),
     };
 
-    let nexter_pref = SelfAddressing::Blake3_256.derive(
-        [sig_pref_1.to_str(), enc_pref_1.to_str()]
-            .join("")
-            .as_bytes(),
-    );
+    // TODO: is this needed here?
+    // let nexter_pref = SelfAddressing::Blake3_256.derive(
+    //     [sig_pref_1.to_str(), enc_pref_1.to_str()]
+    //         .join("")
+    //         .as_bytes(),
+    // );
 
-    let icp_data = EventMessage::get_inception_data(
-        &InceptionEvent {
-            key_config: KeyConfig {
-                threshold: 1,
-                public_keys: vec![sig_pref_0.clone(), enc_pref_0.clone()],
-                threshold_key_digest: nexter_pref,
-            },
-            witness_config: InceptionWitnessConfig::default(),
-            inception_configuration: vec![],
-        },
-        SelfAddressing::Blake3_256,
-        &SerializationFormats::JSON,
-    );
+    // next key set pre-commitment
+    let nexter_pref = nxt_commitment(1, &[sig_pref_1, enc_pref_1], SelfAddressing::Blake3_256);
 
-    let pref = IdentifierPrefix::SelfAddressing(SelfAddressing::Blake3_256.derive(
-        &dfs_serializer::to_vec(&icp_data).map_err(|_| "failed to extract data set".to_string())?,
-    ));
+    let icp = InceptionEvent::new(
+        KeyConfig::new(
+            vec![sig_pref_0.clone(), enc_pref_0.clone()],
+            nexter_pref,
+            Some(1),
+        ),
+        None,
+        None,
+    )
+    .incept_self_addressing(SelfAddressing::Blake3_256, SerializationFormats::JSON)?;
 
-    let icp_event = Event {
-        prefix: pref,
-        ..icp_data.event
-    }
-    .to_message(&SerializationFormats::JSON)
-    .map_err(|_| "failed to create inception message".to_string())?;
-
-    uw.id = ["did:jun", &icp_event.event.prefix.to_str()].join(":");
+    uw.id = ["did:jun", &icp.event.prefix.to_str()].join(":");
     uw.set_key_controller(
         &sig_key_0.id,
         &[uw.id.clone(), sig_pref_0.to_str()].join("#"),
@@ -232,24 +203,20 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
         &[uw.id.clone(), enc_pref_0.to_str()].join("#"),
     );
 
-    let serialized = icp_event.serialize().map_err(|e| e.to_string())?;
+    let serialized = icp.serialize()?;
 
-    let sig = uw.sign_raw(&sig_key_0.id, &serialized)?;
+    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, uw.sign_raw(&sig_key_0.id, &serialized)?, 0);
 
-    let sig_pref = AttachedSignaturePrefix::new(SelfSigning::Ed25519Sha512, sig, 0);
+    let signed_event = icp.sign(vec![sig_pref]);
 
-    let signed_event = icp_event.sign(vec![sig_pref]);
-
-    serde_json::to_string(&WalletInceptionRep {
+    Ok(serde_json::to_string(&WalletInceptionRep {
         id: uw.id.clone(),
         encrypted_wallet: export_wallet(uw, pass)?,
-        inception_event: String::from_utf8(signed_event.serialize().map_err(|e| e.to_string())?)
-            .map_err(|_| "failed to serialize".to_string())?,
-    })
-    .map_err(|e| e.to_string())
+        inception_event: String::from_utf8(signed_event.serialize()?)?,
+    }).map_err(|e| UwError::Serde(e))?)
 }
 
-pub fn export_wallet(uw: UnlockedWallet, pass: &str) -> Result<String, String> {
+pub fn export_wallet(uw: UnlockedWallet, pass: &str) -> Result<String, Error> {
     Ok(base64::encode_config(
         uw.lock(pass.as_bytes())?.ciphertext,
         base64::URL_SAFE,
@@ -261,7 +228,7 @@ pub fn change_pass(
     id: &str,
     old_pass: &str,
     new_pass: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, &old_pass)?;
     export_wallet(uw, new_pass)
 }
@@ -271,7 +238,7 @@ pub fn change_id(
     id: &str,
     new_id: &str,
     pass: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let mut uw = wallet_from(encrypted_wallet, id, &pass)?;
     uw.id = new_id.to_string();
     export_wallet(uw, pass)
@@ -283,18 +250,17 @@ pub fn new_key(
     pass: &str,
     key_type: &str,
     controller: Option<Vec<String>>,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
     let nkt = KeyType::from_str(key_type)?;
 
     let key = uw.new_key(nkt, controller)?;
 
-    serde_json::to_string(&AddKeyResultRep {
+    Ok(serde_json::to_string(&AddKeyResultRep {
         new_encrypted_state: export_wallet(uw, pass)?,
         new_key: key,
-    })
-    .map_err(|e| e.to_string())
+    }).map_err(|e| UwError::Serde(e))?)
 }
 
 pub fn add_content(
@@ -302,10 +268,11 @@ pub fn add_content(
     id: &str,
     pass: &str,
     content: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let content_entity: Content = serde_json::from_str(content).map_err(|e| e.to_string())?;
+    let content_entity: Content = serde_json::from_str(content)
+        .map_err(|e| UwError::Serde(e))?;
 
     uw.import_content(&content_entity);
 
@@ -318,7 +285,7 @@ pub fn set_key_controller(
     pass: &str,
     key_ref: &str,
     controller: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let mut uw = wallet_from(encrypted_wallet, id, pass)?;
 
     uw.set_key_controller(key_ref, controller);
@@ -332,14 +299,14 @@ pub fn sign_by_controller(
     pass: &str,
     controller: &str,
     data: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
     let key_ref = match uw.get_key_by_controller(controller) {
         Some(c) => c.id,
-        None => return Err("No Key Found".to_string()),
+        None => return Err(Error::Generic("No Key Found".to_string())),
     };
 
     let sig_bytes = uw.sign_raw(&key_ref, &data_bytes)?;
@@ -353,25 +320,40 @@ pub fn sign(
     pass: &str,
     key_ref: &str,
     data: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
     let sig = uw.sign_raw(key_ref, &data_bytes)?;
 
     Ok(base64::encode_config(sig, base64::URL_SAFE))
 }
 
-pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> Result<bool, String> {
-    // use url safe or not?
-    let key_bytes = base64::decode_config(key_str, base64::URL_SAFE).map_err(|e| e.to_string())?;
+// pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> Result<bool, Error> {
+//     // use url safe or not?
+//     let key_bytes = base64::decode_config(key_str, base64::URL_SAFE)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE).map_err(|e| e.to_string())?;
+//     let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
-    let sig_bytes = base64::decode_config(sig, base64::URL_SAFE).map_err(|e| e.to_string())?;
+//     let sig_bytes = base64::decode_config(sig, base64::URL_SAFE)?;
 
-    PublicKeyInfo::new(KeyType::from_str(key_type)?, &key_bytes).verify(&data_bytes, &sig_bytes)
+//     let pk = PublicKeyInfo::new(key_type.try_into()?, &key_bytes);
+
+//     let verification_result = pk.verify(&data_bytes, &sig_bytes);
+
+//     Ok(verification_result?)
+// }
+
+pub fn verify(key_str: &str, key_type: &str, data: &str, signature: &str) -> Result<bool, Error> {
+    Ok(PublicKeyInfo::new(
+        key_type.try_into()?,
+        &decode_base64_url_safe(key_str)?
+    ).verify(&decode_base64_url_safe(data)?, &decode_base64_url_safe(signature)?)?)
+}
+
+fn decode_base64_url_safe(encoded: &str) -> Result<Vec<u8>, Error> {
+    Ok(base64::decode_config(encoded, base64::URL_SAFE)?)
 }
 
 pub fn decrypt_by_controller(
@@ -381,19 +363,19 @@ pub fn decrypt_by_controller(
     controller: &str,
     data: &str,
     aad: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
-    let aad_bytes = base64::decode_config(aad, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let aad_bytes = base64::decode_config(aad, base64::URL_SAFE)?;
 
     let key_ref = match uw.get_key_by_controller(controller) {
         Some(c) => c.id,
-        None => return Err("No Key Found".to_string()),
+        None => return Err(Error::Generic("No Key Found".to_string())),
     };
 
-    let decrypted = uw.decrypt(&key_ref, &data_bytes, &aad_bytes)?;
+    let decrypted = uw.decrypt(&key_ref, &data_bytes, Some(&aad_bytes))?;
 
     Ok(base64::encode_config(decrypted, base64::URL_SAFE))
 }
@@ -405,40 +387,35 @@ pub fn decrypt(
     key_ref: &str,
     data: &str,
     aad: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
-    let aad_bytes = base64::decode_config(aad, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let aad_bytes = base64::decode_config(aad, base64::URL_SAFE)?;
 
-    let decrypted = uw.decrypt(key_ref, &data_bytes, &aad_bytes)?;
+    let decrypted = uw.decrypt(key_ref, &data_bytes, Some(&aad_bytes))?;
 
     Ok(base64::encode_config(decrypted, base64::URL_SAFE))
 }
 
-pub fn encrypt(key: &str, key_type: &str, data: &str, aad: &str) -> Result<String, String> {
-    let key_bytes = base64::decode_config(key, base64::URL_SAFE).map_err(|e| e.to_string())?;
+pub fn encrypt(key: &str, key_type: &str, data: &str, aad: &str) -> Result<String, Error> {
+    let key_bytes = base64::decode_config(key, base64::URL_SAFE)?;
 
-    let data_bytes = base64::decode_config(data, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
 
-    let aad_bytes = base64::decode_config(aad, base64::URL_SAFE).map_err(|e| e.to_string())?;
+    let aad_bytes = base64::decode_config(aad, base64::URL_SAFE)?;
 
-    match PublicKeyInfo::new(KeyType::from_str(key_type)?, &key_bytes)
-        .encrypt(&data_bytes, &aad_bytes)
-    {
-        Ok(v) => Ok(base64::encode_config(v, base64::URL_SAFE)),
-        Err(e) => Err(e.to_string()),
-    }
+    let pki = PublicKeyInfo::new(KeyType::from_str(key_type)?, &key_bytes)
+        .encrypt(&data_bytes, Some(&aad_bytes))?;
+    Ok(base64::encode_config(pki, base64::URL_SAFE))
 }
 
-pub fn get_keys(encrypted_wallet: &str, id: &str, pass: &str) -> Result<String, String> {
+pub fn get_keys(encrypted_wallet: &str, id: &str, pass: &str) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
-    match serde_json::to_string(&uw.get_keys()) {
-        Ok(s) => Ok(s),
-        Err(e) => Err(e.to_string()),
-    }
+    Ok(serde_json::to_string(&uw.get_keys())
+        .map_err(|e| UwError::Serde(e))?)
 }
 
 pub fn get_key(
@@ -446,18 +423,16 @@ pub fn get_key(
     id: &str,
     pass: &str,
     key_ref: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
     let pk = match uw.get_key(&key_ref) {
         Some(pk) => pk,
-        None => return Err("No key found".to_string()),
+        None => return Err(Error::Generic("No key found".to_string())),
     };
 
-    match serde_json::to_string(&pk) {
-        Ok(s) => Ok(s),
-        Err(e) => Err(e.to_string()),
-    }
+    Ok(serde_json::to_string(&pk)
+        .map_err(|e| UwError::Serde(e))?)
 }
 
 pub fn get_key_by_controller(
@@ -465,22 +440,20 @@ pub fn get_key_by_controller(
     id: &str,
     pass: &str,
     controller: &str,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
 
     let pk = match uw.get_key_by_controller(controller) {
         Some(pk) => pk,
-        None => return Err("No key found".to_string()),
+        None => return Err(Error::Generic("No key found".to_string())),
     };
 
-    match serde_json::to_string(&pk) {
-        Ok(s) => Ok(s),
-        Err(e) => Err(e.to_string()),
-    }
+    Ok(serde_json::to_string(&pk)
+        .map_err(|e| UwError::Serde(e))?)
 }
 
 #[test]
-fn test_create() -> Result<(), String> {
+fn test_create() -> Result<(), Error> {
     let id = "my_did".to_string();
     let p = "my_password".to_string();
 
@@ -492,8 +465,7 @@ fn test_create() -> Result<(), String> {
         &p,
         "EcdsaSecp256k1VerificationKey2019",
         None,
-    )?)
-    .map_err(|e| e.to_string())?;
+    )?).map_err(|e| UwError::Serde(e))?;
 
     let keys = get_keys(&res.new_encrypted_state, &id, &p)?;
     assert!(keys.len() > 16);
@@ -502,31 +474,31 @@ fn test_create() -> Result<(), String> {
 }
 
 #[test]
-fn test_incept() -> Result<(), String> {
+fn test_incept() -> Result<(), Error> {
+    use crate::{validate_events_str, did_document::{KeyTypes, DIDDocument}};
+
     let id = "my_did";
     let p = "my_password";
 
     let ew = new_wallet(id, p)?;
 
     let res_str: WalletInceptionRep =
-        serde_json::from_str(&incept_wallet(&ew, id, p)?).map_err(|e| e.to_string())?;
+        serde_json::from_str(&incept_wallet(&ew, id, p)?).map_err(|e| UwError::Serde(e))?;
 
     let nid: String = res_str.id.clone();
 
     let uw = LockedWallet::new(
         &nid,
-        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)
-            .map_err(|e| e.to_string())?,
-    )
-    .unlock(p.as_bytes())?;
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)?
+        ).unlock(p.as_bytes())?;
 
     assert_eq!(uw.get_keys().len(), 4);
 
-    let kel_str = res_str.inception_event;
+    let kel_bytes = res_str.inception_event.as_bytes();
 
-    let ddo_str = validate_events_str(&kel_str, "jun")?;
+    let ddo_str = validate_events_str(&kel_bytes, "jun")?;
 
-    let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| e.to_string())?;
+    let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| UwError::Serde(e))?;
 
     assert_eq!(ddo.verification_methods.len(), 2);
     assert_eq!(
@@ -542,26 +514,25 @@ fn test_incept() -> Result<(), String> {
 }
 
 #[test]
-fn test_rt_sign() -> Result<(), String> {
+fn test_rt_sign() -> Result<(), Error> {
     let id = "my_did";
     let pass = "my_pass";
     let message = base64::encode_config("hello there", base64::URL_SAFE);
 
     let mut uw = UnlockedWallet::new(id);
     let k1 = uw
-        .new_key(KeyType::EcdsaSecp256k1VerificationKey2019, None)
-        .map_err(|_| "bad sig".to_string())?;
+        .new_key(KeyType::EcdsaSecp256k1VerificationKey2019, None)?;
+        // .map_err(|_| "bad sig".to_string())?; // TODO: should this be transparent or use this string?
 
     let pk = match k1.content {
         Content::PublicKey(pk) => pk,
-        _ => return Err("bad key".to_string()),
+        _ => return Err(Error::Generic("bad key".to_string())),
     };
 
     let pks = base64::encode_config(pk.public_key, base64::URL_SAFE);
 
     let lw = uw
-        .lock(pass.as_bytes())
-        .map_err(|_| "bad lock".to_string())?;
+        .lock(pass.as_bytes())?;
 
     let sig = sign(
         &base64::encode_config(lw.ciphertext, base64::URL_SAFE),
@@ -582,7 +553,7 @@ fn test_rt_sign() -> Result<(), String> {
 }
 
 #[test]
-fn test_sign() -> Result<(), String> {
+fn test_sign() -> Result<(), Error> {
     let kt = "EcdsaSecp256k1VerificationKey2019";
     let key = "Aw2CKxqxbAH5CJK5fo0LqnREgJQYYsFcAocCKX7TrUmp";
     let message = base64::encode_config("hello there".as_bytes(), base64::URL_SAFE);
@@ -599,7 +570,25 @@ fn test_sign() -> Result<(), String> {
 }
 
 #[test]
-fn test_incept_from_keys() -> Result<(), String> {
+fn test_key_type() -> Result<(), Error> {
+    let kt = KeyType::from_str("EcdsaSecp256k1VerificationKey2019");
+    assert!(&kt.is_ok());
+    let kt = kt?;
+    let expected = KeyType::EcdsaSecp256k1VerificationKey2019;
+    assert_eq!(kt, expected);
+    let pki_1 = PublicKeyInfo::new(KeyType::from_str("EcdsaSecp256k1VerificationKey2019")?, b"nokey");
+    let pki_2 = PublicKeyInfo::new("EcdsaSecp256k1VerificationKey2019".try_into()?, b"nokey");
+    let pki_3 = PublicKeyInfo::new(kt, b"nokey");
+    assert_eq!(pki_1.key_type, KeyType::EcdsaSecp256k1VerificationKey2019);
+    assert_eq!(pki_2.key_type, KeyType::EcdsaSecp256k1VerificationKey2019);
+    assert_eq!(pki_3.key_type, KeyType::EcdsaSecp256k1VerificationKey2019);
+    Ok(())
+}
+
+#[test]
+fn test_incept_from_keys() -> Result<(), Error> {
+    use crate::validate_events_str;
+
     let pass = "secret";
     let sign_enc_keys = "[\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\",\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\"]";
     let pre_rot_sign_enc_keys = sign_enc_keys.clone();
@@ -607,35 +596,26 @@ fn test_incept_from_keys() -> Result<(), String> {
         sign_enc_keys,
         pre_rot_sign_enc_keys,
         pass,
-    )?)
-    .map_err(|e| e.to_string())?;
+    )?).map_err(|e| UwError::Serde(e))?;
 
     let wallet = LockedWallet::new(
         &res_str.id,
-        base64::decode_config(res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
     );
 
     let uw = wallet.unlock(pass.as_bytes()).unwrap();
-    let kel_str = res_str.inception_event;
-    let ddo_str = validate_events_str(&kel_str, "jun")?;
+    let kel_bytes = &res_str.inception_event.as_bytes();
+    let ddo_str = validate_events_str(kel_bytes, "jun")?;
+    let expected = "{\
+        \"@context\":\"https://www.w3.org/ns/did/v1\",\"id\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\
+        \"verificationMethod\":[{\"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\"type\":\"Ed25519VerificationKey2018\",\
+        \"controller\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\"publicKeyBase64\":\
+        \"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"},{\"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\"type\":\
+        \"X25519KeyAgreementKey2019\",\"controller\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\"publicKeyBase64\":\
+        \"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"}]}";
     assert_eq!(
         ddo_str,
-        "{\
-        \"@context\":\"https://www.w3.org/ns/did/v1\",\
-        \"id\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
-        \"verificationMethod\":[\
-        {\
-            \"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\
-            \"type\":\"Ed25519VerificationKey2018\",\
-            \"controller\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
-            \"publicKeyBase64\":\"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"\
-        },{\
-            \"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\
-            \"type\":\"X25519KeyAgreementKey2019\",\
-            \"controller\":\"did:jun:ENaTFPuLm9M3Qj3sIaPEVgbuPkyz5lLQwmDLoasG22Rk\",\
-            \"publicKeyBase64\":\"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"\
-        }]\
-    }"
+        expected
     );
 
     assert_eq!(uw.get_keys().len(), 4);
