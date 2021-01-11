@@ -48,3 +48,6 @@ buck-out/
 
 #rust
 rust/signer/target
+
+# flapigen
+flapigen/python/libs
