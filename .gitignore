@@ -50,4 +50,4 @@ buck-out/
 rust/signer/target
 
 # flapigen
-flapigen/python/libs
+ffi/python/libs

@@ -15,6 +15,4 @@ jolocom_native_utils = { path = "../../../rust/jolocom_native_utils" }
 cpython = { version = "0.3", features = ["extension-module"] }
 
 [build-dependencies]
-env_logger = "0.7"
-log = "0.4.6"
 flapigen = "0.6.0-pre7"

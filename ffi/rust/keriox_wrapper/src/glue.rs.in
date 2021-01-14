@@ -13,7 +13,7 @@ impl WalletError {
 
 impl fmt::Display for WalletError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "TestError struct!")
+        write!(f, "Wallet Error")
     }
 }
 
@@ -21,14 +21,6 @@ impl std::error::Error for WalletError {}
 
 pub struct Wallet {}
 impl Wallet {
-    pub fn validate_events(kel_string: String) -> Result<String, WalletError> {
-       validate_events_str(&kel_string.as_bytes(), "jun").map_err(|_| WalletError::new())
-    }
-
-    fn get_id_from_event(event_string: String) -> Result<String, WalletError> {
-        get_id_from_event_str(&event_string.as_bytes()).map_err(|_| WalletError::new())
-    }
-
     fn new_wallet(id: String, pass: String) -> Result<String, WalletError> {
         wallet::new_wallet(&id, &pass).map_err(|_| WalletError::new())
     }
@@ -97,8 +89,6 @@ impl Wallet {
 
 foreign_class!(
     class Wallet {
-        fn Wallet::validate_events(s: String) -> Result<String, WalletError>;
-        fn Wallet::get_id_from_event(s: String) -> Result<String, WalletError>;
         fn Wallet::new_wallet(id: String, pass: String) -> Result<String, WalletError>;
         fn Wallet::keri_incept_wallet(ew: String, id: String, pass: String) -> Result<String, WalletError>;
         fn Wallet::keri_incept_wallet_from_keys(live_keys: String, pre_rotated_keys: String, pass: String) -> Result<String, WalletError>;
