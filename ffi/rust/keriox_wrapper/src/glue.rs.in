@@ -1,5 +1,5 @@
 use std::fmt;
-use jolocom_native_utils::{get_id_from_event_str, validate_events_str, wallet};
+use jolocom_native_utils::{wallet};
 use std::convert::TryInto;
 
 #[derive(Debug, Clone, Copy)]
