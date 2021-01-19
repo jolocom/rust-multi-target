@@ -1,9 +1,10 @@
 var addon = require('./addon')
 import { CryptoUtils, EncryptedWalletUtils } from "@jolocom/vaulted-key-provider"
 
-export const validateEvents = async (
-    events: string
-): Promise<string> => await addon.validateEvents(events);
+export const processEvents = async (
+    events: string,
+    db_path: string
+): Promise<void> => await addon.processEvents(events, db_path);
 
 export const getIcpFromKeySet = async (config: {
     live_keys: string,
@@ -33,9 +34,10 @@ export const getIcp = async (config: {
     config.pass
 ));
 
-export const getIdFromEvent = async (
-    event: string
-): Promise<string> => await addon.getIdFromEvent(event);
+export const resolve = async (
+    id: string,
+    db_path: string
+): Promise<string> => await addon.resolve(id, db_path);
 
 export const walletUtils: EncryptedWalletUtils = {
     newWallet: async (

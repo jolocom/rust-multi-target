@@ -8,16 +8,15 @@ use keri::{
 };
 use std::path::Path;
 
-fn get_processor() -> Result<EventProcessor<LmdbEventDatabase>, Error> {
-    let path_str: &'static str = env!("EVENT_DB_PATH", "No Event Database Path provided");
+fn get_processor(path: &str) -> Result<EventProcessor<LmdbEventDatabase>, Error> {
     Ok(EventProcessor::new(
-        LmdbEventDatabase::new(Path::new(path_str)).map_err(|e| Error::Generic(e.to_string()))?,
+        LmdbEventDatabase::new(Path::new(path)).map_err(|e| Error::Generic(e.to_string()))?,
     ))
 }
 
-pub fn process_events(kel: &[u8]) -> Result<(), Error> {
+pub fn process_events(kel: &[u8], db_path: &str) -> Result<(), Error> {
     let events = signed_event_stream(kel).map_err(|e| Error::Generic(e.to_string()))?;
-    let proc = get_processor()?;
+    let proc = get_processor(db_path)?;
 
     for event in events.1 {
         proc.process(event);
@@ -26,12 +25,12 @@ pub fn process_events(kel: &[u8]) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn get_kel(id: &IdentifierPrefix) -> Result<Option<Vec<u8>>, Error> {
+pub fn get_kel(id: &IdentifierPrefix, db_path: &str) -> Result<Option<Vec<u8>>, Error> {
     todo!()
 }
 
-pub fn get_state(id: &IdentifierPrefix) -> Result<Option<IdentifierState>, Error> {
-    get_processor()?
+pub fn get_state(id: &IdentifierPrefix, db_path: &str) -> Result<Option<IdentifierState>, Error> {
+    get_processor(db_path)?
         .compute_state(id)
         .map_err(|e| Error::Generic(e.to_string()))
 }

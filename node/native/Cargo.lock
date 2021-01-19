@@ -832,8 +832,8 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 
 [[package]]
 name = "keri"
-version = "0.3.1"
-source = "git+https://github.com/35359595/keriox?branch=ursa_bump#2cac8a9424bef605a781e60089221570c6a8924b"
+version = "0.4.0"
+source = "git+https://github.com/decentralized-identity/keriox?branch=master#a51374b906ac720795f094813fd5819c2189816a"
 dependencies = [
  "base64 0.12.3",
  "bincode",
@@ -842,6 +842,7 @@ dependencies = [
  "itoa",
  "nom",
  "rkv",
+ "rmp-serde",
  "ryu",
  "serde",
  "serde-hex",
@@ -974,6 +975,7 @@ dependencies = [
  "jolocom_native_utils",
  "neon",
  "neon-build",
+ "serde_json",
 ]
 
 [[package]]
@@ -1303,6 +1305,27 @@ dependencies = [
  "serde_derive",
  "url",
  "uuid",
+]
+
+[[package]]
+name = "rmp"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0f10b46df14cf1ee1ac7baa4d2fbc2c52c0622a4b82fa8740e37bc452ac0184f"
+dependencies = [
+ "byteorder",
+ "num-traits",
+]
+
+[[package]]
+name = "rmp-serde"
+version = "0.14.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ce7d70c926fe472aed493b902010bccc17fa9f7284145cb8772fd22fdb052d8"
+dependencies = [
+ "byteorder",
+ "rmp",
+ "serde",
 ]
 
 [[package]]
