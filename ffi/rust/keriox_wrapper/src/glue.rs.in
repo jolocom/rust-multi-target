@@ -1,0 +1,109 @@
+use std::fmt;
+use jolocom_native_utils::{wallet};
+use std::convert::TryInto;
+
+#[derive(Debug, Clone, Copy)]
+pub struct WalletError {}
+
+impl WalletError {
+    pub fn new() -> WalletError {
+        WalletError {}
+    }
+}
+
+impl fmt::Display for WalletError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Wallet Error")
+    }
+}
+
+impl std::error::Error for WalletError {}
+
+pub struct Wallet {}
+impl Wallet {
+    fn new_wallet(id: String, pass: String) -> Result<String, WalletError> {
+        wallet::new_wallet(&id, &pass).map_err(|_| WalletError::new())
+    }
+
+    fn keri_incept_wallet(ew: String, id: String, pass: String) -> Result<String, WalletError> {
+        wallet::incept_wallet(&ew, &id, &pass).map_err(|_| WalletError::new())
+    }
+
+    fn keri_incept_wallet_from_keys(live_keys: String, pre_rotated_keys: String, pass: String) -> Result<String, WalletError> {
+        wallet::incept_populated_wallet(&live_keys, &pre_rotated_keys, &pass).map_err(|_| WalletError::new())
+    }
+
+    fn change_pass(ew: String, id: String, old_pass: String, new_pass: String) -> Result<String, WalletError> {
+        wallet::change_pass(&ew, &id, &old_pass, &new_pass).map_err(|_| WalletError::new())
+    }
+
+    fn change_id(ew: String, id: String, new_id: String, pass: String) -> Result<String, WalletError> {
+        wallet::change_id(&ew, &id, &new_id, &pass).map_err(|_| WalletError::new())
+    }
+
+    fn new_key(ew: String, id: String, pass: String, key_type: String, controller: String) -> Result<String, WalletError> {
+        wallet::new_key(&ew, &id, &pass, &key_type, if controller.len() > 0 {Some(vec![controller])} else { None }).map_err(|_| WalletError::new())
+    }
+
+    fn add_content(ew: String, id: String, pass: String, content: String) -> Result<String,  WalletError> {
+        wallet::add_content(&ew, &id, &pass, &content).map_err(|_| WalletError::new())
+    }
+
+    fn set_key_controller(ew: String, id: String, pass: String, key_ref: String, controller: String) -> Result<String, WalletError> {
+        wallet::set_key_controller(&ew, &id, &pass, &key_ref, &controller).map_err(|_| WalletError::new())
+    }
+
+    fn get_key(ew: String, id: String, pass: String, key_ref: String) -> Result<String, WalletError> {
+        wallet::get_key(&ew, &id, &pass, &key_ref).map_err(|_| WalletError::new())
+    }
+
+    fn get_key_by_controller(ew: String, id: String, pass: String, controller: String) -> Result<String, WalletError> {
+        wallet::get_key_by_controller(&ew, &id, &pass, &controller).map_err(|_| WalletError::new())
+    }
+
+    fn get_keys(ew: String, id: String, pass: String) -> Result<String, WalletError> {
+        wallet::get_keys(&ew, &id, &pass).map_err(|_| WalletError::new())
+    }
+
+    fn sign_by_controller(ew: String, id: String, pass: String, controller: String, data: String) -> Result<String, WalletError> {
+        wallet::sign_by_controller(&ew, &id, &pass, &controller, &data).map_err(|_| WalletError::new())
+    }
+
+    fn jc_verify(key: String, key_type: String, data: String, signature: String) -> Result<bool, WalletError> {
+        wallet::verify(&key, &key_type, &data, &signature).map_err(|_| WalletError::new())
+    }
+
+    fn jc_encrypt(key: String, key_type: String, data: String, aad: String) -> Result<String, WalletError> {
+        wallet::encrypt(&key, &key_type, &data, &aad).map_err(|_| WalletError::new())
+    }
+
+    fn jc_decrypt(ew: String, id: String, pass: String, key_ref: String, data: String, aad: String) -> Result<String, WalletError> {
+        wallet::decrypt_by_controller(&ew, &id, &pass, &key_ref, &data, &aad).map_err(|_| WalletError::new())
+    }
+
+    fn get_random(len: u32) -> Result<String, WalletError> {
+        wallet::get_random_b64(len.try_into().unwrap()).map_err(|_| WalletError::new())
+    }
+
+}
+
+foreign_class!(
+    class Wallet {
+        fn Wallet::new_wallet(id: String, pass: String) -> Result<String, WalletError>;
+        fn Wallet::keri_incept_wallet(ew: String, id: String, pass: String) -> Result<String, WalletError>;
+        fn Wallet::keri_incept_wallet_from_keys(live_keys: String, pre_rotated_keys: String, pass: String) -> Result<String, WalletError>;
+        fn Wallet::change_pass(ew: String, id: String, old_pass: String, new_pass: String) -> Result<String, WalletError>;
+        fn Wallet::change_id(ew: String, id: String, new_id: String, pass: String) -> Result<String, WalletError>;
+        fn Wallet::new_key(ew: String, id: String, pass: String, key_type: String, controller: String) -> Result<String, WalletError>;
+        fn Wallet::add_content(ew: String, id: String, pass: String, content: String) -> Result<String,  WalletError>;
+        fn Wallet::set_key_controller(ew: String, id: String, pass: String, key_ref: String, controller: String) -> Result<String, WalletError>; 
+        fn Wallet::get_key(ew: String, id: String, pass: String, key_ref: String) -> Result<String, WalletError>;
+        fn Wallet::get_key_by_controller(ew: String, id: String, pass: String, controller: String) -> Result<String, WalletError>;
+        fn Wallet::get_keys(ew: String, id: String, pass: String) -> Result<String, WalletError>;
+        fn Wallet::sign_by_controller(ew: String, id: String, pass: String, controller: String, data: String) -> Result<String, WalletError>; 
+        fn Wallet::jc_verify(key: String, key_type: String, data: String, signature: String) -> Result<bool, WalletError>;
+        fn Wallet::jc_encrypt(key: String, key_type: String, data: String, aad: String) -> Result<String, WalletError>;
+        fn Wallet::jc_decrypt(ew: String, id: String, pass: String, key_ref: String, data: String, aad: String) -> Result<String, WalletError>; 
+        fn Wallet::get_random(len: u32) -> Result<String, WalletError>;
+    }
+);
