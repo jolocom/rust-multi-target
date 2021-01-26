@@ -832,8 +832,8 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 
 [[package]]
 name = "keri"
-version = "0.4.0"
-source = "git+https://github.com/decentralized-identity/keriox?branch=master#a51374b906ac720795f094813fd5819c2189816a"
+version = "0.5.0"
+source = "git+https://github.com/decentralized-identity/keriox?branch=master#6f149cb365b213d0d06da342539acb6c30f7eb37"
 dependencies = [
  "base64 0.12.3",
  "bincode",
@@ -846,7 +846,6 @@ dependencies = [
  "ryu",
  "serde",
  "serde-hex",
- "serde-transcode",
  "serde_cbor",
  "serde_json",
  "thiserror",
@@ -1286,15 +1285,14 @@ checksum = "26412eb97c6b088a6997e05f69403a802a92d520de2f8e63c2b65f9e0f47c4e8"
 
 [[package]]
 name = "rkv"
-version = "0.15.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e97d1b6321740ce36d77d67d22ff84ac8a996cf69dbd0727b8bcae52f1c98aaa"
+checksum = "28e2e15d3fff125cfc4fb3f1b226ff83af057c4715061ded16193b7142beefc9"
 dependencies = [
  "arrayref",
  "bincode",
  "bitflags",
  "byteorder",
- "failure",
  "id-arena",
  "lazy_static",
  "lmdb-rkv",
@@ -1303,6 +1301,7 @@ dependencies = [
  "paste",
  "serde",
  "serde_derive",
+ "thiserror",
  "url",
  "uuid",
 ]
@@ -1389,15 +1388,6 @@ dependencies = [
  "array-init",
  "serde",
  "smallvec",
-]
-
-[[package]]
-name = "serde-transcode"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97528f0dfcf8ce2d51d995cb513a103b9cd301dc3f387a9cae5ef974381d4e1c"
-dependencies = [
- "serde",
 ]
 
 [[package]]

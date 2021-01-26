@@ -4,17 +4,17 @@ use serde_json::to_string;
 
 fn process_events(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let str = cx.argument::<JsString>(0)?.value();
-    let path_str = cx.argument::<JsString>(1)?.value();
-    keri::process_events(&str.as_bytes(), &path_str).unwrap();
+    let path = cx.argument::<JsString>(1)?.value();
+    keri::process_events(&str.as_bytes(), &path).unwrap();
     Ok(JsUndefined::new())
 }
 
 fn resolve(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    let path_str = cx.argument::<JsString>(1)?.value();
+    let path = cx.argument::<JsString>(1)?.value();
     Ok(cx.string(
         to_string(&did_document::state_to_did_document(
-            keri::get_state(&str.parse().unwrap(), &path_str)
+            keri::get_state(&str.parse().unwrap(), &path)
                 .unwrap()
                 .unwrap(),
             "keri",

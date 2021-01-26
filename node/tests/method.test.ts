@@ -1,6 +1,6 @@
 import { walletUtils, getIcp, processEvents, resolve } from "../lib";
 
-const db_path = "../db.db"
+const db_path = "./test_db"
 
 describe("Local DID Resolver", () => {
   describe("getResolver", () => {
@@ -16,15 +16,15 @@ describe("Local DID Resolver", () => {
       let encryptedWallet = await walletUtils.newWallet(idNone, pass)
       const icp_data = await getIcp({encryptedWallet, id: idNone, pass})
       const { inceptionEvent, id } = icp_data
+      const prefix = id.split(":")[2]
 
       // save the event to the DB, and resolve the DID
       await processEvents(inceptionEvent, db_path)
-      console.log(id)
-      const ddo = await resolve(id, db_path)
+      const ddo = await resolve(prefix, db_path)
 
       // now do it again, resolved DID doc should be unchanged
       await processEvents(inceptionEvent, db_path)
-      const ddoUpdated = await resolve(id, db_path)
+      const ddoUpdated = await resolve(prefix, db_path)
 
       return expect(ddoUpdated).toEqual(ddo)
     });
