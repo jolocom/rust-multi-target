@@ -25,6 +25,8 @@ describe("Local DID Resolver", () => {
       // now do it again, resolved DID doc should be unchanged
       await processEvents(inceptionEvent, db_path)
       const ddoUpdated = await resolve(prefix, db_path)
+      
+      expect(get_kerl(prefix, db_path)).resolves.toEqual(inceptionEvent)
 
       return expect(ddoUpdated).toEqual(ddo)
     });
