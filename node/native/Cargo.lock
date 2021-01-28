@@ -833,7 +833,7 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 [[package]]
 name = "keri"
 version = "0.5.0"
-source = "git+https://github.com/decentralized-identity/keriox?branch=master#6f149cb365b213d0d06da342539acb6c30f7eb37"
+source = "git+https://github.com/decentralized-identity/keriox?branch=master#62528c164c26f6aa9fcf1ee0e41b34f0e7c45e0b"
 dependencies = [
  "base64 0.12.3",
  "bincode",

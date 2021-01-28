@@ -23,6 +23,19 @@ fn resolve(mut cx: FunctionContext) -> JsResult<JsString> {
     ))
 }
 
+fn get_kerl(mut cx: FunctionContext) -> JsResult<JsString> {
+    let id_str = cx.argument::<JsString>(0)?.value();
+    let path = cx.argument::<JsString>(1)?.value();
+    Ok(cx.string(
+        String::from_utf8(
+            keri::get_kerl(&id_str.parse().unwrap(), &path)
+                .unwrap()
+                .unwrap(),
+        )
+        .unwrap(),
+    ))
+}
+
 fn new_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
     let id = cx.argument::<JsString>(0)?.value();
     let pass = cx.argument::<JsString>(1)?.value();
@@ -180,6 +193,7 @@ fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
 register_module!(mut cx, {
     cx.export_function("processEvents", process_events)?;
     cx.export_function("resolve", resolve)?;
+    cx.export_function("get_kerl", get_kerl)?;
     cx.export_function("newWallet", new_wallet)?;
     cx.export_function("keriInceptWalletFromKeys", keri_incept_wallet_from_keys)?;
     cx.export_function("keriInceptWallet", keri_incept_wallet)?;

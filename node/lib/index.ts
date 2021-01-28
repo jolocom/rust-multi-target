@@ -34,6 +34,11 @@ export const getIcp = async (config: {
     config.pass
 ));
 
+export const get_kerl = async (
+    id: string,
+    db_path: string
+): Promise<string> => await addon.get_kerl(id, db_path);
+ 
 export const resolve = async (
     id: string,
     db_path: string

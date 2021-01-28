@@ -1,4 +1,4 @@
-import { walletUtils, getIcp, processEvents, resolve } from "../lib";
+import { walletUtils, getIcp, processEvents, resolve, get_kerl } from "../lib";
 
 const db_path = "./test_db"
 

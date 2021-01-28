@@ -25,8 +25,9 @@ pub fn process_events(kel: &[u8], db_path: &str) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn get_kel(id: &IdentifierPrefix, db_path: &str) -> Result<Option<Vec<u8>>, Error> {
-    todo!()
+pub fn get_kerl(id: &IdentifierPrefix, db_path: &str) -> Result<Option<Vec<u8>>, Error> {
+    let proc = get_processor(db_path)?;
+    proc.get_kerl(id).map_err(|e| Error::Generic(e.to_string()))
 }
 
 pub fn get_state(id: &IdentifierPrefix, db_path: &str) -> Result<Option<IdentifierState>, Error> {
