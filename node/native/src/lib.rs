@@ -9,7 +9,7 @@ fn process_events(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     Ok(JsUndefined::new())
 }
 
-fn resolve(mut cx: FunctionContext) -> JsResult<JsString> {
+fn resolve_id(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
     let path = cx.argument::<JsString>(1)?.value();
     Ok(cx.string(
@@ -192,7 +192,7 @@ fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
 
 register_module!(mut cx, {
     cx.export_function("processEvents", process_events)?;
-    cx.export_function("resolve", resolve)?;
+    cx.export_function("resolve_id", resolve_id)?;
     cx.export_function("get_kerl", get_kerl)?;
     cx.export_function("newWallet", new_wallet)?;
     cx.export_function("keriInceptWalletFromKeys", keri_incept_wallet_from_keys)?;

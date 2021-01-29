@@ -39,10 +39,10 @@ export const get_kerl = async (
     db_path: string
 ): Promise<string> => await addon.get_kerl(id, db_path);
  
-export const resolve = async (
+export const resolve_id = async (
     id: string,
     db_path: string
-): Promise<string> => await addon.resolve(id, db_path);
+): Promise<string> => await addon.resolve_id(id, db_path);
 
 export const walletUtils: EncryptedWalletUtils = {
     newWallet: async (
