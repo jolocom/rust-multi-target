@@ -9,8 +9,8 @@ export! {
         keri::process_events(&kel_string.as_bytes(), &db_path).map_err(|e| e.to_string())
     }
 
-    @Java_io_jolocom_jolocomCore_JolocomCoreModule_resolve
-    fn resolve(id: String, db_path: String) -> Result<String, String> {
+    @Java_io_jolocom_jolocomCore_JolocomCoreModule_resolveId
+    fn resolve_id(id: String, db_path: String) -> Result<String, String> {
         to_string(&did_document::state_to_did_document(
             keri::get_state(&id.parse().map_err(|_| "Invalid Identifier".to_string())?, &db_path)
                 .map_err(|e| e.to_string())?

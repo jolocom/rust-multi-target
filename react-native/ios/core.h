@@ -11,13 +11,11 @@ struct ExternError {
 
 void signer_destroy_string(const char *cstring);
 
-// ethkey ffi
+void process_events(struct ExternError *, const char *kel_str, const char *db_path);
 
-// validates a key event log,
-// see /react-native/rust/keriox-wrapper/src/lib.rs:7
-const char *validate_events(struct ExternError *, const char *kel_str);
+const char *resolve_id(struct ExternError *, const char *id, const char *db_path);
 
-const char *get_id_from_event(struct ExternError *, const char *event);
+const char *get_kerl(struct ExternError *, const char *id, const char *db_path);
 
 // returns a new encrypted walet
 const char *new_wallet(struct ExternError *, const char *id, const char *pass);
