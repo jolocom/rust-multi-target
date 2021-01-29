@@ -120,7 +120,7 @@ pub fn incept_populated_wallet(
     )
     .incept_self_addressing(SelfAddressing::Blake3_256, SerializationFormats::JSON)?;
 
-    uw.id = ["did:jun", &icp.event.prefix.to_str()].join(":");
+    uw.id = ["did:keri", &icp.event.prefix.to_str()].join(":");
     let sig_0_controller = vec![[uw.id.clone(), sig_pref_0.to_str()].join("#").to_string()];
     let key_id = uw
         .import_content(&Content::KeyPair(
@@ -221,7 +221,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     )
     .incept_self_addressing(SelfAddressing::Blake3_256, SerializationFormats::JSON)?;
 
-    uw.id = ["did:jun", &icp.event.prefix.to_str()].join(":");
+    uw.id = ["did:keri", &icp.event.prefix.to_str()].join(":");
     uw.set_key_controller(
         &sig_key_0.id,
         &[uw.id.clone(), sig_pref_0.to_str()].join("#"),
