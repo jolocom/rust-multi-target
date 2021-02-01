@@ -28,9 +28,9 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void validateEvents(String events, Promise promise) {
+  public void processEvents(String events, String dbPath, Promise promise) {
     try {
-      String result = validateEventsStr(events);
+      String result = processEvents(events, dbPath);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "parsing the KEL", e);
@@ -38,12 +38,22 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getIdFromEvent(String event, Promise promise) {
+  public void resolveId(String id, String dbPath, Promise promise) {
     try {
-      String result = getIdFromEvent(event);
+      String result = resolveId(id, dbPath);
       promise.resolve(result);
     } catch (Exception e) {
-      rejectWithException(promise, "extracting the ID from key event", e);
+      rejectWithException(promise, "resolving Id", e);
+    }
+  }
+
+  @ReactMethod
+  public void getKerl(String id, String dbPath, Promise promise) {
+    try {
+      String result = getKerl(id, dbPath);
+      promise.resolve(result);
+    } catch (Exception e) {
+      rejectWithException(promise, "getting KERL", e);
     }
   }
 

@@ -18,7 +18,7 @@ RCT_EXTERN_METHOD(processEvents
                   : (NSString *)dbPath resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(resolve_id
+RCT_EXTERN_METHOD(resolveId
                   : (NSString *)id dbPath
                   : (NSString *)dbPath resolve
                   : (RCTPromiseResolveBlock)resolve reject

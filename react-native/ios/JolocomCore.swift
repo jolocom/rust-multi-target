@@ -39,11 +39,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func resolve_id(_ id: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func resolveId(_ id: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { resolve_id($0, id, dbPath) },
+      get_result: { resolveId($0, id, dbPath) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
@@ -51,11 +51,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func get_kerl(_ id: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func getKerl(_ id: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { get_kerl($0, id, dbPath) },
+      get_result: { getKerl($0, id, dbPath) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
