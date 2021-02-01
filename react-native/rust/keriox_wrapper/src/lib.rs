@@ -10,12 +10,12 @@ export! {
     }
 
     @Java_io_jolocom_jolocomCore_JolocomCoreModule_resolveId
-    fn resolve_id(id: String, db_path: String) -> Result<String, String> {
+    fn resolve_id(id: String, db_path: String, method_name: String) -> Result<String, String> {
         to_string(&did_document::state_to_did_document(
             keri::get_state(&id.parse().map_err(|_| "Invalid Identifier".to_string())?, &db_path)
                 .map_err(|e| e.to_string())?
                 .ok_or("Identifier Unregistered".to_string())?,
-            "keri",
+            &method_name
         ))
         .map_err(|e| e.to_string())
     }

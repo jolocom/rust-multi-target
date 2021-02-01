@@ -3,8 +3,8 @@ import { CryptoUtils, EncryptedWalletUtils } from "@jolocom/vaulted-key-provider
 
 export const processEvents = async (
     events: string,
-    db_path: string
-): Promise<void> => await addon.processEvents(events, db_path);
+    dbPath: string
+): Promise<void> => await addon.processEvents(events, dbPath);
 
 export const getIcpFromKeySet = async (config: {
     live_keys: string,
@@ -34,15 +34,16 @@ export const getIcp = async (config: {
     config.pass
 ));
 
-export const get_kerl = async (
+export const getKerl = async (
     id: string,
-    db_path: string
-): Promise<string> => await addon.get_kerl(id, db_path);
+    dbPath: string
+): Promise<string> => await addon.getKerl(id, dbPath);
  
-export const resolve_id = async (
+export const resolveId = async (
     id: string,
-    db_path: string
-): Promise<string> => await addon.resolve_id(id, db_path);
+    dbPath: string,
+    methodName: string
+): Promise<string> => await addon.resolveId(id, dbPath, methodName);
 
 export const walletUtils: EncryptedWalletUtils = {
     newWallet: async (

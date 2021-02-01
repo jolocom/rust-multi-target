@@ -13,7 +13,7 @@ void signer_destroy_string(const char *cstring);
 
 void process_events(struct ExternError *, const char *kel_str, const char *db_path);
 
-const char *resolve_id(struct ExternError *, const char *id, const char *db_path);
+const char *resolve_id(struct ExternError *, const char *id, const char *db_path, const char *method_name);
 
 const char *get_kerl(struct ExternError *, const char *id, const char *db_path);
 

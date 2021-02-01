@@ -20,7 +20,8 @@ RCT_EXTERN_METHOD(processEvents
                   : (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(resolveId
                   : (NSString *)id dbPath
-                  : (NSString *)dbPath resolve
+                  : (NSString *)dbPath methodName
+                  : (NSString *)methodName resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getKerl

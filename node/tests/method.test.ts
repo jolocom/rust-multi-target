@@ -1,4 +1,4 @@
-import { walletUtils, getIcp, processEvents, resolve_id, get_kerl } from "../lib";
+import { walletUtils, getIcp, processEvents, resolveId, getKerl } from "../lib";
 
 const db_path = "./test_db"
 
@@ -7,7 +7,7 @@ describe("Local DID Resolver", () => {
     it("It should fail to resolve an unknown local DID", async () => {
       const testDid = 'did:jun:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
-      return expect(resolve_id(testDid.split(":")[2], db_path)).rejects.toBeTruthy()
+      return expect(resolveId(testDid.split(":")[2], db_path, "keri")).rejects.toBeTruthy()
     });
 
     it('It should correctly register a known local DID', async () => {
@@ -20,13 +20,13 @@ describe("Local DID Resolver", () => {
 
       // save the event to the DB, and resolve the DID
       await processEvents(inceptionEvent, db_path)
-      const ddo = await resolve_id(prefix, db_path)
+      const ddo = await resolveId(prefix, db_path, "keri")
 
       // now do it again, resolved DID doc should be unchanged
       await processEvents(inceptionEvent, db_path)
-      const ddoUpdated = await resolve_id(prefix, db_path)
+      const ddoUpdated = await resolveId(prefix, db_path, "keri")
       
-      expect(get_kerl(prefix, db_path)).resolves.toEqual(inceptionEvent)
+      expect(getKerl(prefix, db_path)).resolves.toEqual(inceptionEvent)
 
       return expect(ddoUpdated).toEqual(ddo)
     });

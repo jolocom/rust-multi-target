@@ -38,9 +38,9 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void resolveId(String id, String dbPath, Promise promise) {
+  public void resolveId(String id, String dbPath, String methodName, Promise promise) {
     try {
-      String result = resolveId(id, dbPath);
+      String result = resolveId(id, dbPath, methodName);
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "resolving Id", e);

@@ -39,11 +39,11 @@ class JolocomCore: NSObject {
     })
   }
 
-  @objc func resolveId(_ id: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func resolveId(_ id: String, dbPath: String, methodName: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { resolveId($0, id, dbPath) },
+      get_result: { resolveId($0, id, dbPath, methodName) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)
