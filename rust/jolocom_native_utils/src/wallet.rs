@@ -101,7 +101,7 @@ pub fn incept_populated_wallet(
     let icp = InceptionEvent::new(
         KeyConfig::new(
             vec![sig_pref_0.clone(), enc_pref_0.clone()],
-            nexter_pref,
+            Some(nexter_pref),
             Some(1),
         ),
         None,
@@ -185,7 +185,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     let icp = InceptionEvent::new(
         KeyConfig::new(
             vec![sig_pref_0.clone(), enc_pref_0.clone()],
-            nexter_pref,
+            Some(nexter_pref),
             Some(1),
         ),
         None,
@@ -450,6 +450,51 @@ pub fn get_key_by_controller(
 
     Ok(serde_json::to_string(&pk)
         .map_err(|e| UwError::Serde(e))?)
+}
+
+pub fn ecdh_get_shared_secret(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    key_ref: &str,
+    pub_key: &str
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+
+    let pub_key_bytes = base64::decode_config(pub_key, base64::URL_SAFE)?;
+
+    if pub_key_bytes.len() != 32 {
+        return Err(Error::Generic("Invalid X25519 Pub Key Size".to_owned()))
+    }
+
+    let shared_secret = uw.ecdh_key_agreement(key_ref, &pub_key_bytes)?;
+
+    Ok(base64::encode_config(shared_secret, base64::URL_SAFE))
+}
+
+pub fn ecdh_get_shared_secret_by_controller(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    controller: &str,
+    pub_key: &str
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+
+    let key_ref = match uw.get_key_by_controller(controller) {
+        Some(c) => c.id,
+        None => return Err(Error::Generic("No Key Found".to_string())),
+    };
+
+    let pub_key_bytes = base64::decode_config(pub_key, base64::URL_SAFE)?;
+
+    if pub_key_bytes.len() != 32 {
+        return Err(Error::Generic("Invalid X25519 Pub Key Size".to_owned()))
+    }
+
+    let shared_secret = uw.ecdh_key_agreement(&key_ref, &pub_key_bytes)?;
+
+    Ok(base64::encode_config(shared_secret, base64::URL_SAFE))
 }
 
 #[test]

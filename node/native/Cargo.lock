@@ -832,8 +832,8 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 
 [[package]]
 name = "keri"
-version = "0.3.1"
-source = "git+https://github.com/35359595/keriox?branch=ursa_bump#2cac8a9424bef605a781e60089221570c6a8924b"
+version = "0.5.0"
+source = "git+https://github.com/decentralized-identity/keriox?branch=master#62528c164c26f6aa9fcf1ee0e41b34f0e7c45e0b"
 dependencies = [
  "base64 0.12.3",
  "bincode",
@@ -842,10 +842,10 @@ dependencies = [
  "itoa",
  "nom",
  "rkv",
+ "rmp-serde",
  "ryu",
  "serde",
  "serde-hex",
- "serde-transcode",
  "serde_cbor",
  "serde_json",
  "thiserror",
@@ -1284,15 +1284,14 @@ checksum = "26412eb97c6b088a6997e05f69403a802a92d520de2f8e63c2b65f9e0f47c4e8"
 
 [[package]]
 name = "rkv"
-version = "0.15.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e97d1b6321740ce36d77d67d22ff84ac8a996cf69dbd0727b8bcae52f1c98aaa"
+checksum = "28e2e15d3fff125cfc4fb3f1b226ff83af057c4715061ded16193b7142beefc9"
 dependencies = [
  "arrayref",
  "bincode",
  "bitflags",
  "byteorder",
- "failure",
  "id-arena",
  "lazy_static",
  "lmdb-rkv",
@@ -1301,8 +1300,30 @@ dependencies = [
  "paste",
  "serde",
  "serde_derive",
+ "thiserror",
  "url",
  "uuid",
+]
+
+[[package]]
+name = "rmp"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0f10b46df14cf1ee1ac7baa4d2fbc2c52c0622a4b82fa8740e37bc452ac0184f"
+dependencies = [
+ "byteorder",
+ "num-traits",
+]
+
+[[package]]
+name = "rmp-serde"
+version = "0.14.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ce7d70c926fe472aed493b902010bccc17fa9f7284145cb8772fd22fdb052d8"
+dependencies = [
+ "byteorder",
+ "rmp",
+ "serde",
 ]
 
 [[package]]
@@ -1366,15 +1387,6 @@ dependencies = [
  "array-init",
  "serde",
  "smallvec",
-]
-
-[[package]]
-name = "serde-transcode"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97528f0dfcf8ce2d51d995cb513a103b9cd301dc3f387a9cae5ef974381d4e1c"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -1634,9 +1646,9 @@ dependencies = [
 
 [[package]]
 name = "universal_wallet"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1357cfc0c54d7e7d532fc3aa8b6516efdde3801b37fe29ecc4227c730507b54"
+checksum = "afc010a0c617be0a27819dd20a01b9419acb08858f6913ac353b653cb78c8dae"
 dependencies = [
  "aead",
  "arrayref",
