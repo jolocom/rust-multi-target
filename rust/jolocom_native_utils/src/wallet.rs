@@ -717,7 +717,8 @@ fn test_add_content() -> Result<(), Error> {
     assert!(ew0.len() < ew1.len());
     assert!(ew1.len() < ew2.len());
 
-    LockedWallet::new(id, ew2.into_bytes()).unlock(pass.as_bytes())?;
+    LockedWallet::new(id, base64::decode_config(&ew2, base64::URL_SAFE)?)
+        .unlock(pass.as_bytes())?;
 
     Ok(())
 }
