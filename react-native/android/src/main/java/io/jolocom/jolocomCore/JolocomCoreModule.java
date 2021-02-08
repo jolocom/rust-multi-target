@@ -224,6 +224,16 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void createMessage(String ew, String id, String pass, Promise promise) {
+    try {
+      String result = createDidcommMessage(ew, id, pass);
+      promise.resolve(result);
+    } catch (Exception e) {
+      rejectWithException(promise, "creating didcomm message", e);
+    }
+  }
+
   /**
    * Rust functions that will be exposed by the JNI libs
    *
@@ -265,4 +275,5 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
                                           String keyRef, String data,
                                           String aad);
   private static native String getRandomStr(int length);
+  private static native String createDidcommMessage(String ew, String id, String pass);
 }

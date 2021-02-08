@@ -92,6 +92,10 @@ export! {
     fn get_random(len: u32) -> Result<String, String> {
         wallet::get_random_b64(len.try_into().unwrap())
     }
+    @Java_io_jolocom_jolocomCore_JolocomCoreModule_createDidcommMessage
+    fn create_didcomm_message(ew: String, id: String, pass: String) -> Result<String, String> {
+        wallet::create_didcomm_message(&ew, &id, &pass)
+    }
 }
 
 ffi_support::define_string_destructor!(jolo_destroy_string);

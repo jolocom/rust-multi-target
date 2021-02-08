@@ -81,6 +81,10 @@ impl Wallet {
         wallet::decrypt_by_controller(&ew, &id, &pass, &key_ref, &data, &aad).map_err(|_| WalletError::new())
     }
 
+    fn jc_create_didcomm_message(ew: String, id: String, pass: String) -> Result<String, WalletError> {
+        wallet::create_didcomm_message(&ew, &id, &pass).map_err(|_| WalletError::new())
+    }
+
     fn get_random(len: u32) -> Result<String, WalletError> {
         wallet::get_random_b64(len.try_into().unwrap()).map_err(|_| WalletError::new())
     }

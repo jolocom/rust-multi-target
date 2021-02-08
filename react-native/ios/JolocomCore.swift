@@ -239,4 +239,21 @@ class JolocomCore: NSObject {
         return val
     })
   }
+
+  @objc func createMessage(_ ew: String, id: String, pass: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)
+  -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: {
+        jc_create_didcomm_message($0, ew, id, pass)
+      },
+      success: {
+        (res: Optional<UnsafePointer<CChar>>) -> String in
+          let val = String(cString res!)
+          jolo_destroy_string(res!)
+          return val
+      }
+    )
+  }
 }

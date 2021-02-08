@@ -452,6 +452,15 @@ pub fn get_key_by_controller(
         .map_err(|e| UwError::Serde(e))?)
 }
 
+pub fn create_didcomm_message(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+    uw.create_didcomm_message()
+}
+
 #[test]
 fn test_create() -> Result<(), Error> {
     let id = "my_did".to_string();

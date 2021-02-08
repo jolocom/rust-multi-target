@@ -57,7 +57,7 @@ const char *get_keys(struct ExternError *, const char *ew, const char *id,
 const char *sign_by_controller(struct ExternError *, const char *ew, const char *id,
                  const char *pass, const char *controller, const char *data);
 
-const bool jc_verify(struct ExternError *, const char *key, const char *type,
+const bool *jc_verify(struct ExternError *, const char *key, const char *type,
                    const char *data, const char *signature);
 
 const char *jc_encrypt(struct ExternError *, const char *key, const char *type,
@@ -68,5 +68,8 @@ const char *jc_decrypt(struct ExternError *, const char *ew, const char *id,
                     const char *aad);
 
 const char *get_random(struct ExternError *, const unsigned len);
+
+const char *jc_create_didcomm_message(struct ExternError *, const char *ew, const char *id,
+                    const char *pass);
 
 const void jolo_destroy_string(const char *);

@@ -165,6 +165,13 @@ fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(wallet::get_random_b64(len.into()).unwrap()))
 }
 
+fn create_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    Ok(cx.string(wallet::create_didcomm_message(&ew, &id, &pass)?))
+}
+
 register_module!(mut cx, {
     cx.export_function("validateEvents", validate_events)?;
     cx.export_function("getIdFromEvent", get_id_from_event)?;
