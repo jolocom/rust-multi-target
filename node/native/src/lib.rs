@@ -160,6 +160,19 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     )
 }
 
+fn ecdh_key_agreement(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let controller = cx.argument::<JsString>(3)?.value();
+    let pub_key = cx.argument::<JsString>(4)?.value();
+
+    Ok(cx.string(
+        wallet::ecdh_get_shared_secret_by_controller(&ew, &id, &pass, &controller, &pub_key)
+            .unwrap(),
+    ))
+}
+
 fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
     let len = cx.argument::<JsNumber>(0)?.value() as usize;
     Ok(cx.string(wallet::get_random_b64(len.into()).unwrap()))
@@ -190,6 +203,7 @@ register_module!(mut cx, {
     cx.export_function("verify", verify)?;
     cx.export_function("encrypt", encrypt)?;
     cx.export_function("decrypt", decrypt)?;
+    cx.export_function("ecdhKeyAgreement", ecdh_key_agreement)?;
     cx.export_function("getRandom", get_random)?;
     Ok(())
 });
