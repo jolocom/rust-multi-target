@@ -81,8 +81,23 @@ impl Wallet {
         wallet::decrypt_by_controller(&ew, &id, &pass, &key_ref, &data, &aad).map_err(|_| WalletError::new())
     }
 
-    fn jc_create_didcomm_message(ew: String, id: String, pass: String) -> Result<String, WalletError> {
-        wallet::create_didcomm_message(&ew, &id, &pass).map_err(|_| WalletError::new())
+    fn create_didcomm_message() -> String {
+        wallet::create_didcomm_message()
+    }
+
+    fn seal_didcomm_message(ew: String, id: String, pass: String, key_id: String, message: String, header: String)
+         -> Result<String, WalletError> {
+        wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &message, &header).map_err(|_| WalletError::new())
+    }
+
+    fn seal_signed_didcomm_message(ew: String, id: String, pass: String, key_id: String, sign_key_id: String,  message: String, header: String)
+         -> Result<String, WalletError> {
+        wallet::seal_signed_didcomm_message(&ew, &id, &pass, &key_id, &sign_key_id, &message, &header).map_err(|_| WalletError::new())
+    }
+
+    fn receive_didcomm_message(ew: String, id: String, pass: String, message: String, sender_public_key: String, verifying_key: String)
+         -> Result<String, WalletError> {
+        wallet::receive_didcomm_message(&ew, &id, &pass, &message.as_bytes(), &sender_public_key,as_bytes(), &verifying_key.as_bytes()).map_err(|_| WalletError::new())
     }
 
     fn get_random(len: u32) -> Result<String, WalletError> {

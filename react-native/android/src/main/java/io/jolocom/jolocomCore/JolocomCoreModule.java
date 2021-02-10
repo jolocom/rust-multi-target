@@ -234,6 +234,57 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void sealDidcommMessage(
+    String ew,
+    String id,
+    String pass,
+    String key_id,
+    String message,
+    String header,
+    Promise promise) {
+      try {
+        String result = sealDidcommMessage(ew, id, pass, key_id, message, header);
+        promise.resolve(result);
+      } catch (Exception e) {
+        rejectWithException(promise, "sealing didcomm message", e);
+      }
+    }
+
+    @ReactMethod
+    public void sealSignedDidcommMessage(
+      String ew,
+      String id,
+      String pass,
+      String key_id,
+      String sign_key_id,
+      String message,
+      String header,
+      Promise promise) {
+        try {
+          String result = sealSignedDidcommMessage(ew, id, pass, key_id, message, header, sign_key_id);
+          promise.resolve(result);
+        } catch (Exception e) {
+          rejectWithException(promise, "sealing signed didcomm message", e);
+        }
+      }
+
+      @ReactMethodpublic void receiveDidcommMessage(
+        String ew,
+        String id,
+        String pass,
+        String key_id,
+        String message,
+        String verifying_key,
+        Promise promise) {
+          try {
+            String result = receiveDidcommMessage(ew, id, pass, key_id, message, verifying_key);
+            promise.resolve(result);
+          } catch (Exception e) {
+            rejectWithException(promise, "receiving didcomm message", e);
+          }
+        }
+
   /**
    * Rust functions that will be exposed by the JNI libs
    *
@@ -276,4 +327,10 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
                                           String aad);
   private static native String getRandomStr(int length);
   private static native String createDidcommMessage(String ew, String id, String pass);
+  private static native String sealDidcommMessage(String ew, String id, String pass,
+                                          String key_id, String message, String header);
+  private static native String sealSignedDidcommMessage(String ew, String id, String pass,
+                      String key_id, String sign_key_id, String message String header);
+  private static native String receiveDidcommMessage(String ew, String id, String pass,
+                                      String key_id, String message, String verifying_key);
 }

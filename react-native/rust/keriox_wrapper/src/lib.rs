@@ -93,8 +93,27 @@ export! {
         wallet::get_random_b64(len.try_into().unwrap())
     }
     @Java_io_jolocom_jolocomCore_JolocomCoreModule_createDidcommMessage
-    fn create_didcomm_message(ew: String, id: String, pass: String) -> Result<String, String> {
-        wallet::create_didcomm_message(&ew, &id, &pass)
+    fn create_didcomm_message() -> String {
+        wallet::create_didcomm_message()
+    }
+    @Java_io_jolocom_jolocomCore_JolocomCoreModule_sealDidcommMessage
+    fn seal_didcomm_message(ew: String, id: String, pass: String, key_id: String, message: String, header: String)
+        -> Result<String, String> {
+        wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &message, &header)
+    }
+    @Java_io_jolocom_jolocomCore_JolocomCoreModule_sealSignedDidcommMessage
+    fn seal_signed_didcomm_message(ew: String, id: String, pass: String, key_id: String, sign_key_id: String, message: String, header: String)
+        -> Result<String, String> {
+        wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &sign_key_id, &message, &header)
+    }
+    @Java_io_jolocom_jolocomCore_JolocomCoreModule_receiveDidcommMessage
+    fn receive_didcomm_message(ew: String, id: String, pass: String, message: String, sender_public_key: String, verifying_key: String)
+        -> Result<String, String> {
+            let vk = match verifying_key.len() {
+                0 => None,
+                _ => Some(&verifying_key.as_bytes())
+            };
+            wallet::receive_didcomm_message(&ew, &id, &pass, &message.as_bytes(), &sender_public_key.as_bytes(), vk)
     }
 }
 
