@@ -225,9 +225,9 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void createMessage(String ew, String id, String pass, Promise promise) {
+  public void createMessage(Promise promise) {
     try {
-      String result = createDidcommMessage(ew, id, pass);
+      String result = createDidcommMessage();
       promise.resolve(result);
     } catch (Exception e) {
       rejectWithException(promise, "creating didcomm message", e);
