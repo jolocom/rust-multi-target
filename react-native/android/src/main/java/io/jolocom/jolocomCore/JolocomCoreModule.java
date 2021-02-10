@@ -269,7 +269,8 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
         }
       }
 
-      @ReactMethodpublic void receiveDidcommMessage(
+      @ReactMethod
+      public void receiveDidcommMessage(
         String ew,
         String id,
         String pass,
