@@ -112,7 +112,7 @@ pub fn incept_populated_wallet(
     let icp = InceptionEvent::new(
         KeyConfig::new(
             vec![sig_pref_0.clone(), enc_pref_0.clone()],
-            Some(nexter_pref),
+            nexter_pref,
             Some(1),
         ),
         None,
@@ -213,7 +213,7 @@ pub fn incept_wallet(encrypted_wallet: &str, id: &str, pass: &str) -> Result<Str
     let icp = InceptionEvent::new(
         KeyConfig::new(
             vec![sig_pref_0.clone(), enc_pref_0.clone()],
-            Some(nexter_pref),
+            nexter_pref,
             Some(1),
         ),
         None,
