@@ -27,7 +27,7 @@ class JolocomCore: NSObject {
 
 // validates a key event log,
 // see ./core.h:34
-  @objc func processEvents(_ kelString: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func processEvents(_ kelString: String, dbPath: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
