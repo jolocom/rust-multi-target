@@ -597,40 +597,53 @@ fn test_create() -> Result<(), Error> {
 
 #[test]
 fn test_incept() -> Result<(), Error> {
-    // use crate::{validate_events_str, did_document::{KeyTypes, DIDDocument}};
+    use crate::{did_document, keri};
+    use std::fs;
+    use tempfile::Builder;
 
-    // let id = "my_did";
-    // let p = "my_password";
+    let root = Builder::new().prefix("test-db").tempdir().unwrap();
+    fs::create_dir_all(root.path()).unwrap();
 
-    // let ew = new_wallet(id, p)?;
+    let id = "my_did";
+    let p = "my_password";
 
-    // let res_str: WalletInceptionRep =
-    //     serde_json::from_str(&incept_wallet(&ew, id, p)?).map_err(|e| UwError::Serde(e))?;
+    let ew = new_wallet(id, p)?;
 
-    // let nid: String = res_str.id.clone();
+    let res_str: WalletInceptionRep =
+        serde_json::from_str(&incept_wallet(&ew, id, p)?).map_err(|e| UwError::Serde(e))?;
 
-    // let uw = LockedWallet::new(
-    //     &nid,
-    //     base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)?
-    //     ).unlock(p.as_bytes())?;
+    let nid: String = res_str.id.clone();
 
-    // assert_eq!(uw.get_keys().len(), 4);
+    let uw = LockedWallet::new(
+        &nid,
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE)?,
+    )
+    .unlock(p.as_bytes())?;
 
-    // let kel_bytes = res_str.inception_event.as_bytes();
+    assert_eq!(uw.get_keys().len(), 4);
 
-    // let ddo_str = validate_events_str(&kel_bytes, "jun")?;
+    let kel_bytes = res_str.inception_event.as_bytes();
 
-    // let ddo: DIDDocument = serde_json::from_str(&ddo_str).map_err(|e| UwError::Serde(e))?;
+    keri::process_events(kel_bytes, root.path().to_str().unwrap())?;
 
-    // assert_eq!(ddo.verification_methods.len(), 2);
-    // assert_eq!(
-    //     ddo.verification_methods[0].key_type,
-    //     KeyTypes::Ed25519VerificationKey2018
-    // );
-    // assert_eq!(
-    //     ddo.verification_methods[1].key_type,
-    //     KeyTypes::X25519KeyAgreementKey2019
-    // );
+    let prefix = res_str.id.split(":").last().unwrap();
+
+    let ddo = did_document::state_to_did_document(
+        keri::get_state(&prefix.parse()?, root.path().to_str().unwrap())
+            .unwrap()
+            .unwrap(),
+        "keri",
+    );
+
+    assert_eq!(ddo.verification_methods.len(), 2);
+    assert_eq!(
+        ddo.verification_methods[0].key_type,
+        did_document::KeyTypes::Ed25519VerificationKey2018
+    );
+    assert_eq!(
+        ddo.verification_methods[1].key_type,
+        did_document::KeyTypes::X25519KeyAgreementKey2019
+    );
 
     Ok(())
 }
@@ -710,36 +723,52 @@ fn test_key_type() -> Result<(), Error> {
 
 #[test]
 fn test_incept_from_keys() -> Result<(), Error> {
-    // use crate::validate_events_str;
+    use crate::{did_document, keri};
+    use std::fs;
+    use tempfile::Builder;
 
-    // let pass = "secret";
-    // let sign_enc_keys = "[\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\",\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\"]";
-    // let pre_rot_sign_enc_keys = sign_enc_keys.clone();
-    // let res_str: WalletInceptionRep = serde_json::from_str(&incept_populated_wallet(
-    //     sign_enc_keys,
-    //     pre_rot_sign_enc_keys,
-    //     pass,
-    // )?)
-    // .map_err(|e| UwError::Serde(e))?;
+    let root = Builder::new().prefix("test-db").tempdir().unwrap();
+    fs::create_dir_all(root.path()).unwrap();
 
-    // let wallet = LockedWallet::new(
-    //     &res_str.id,
-    //     base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
-    // );
+    let pass = "secret";
+    let sign_enc_keys = "[\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\",\"JsdnEtidkG5mctr6YUxC5cscqsjGVo5NJJMIfbUfDTY\"]";
+    let pre_rot_sign_enc_keys = sign_enc_keys.clone();
+    let res_str: WalletInceptionRep = serde_json::from_str(&incept_populated_wallet(
+        sign_enc_keys,
+        pre_rot_sign_enc_keys,
+        pass,
+    )?)
+    .map_err(|e| UwError::Serde(e))?;
 
-    // let uw = wallet.unlock(pass.as_bytes()).unwrap();
-    // let kel_bytes = &res_str.inception_event.as_bytes();
-    // let ddo_str = validate_events_str(kel_bytes, "jun")?;
-    // let expected = "{\
-    //     \"@context\":\"https://www.w3.org/ns/did/v1\",\"id\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\
-    //     \"verificationMethod\":[{\"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\"type\":\"Ed25519VerificationKey2018\",\
-    //     \"controller\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\"publicKeyBase64\":\
-    //     \"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"},{\"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\"type\":\
-    //     \"X25519KeyAgreementKey2019\",\"controller\":\"did:jun:E5Yfn7S_a94Dcme771a0_CikVD2jcWOfGC0cXPZwUNO4\",\"publicKeyBase64\":\
-    //     \"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"}]}";
-    // assert_eq!(ddo_str, expected);
+    let wallet = LockedWallet::new(
+        &res_str.id,
+        base64::decode_config(&res_str.encrypted_wallet, base64::URL_SAFE).unwrap(),
+    );
 
-    // assert_eq!(uw.get_keys().len(), 4);
+    let uw = wallet.unlock(pass.as_bytes()).unwrap();
+    let kel_bytes = &res_str.inception_event.as_bytes();
+
+    keri::process_events(kel_bytes, root.path().to_str().unwrap())?;
+
+    let prefix = res_str.id.split(":").last().unwrap();
+
+    let ddo_str = serde_json::to_string(&did_document::state_to_did_document(
+        keri::get_state(&prefix.parse()?, root.path().to_str().unwrap())
+            .unwrap()
+            .unwrap(),
+        "keri",
+    ))
+    .unwrap();
+    let expected = "{\
+        \"@context\":\"https://www.w3.org/ns/did/v1\",\"id\":\"did:keri:EdxoiTfJwNR1pTWTxEPI-o41DWCG2wxzGSi32h-LwErA\",\
+        \"verificationMethod\":[{\"id\":\"#DwiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ\",\"type\":\"Ed25519VerificationKey2018\",\
+        \"controller\":\"did:keri:EdxoiTfJwNR1pTWTxEPI-o41DWCG2wxzGSi32h-LwErA\",\"publicKeyBase64\":\
+        \"wiR4cFNqGS0ULQVqvvymjWGTFY58GlnBZUyVTsyv-JQ=\"},{\"id\":\"#CZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w\",\"type\":\
+        \"X25519KeyAgreementKey2019\",\"controller\":\"did:keri:EdxoiTfJwNR1pTWTxEPI-o41DWCG2wxzGSi32h-LwErA\",\"publicKeyBase64\":\
+        \"ZTkGQSfHcFmTRGoLESSby0wGup4XBDP3IkJ6tYpQ_0w=\"}]}";
+    assert_eq!(ddo_str, expected);
+
+    assert_eq!(uw.get_keys().len(), 4);
     Ok(())
 }
 
