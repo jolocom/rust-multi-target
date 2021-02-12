@@ -186,9 +186,78 @@ fn decrypt(mut cx: FunctionContext) -> JsResult<JsString> {
     )
 }
 
+fn ecdh_key_agreement(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let controller = cx.argument::<JsString>(3)?.value();
+    let pub_key = cx.argument::<JsString>(4)?.value();
+
+    Ok(cx.string(
+        wallet::ecdh_get_shared_secret_by_controller(&ew, &id, &pass, &controller, &pub_key)
+            .unwrap(),
+    ))
+}
+
 fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
     let len = cx.argument::<JsNumber>(0)?.value() as usize;
     Ok(cx.string(wallet::get_random_b64(len.into()).unwrap()))
+}
+
+fn create_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    Ok(cx.string(wallet::create_didcomm_message(&ew, &id, &pass)?))
+}
+
+fn seal_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let key_id = cx.argument::<JsString>(3)?.value();
+    let message = cx.argument::<JsString>(4)?.value();
+    let header = cx.argument::<JsString>(5)?.value();
+    Ok(cx.string(wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &message, &header)?))
+}
+
+fn seal_signed_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let key_id = cx.argument::<JsString>(3)?.value();
+    let message = cx.argument::<JsString>(4)?.value();
+    let header = cx.argument::<JsString>(5)?.value();
+    let sign_key_id = cx.argument::<JsString>(6)?.value();
+    Ok(cx.string(wallet::seal_signed_didcomm_message(
+        &ew,
+        &id,
+        &pass,
+        &key_id,
+        &message,
+        &header,
+        &sign_key_id
+    )?))
+}
+
+fn receive_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
+    let ew = cx.argument::<JsString>(0)?.value();
+    let id = cx.argument::<JsString>(1)?.value();
+    let pass = cx.argument::<JsString>(2)?.value();
+    let key_id = cx.argument::<JsString>(3)?.value();
+    let message = cx.argument::<JsString>(4)?.value();
+    let verifying_key = match cx.argument::<JsString>(5) {
+        Ok(s) => Some(&s.value().as_bytes()),
+        Err(_) => None
+    };
+    Ok(cx.string(wallet::receive_didcomm_message(
+        &ew,
+        &id,
+        &pass,
+        &message,
+        &key_id,
+        verifying_key
+    ))
 }
 
 register_module!(mut cx, {
@@ -210,6 +279,11 @@ register_module!(mut cx, {
     cx.export_function("verify", verify)?;
     cx.export_function("encrypt", encrypt)?;
     cx.export_function("decrypt", decrypt)?;
+    cx.export_function("ecdhKeyAgreement", ecdh_key_agreement)?;
     cx.export_function("getRandom", get_random)?;
+    cx.export_function("createDidcommMessage", create_didcomm_message)?;
+    cx.export_function("sealDidcommMessage", seal_didcomm_message)?;
+    cx.export_function("sealSignedDidcommMessage", seal_signed_didcomm_message)?;
+    cx.export_function("receiveDidcommMessage", receive_didcomm_message)?;
     Ok(())
 });

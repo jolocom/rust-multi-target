@@ -177,6 +177,20 @@ export const walletUtils: EncryptedWalletUtils = {
         controller,
         data,
         aad
+    ),
+
+    ecdhKeyAgreement: async (
+        encryptedWallet: string,
+        id: string,
+        pass: string,
+        controller: string,
+        pubKey: string,
+    ): Promise<string> => await addon.ecdhKeyAgreement(
+        encryptedWallet,
+        id,
+        pass,
+        controller,
+        pubKey
     )
 }
 

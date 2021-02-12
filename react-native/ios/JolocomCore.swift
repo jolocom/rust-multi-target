@@ -263,4 +263,72 @@ class JolocomCore: NSObject {
         return val
     })
   }
-}
+
+  @objc func createDidcommMessage(_ resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)
+  -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: {
+        jc_create_didcomm_message($0)
+      },
+      success: {
+        (res: Optional<UnsafePointer<CChar>>) -> String in
+          let val = String(cString res!)
+          jolo_destroy_string(res!)
+          return val
+      }
+    )
+  }
+
+  @objc func sealDidcommMessage(_ ew: String, id: String, pass: String, key_id: String, message: String, header: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)
+  -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: {
+        seal_didcomm_message($0, ew, id, pass, key_id, message, header)
+      },
+      success: {
+        (res: Optional<UnsafePointer<CChar>>) -> String in
+          let val = String(cString res!)
+          jolo_destroy_string(res!)
+          return val
+      }
+    )
+  }
+
+  @objc func sealSignedDidcommMessage(_ ew: String, id: String, pass: String, key_id: String, sign_key_id: String,  message: String, header: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)
+  -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: {
+        seal_signed_didcomm_message($0, ew, id, pass, key_id, sign_key_id, message, header)
+      },
+      success: {
+        (res: Optional<UnsafePointer<CChar>>) -> String in
+          let val = String(cString res!)
+          jolo_destroy_string(res!)
+          return val
+      }
+    )
+  }
+
+  @objc func receiveDidcommMessage(_ ew: String, id: String, pass: String, message: String, sender_public_key: String, verifying_key: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)
+  -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: {
+        receive_didcomm_message($0, ew, id, pass, message, sender_public_key, verifying_key)
+      },
+      success: {
+        (res: Optional<UnsafePointer<CChar>>) -> String in
+          let val = String(cString res!)
+          jolo_destroy_string(res!)
+          return val
+      }
+    )
+  }
+

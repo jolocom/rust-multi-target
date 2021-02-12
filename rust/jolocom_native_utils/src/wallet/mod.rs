@@ -484,6 +484,95 @@ pub fn get_key_by_controller(
     Ok(serde_json::to_string(&pk).map_err(|e| UwError::Serde(e))?)
 }
 
+pub fn ecdh_get_shared_secret(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    key_ref: &str,
+    pub_key: &str,
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+
+    let pub_key_bytes = base64::decode_config(pub_key, base64::URL_SAFE)?;
+
+    if pub_key_bytes.len() != 32 {
+        return Err(Error::Generic("Invalid X25519 Pub Key Size".to_owned()));
+    }
+
+    let shared_secret = uw.ecdh_key_agreement(key_ref, &pub_key_bytes)?;
+
+    Ok(base64::encode_config(shared_secret, base64::URL_SAFE))
+}
+
+pub fn ecdh_get_shared_secret_by_controller(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    controller: &str,
+    pub_key: &str,
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+
+    let key_ref = match uw.get_key_by_controller(controller) {
+        Some(c) => c.id,
+        None => return Err(Error::Generic("No Key Found".to_string())),
+    };
+
+    let pub_key_bytes = base64::decode_config(pub_key, base64::URL_SAFE)?;
+
+    if pub_key_bytes.len() != 32 {
+        return Err(Error::Generic("Invalid X25519 Pub Key Size".to_owned()));
+    }
+
+    let shared_secret = uw.ecdh_key_agreement(&key_ref, &pub_key_bytes)?;
+
+    Ok(base64::encode_config(shared_secret, base64::URL_SAFE))
+}
+
+pub fn create_didcomm_message() -> String {
+    UnlockedWallet::create_message()
+}
+
+pub fn seal_didcomm_message(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    key_id: &str,
+    message: &str,
+    header: &str,
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+    Ok(uw.seal_encrypted(key_id, message, header)?)
+}
+
+pub fn seal_signed_didcomm_message(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    key_id: &str,
+    sign_key_id: &str,
+    message: &str,
+    header: &str,
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+    Ok(uw.seal_signed(key_id, sign_key_id, message, header)?)
+}
+
+pub fn receive_didcomm_message(
+    encrypted_wallet: &str,
+    id: &str,
+    pass: &str,
+    msg_bytes: &[u8],
+    sender_public_key: &[u8],
+    verifying_key: Option<&[u8]>,
+) -> Result<String, Error> {
+    let uw = wallet_from(encrypted_wallet, id, pass)?;
+    Ok(uw
+        .receive_message(msg_bytes, sender_public_key, verifying_key)?
+        .as_raw_json()
+        .map_err(|e| Error::WalletError(e.into()))?)
+}
+
 #[test]
 fn test_create() -> Result<(), Error> {
     let id = "my_did".to_string();
@@ -651,5 +740,25 @@ fn test_incept_from_keys() -> Result<(), Error> {
     // assert_eq!(ddo_str, expected);
 
     // assert_eq!(uw.get_keys().len(), 4);
+    Ok(())
+}
+
+#[test]
+fn test_add_content() -> Result<(), Error> {
+    let id = "id";
+    let pass = "pass";
+    let content_1 = r#"{"type":["TestEntropy"],"value":"Gf6rvA=="}"#;
+    let content_2 = r#"{"controller":["ecdh_key"],"type":"X25519KeyAgreementKey2019","publicKeyHex":"8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a","private_key":"77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a"}"#;
+
+    let ew0 = export_wallet(UnlockedWallet::new(id), pass)?;
+    let ew1 = add_content(&ew0, id, pass, content_1)?;
+    let ew2 = add_content(&ew1, id, pass, content_2)?;
+
+    assert!(ew0.len() < ew1.len());
+    assert!(ew1.len() < ew2.len());
+
+    LockedWallet::new(id, base64::decode_config(&ew2, base64::URL_SAFE)?)
+        .unlock(pass.as_bytes())?;
+
     Ok(())
 }
