@@ -1,6 +1,6 @@
 {
   "name": "@jolocom/native-core-node-",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "jolocom/wallet-rs javascript bindings based on Neon",
   "main": "index.node",
   "files": [
@@ -18,7 +18,7 @@
     "rust"
   ],
   "devDependencies": {
-    "@jolocom/vaulted-key-provider": "^0.7.2",
+    "@jolocom/vaulted-key-provider": "^0.8.0",
     "@types/node": "^14.0.23",
     "fs-extra": "^9.0.1",
     "local-did-resolver": "^0.2.2",
