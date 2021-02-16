@@ -9,6 +9,9 @@ use keri::{
 };
 use universal_wallet::Error as UwError;
 
+#[cfg(test)]
+mod didcomm_tests;
+
 pub fn validate_events_str<'a>(kel_str: &[u8], method_name: &str) -> Result<String, Error> {
     let state = signed_event_stream_validate(kel_str)
         .map_err(|e| Error::Generic(e.to_string()))?;
@@ -28,5 +31,3 @@ pub fn get_id_from_event_str(event: &[u8]) -> Result<String, Error> {
     }
 }
 
-#[test]
-fn test() {}
