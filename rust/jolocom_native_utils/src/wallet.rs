@@ -524,7 +524,7 @@ pub fn seal_didcomm_message(
     pass: &str,
     key_id: &str,
     message: &str,
-    header: &str
+    header: &str,
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
     Ok(uw.seal_encrypted(key_id, message, header)?)
@@ -537,7 +537,7 @@ pub fn seal_signed_didcomm_message(
     key_id: &str,
     sign_key_id: &str,
     message: &str,
-    header: &str
+    header: &str,
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
     Ok(uw.seal_signed(key_id, sign_key_id, message, header)?)
@@ -549,10 +549,13 @@ pub fn receive_didcomm_message(
     pass: &str,
     msg_bytes: &[u8],
     sender_public_key: &[u8],
-    verifying_key: Option<&[u8]>
+    verifying_key: Option<&[u8]>,
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
-    Ok(uw.receive_message(msg_bytes, sender_public_key, verifying_key)?
+    // TODO we will have to figure out encodings for the sender + verifying key which make sense and
+    // indicate what kind of key it is
+    Ok(uw
+        .receive_message(msg_bytes, sender_public_key, verifying_key)?
         .as_raw_json()
         .map_err(|e| Error::WalletError(e.into()))?)
 }
