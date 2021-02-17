@@ -15,5 +15,5 @@ crate-type = ["cdylib"]
 neon-build = "0.4.0"
 
 [dependencies]
-neon = "0.4.0"
+neon = "0.7"
 jolocom_native_utils = { path = "../../rust/jolocom_native_utils" }

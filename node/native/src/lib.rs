@@ -179,10 +179,7 @@ fn get_random(mut cx: FunctionContext) -> JsResult<JsString> {
 }
 
 fn create_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
-    let ew = cx.argument::<JsString>(0)?.value();
-    let id = cx.argument::<JsString>(1)?.value();
-    let pass = cx.argument::<JsString>(2)?.value();
-    Ok(cx.string(wallet::create_didcomm_message(&ew, &id, &pass)?))
+    Ok(cx.string(wallet::create_didcomm_message()))
 }
 
 fn seal_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -192,7 +189,8 @@ fn seal_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let key_id = cx.argument::<JsString>(3)?.value();
     let message = cx.argument::<JsString>(4)?.value();
     let header = cx.argument::<JsString>(5)?.value();
-    Ok(cx.string(wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &message, &header)?))
+    Ok(cx.string(wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &message, &header)
+        .map_err(|e| e.to_string()).unwrap()))
 }
 
 fn seal_signed_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -211,7 +209,7 @@ fn seal_signed_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
         &message,
         &header,
         &sign_key_id
-    )?))
+    ).map_err(|e| e.to_string()).unwrap()))
 }
 
 fn receive_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -220,18 +218,19 @@ fn receive_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let pass = cx.argument::<JsString>(2)?.value();
     let key_id = cx.argument::<JsString>(3)?.value();
     let message = cx.argument::<JsString>(4)?.value();
-    let verifying_key = match cx.argument::<JsString>(5) {
-        Ok(s) => Some(&s.value().as_bytes()),
-        Err(_) => None
+    let ver_key = cx.argument::<JsString>(5)?.value();
+    let verifying_key = match ver_key.len() {
+        0 => None,
+        _ => Some(ver_key.as_bytes()),
     };
     Ok(cx.string(wallet::receive_didcomm_message(
         &ew,
         &id,
         &pass,
-        &message,
-        &key_id,
+        &message.as_bytes(),
+        &key_id.as_bytes(),
         verifying_key
-    ))
+    ).map_err(|e| e.to_string()).unwrap()))
 }
 
 register_module!(mut cx, {
