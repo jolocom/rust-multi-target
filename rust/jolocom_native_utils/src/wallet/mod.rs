@@ -363,21 +363,6 @@ pub fn sign(
     Ok(base64::encode_config(sig, base64::URL_SAFE))
 }
 
-// pub fn verify(key_str: &str, key_type: &str, data: &str, sig: &str) -> Result<bool, Error> {
-//     // use url safe or not?
-//     let key_bytes = base64::decode_config(key_str, base64::URL_SAFE)?;
-
-//     let data_bytes = base64::decode_config(data, base64::URL_SAFE)?;
-
-//     let sig_bytes = base64::decode_config(sig, base64::URL_SAFE)?;
-
-//     let pk = PublicKeyInfo::new(key_type.try_into()?, &key_bytes);
-
-//     let verification_result = pk.verify(&data_bytes, &sig_bytes);
-
-//     Ok(verification_result?)
-// }
-
 pub fn verify(key_str: &str, key_type: &str, data: &str, signature: &str) -> Result<bool, Error> {
     Ok(
         PublicKeyInfo::new(key_type.try_into()?, &decode_base64_url_safe(key_str)?).verify(
@@ -567,6 +552,8 @@ pub fn receive_didcomm_message(
     verifying_key: Option<&[u8]>,
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
+    // TODO we will have to figure out encodings for the sender + verifying key which make sense and
+    // indicate what kind of key it is
     Ok(uw
         .receive_message(msg_bytes, sender_public_key, verifying_key)?
         .as_raw_json()
