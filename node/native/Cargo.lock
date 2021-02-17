@@ -880,8 +880,8 @@ checksum = "67c21572b4949434e4fc1e1978b99c5f77064153c59d998bf13ecd96fb5ecba7"
 
 [[package]]
 name = "keri"
-version = "0.5.0"
-source = "git+https://github.com/decentralized-identity/keriox?branch=master#62528c164c26f6aa9fcf1ee0e41b34f0e7c45e0b"
+version = "0.4.0"
+source = "git+https://github.com/jolocom/keriox?rev=99adaf24#99adaf2467ba19d6f3c23f644015ae326ce8becd"
 dependencies = [
  "base64 0.12.3",
  "bincode",
@@ -890,10 +890,10 @@ dependencies = [
  "itoa",
  "nom",
  "rkv",
- "rmp-serde",
  "ryu",
  "serde",
  "serde-hex",
+ "serde-transcode",
  "serde_cbor",
  "serde_json",
  "thiserror",
@@ -1021,19 +1021,20 @@ version = "0.1.0"
 dependencies = [
  "jolocom_native_utils",
  "neon",
- "neon-build",
+ "neon-build 0.4.0",
 ]
 
 [[package]]
 name = "neon"
-version = "0.4.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6cac4691701b686e6c07b2eb5b51a9f26f5c11179c5d7924b78100dd387fc99d"
+checksum = "9e98cdd7a8f84ad67b8b3b15806a2972914533d3af7e4ec32cb24e3a101955b9"
 dependencies = [
  "cslice",
- "neon-build",
+ "neon-build 0.7.1",
  "neon-runtime",
  "semver",
+ "smallvec 1.6.1",
 ]
 
 [[package]]
@@ -1043,24 +1044,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9ed332afd4711b84f4f83d334428a1fd9ce53620b62b87595934297c5ede2ed"
 dependencies = [
  "cfg-if 0.1.10",
+]
+
+[[package]]
+name = "neon-build"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40aa98b2816150f1b0e4f9283b6cb8df101aba9a5e8c5facba32e607e80bedac"
+dependencies = [
  "neon-sys",
 ]
 
 [[package]]
 name = "neon-runtime"
-version = "0.4.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2beea093a60c08463f65e1da4cda68149986f60d8d2177489b44589463c782a6"
+checksum = "cdde3dee10a83057034f65c7a1e73dc595f111c16d7e4ae123c57fa7f065e86a"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "neon-sys",
+ "smallvec 1.6.1",
 ]
 
 [[package]]
 name = "neon-sys"
-version = "0.4.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69a6c1ba6b926746f4d3f596de18ce49d062d78fd9f35f636080232aa77a0e16"
+checksum = "b629558852a971fc3cde65a58cc925f708417eb5e1f448344be28b3e3b04bb0c"
 dependencies = [
  "cc",
  "regex",
@@ -1383,14 +1393,15 @@ checksum = "26412eb97c6b088a6997e05f69403a802a92d520de2f8e63c2b65f9e0f47c4e8"
 
 [[package]]
 name = "rkv"
-version = "0.17.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28e2e15d3fff125cfc4fb3f1b226ff83af057c4715061ded16193b7142beefc9"
+checksum = "e97d1b6321740ce36d77d67d22ff84ac8a996cf69dbd0727b8bcae52f1c98aaa"
 dependencies = [
  "arrayref",
  "bincode",
  "bitflags",
  "byteorder",
+ "failure",
  "id-arena",
  "lazy_static",
  "lmdb-rkv",
@@ -1399,30 +1410,8 @@ dependencies = [
  "paste",
  "serde",
  "serde_derive",
- "thiserror",
  "url",
  "uuid",
-]
-
-[[package]]
-name = "rmp"
-version = "0.8.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f10b46df14cf1ee1ac7baa4d2fbc2c52c0622a4b82fa8740e37bc452ac0184f"
-dependencies = [
- "byteorder",
- "num-traits",
-]
-
-[[package]]
-name = "rmp-serde"
-version = "0.14.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ce7d70c926fe472aed493b902010bccc17fa9f7284145cb8772fd22fdb052d8"
-dependencies = [
- "byteorder",
- "rmp",
- "serde",
 ]
 
 [[package]]
@@ -1485,7 +1474,16 @@ checksum = "ca37e3e4d1b39afd7ff11ee4e947efae85adfddf4841787bfa47c470e96dc26d"
 dependencies = [
  "array-init",
  "serde",
- "smallvec",
+ "smallvec 0.6.13",
+]
+
+[[package]]
+name = "serde-transcode"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97528f0dfcf8ce2d51d995cb513a103b9cd301dc3f387a9cae5ef974381d4e1c"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -1598,6 +1596,12 @@ checksum = "f7b0758c52e15a8b5e3691eae6cc559f08eee9406e548a4477ba4e67770a82b6"
 dependencies = [
  "maybe-uninit",
 ]
+
+[[package]]
+name = "smallvec"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe0f37c9e8f3c5a4a66ad655a93c74daac4ad00c441533bf5c6e7990bb42604e"
 
 [[package]]
 name = "static_assertions"
@@ -1785,7 +1789,7 @@ dependencies = [
 [[package]]
 name = "ursa"
 version = "0.3.5"
-source = "git+https://github.com/hyperledger/ursa?branch=master#d4af8efd74d80ea560e3e37ee1b38d3ba1c6d262"
+source = "git+https://github.com/hyperledger/ursa?rev=d4af8efd#d4af8efd74d80ea560e3e37ee1b38d3ba1c6d262"
 dependencies = [
  "aead",
  "aes",
