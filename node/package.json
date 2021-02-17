@@ -33,15 +33,15 @@
     "x64"
   ],
   "optionalDependencies": {
-    "@jolocom/native-core-node-10-win32-x64": "^1.1.0",
-    "@jolocom/native-core-node-12-win32-x64": "^1.1.0",
-    "@jolocom/native-core-node-14-win32-x64": "^1.1.0",
-    "@jolocom/native-core-node-10-darwin-x64": "^1.1.0",
-    "@jolocom/native-core-node-10-linux-x64": "^1.1.0",
-    "@jolocom/native-core-node-12-darwin-x64": "^1.1.0",
-    "@jolocom/native-core-node-12-linux-x64": "^1.1.0",
-    "@jolocom/native-core-node-14-darwin-x64": "^1.1.0",
-    "@jolocom/native-core-node-14-linux-x64": "^1.1.0"
+    "@jolocom/native-core-node-10-win32-x64": "^1.1.1",
+    "@jolocom/native-core-node-12-win32-x64": "^1.1.1",
+    "@jolocom/native-core-node-14-win32-x64": "^1.1.1",
+    "@jolocom/native-core-node-10-darwin-x64": "^1.1.1",
+    "@jolocom/native-core-node-10-linux-x64": "^1.1.1",
+    "@jolocom/native-core-node-12-darwin-x64": "^1.1.1",
+    "@jolocom/native-core-node-12-linux-x64": "^1.1.1",
+    "@jolocom/native-core-node-14-darwin-x64": "^1.1.1",
+    "@jolocom/native-core-node-14-linux-x64": "^1.1.1"
   },
   "scripts": {
     "prepare": "yarn build",
