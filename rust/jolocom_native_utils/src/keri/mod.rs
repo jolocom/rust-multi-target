@@ -6,11 +6,16 @@ use keri::{
     processor::EventProcessor,
     state::IdentifierState,
 };
+use std::fs::create_dir_all;
 use std::path::Path;
 
-fn get_processor(path: &str) -> Result<EventProcessor<LmdbEventDatabase>, Error> {
+fn get_processor(path_str: &str) -> Result<EventProcessor<LmdbEventDatabase>, Error> {
+    let path = Path::new(path_str);
+    if !path.exists() {
+        create_dir_all(path).map_err(|e| Error::Generic(e.to_string()))?;
+    }
     Ok(EventProcessor::new(
-        LmdbEventDatabase::new(Path::new(path)).map_err(|e| Error::Generic(e.to_string()))?,
+        LmdbEventDatabase::new(path).map_err(|e| Error::Generic(e.to_string()))?,
     ))
 }
 
