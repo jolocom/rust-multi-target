@@ -27,11 +27,35 @@ class JolocomCore: NSObject {
 
 // validates a key event log,
 // see ./core.h:34
-  @objc func validateEvents(_ kelString: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func processEvents(_ kelString: String, dbPath: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { validate_events($0, kelString) },
+      get_result: { process_events($0, kelString, dbPath) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        jolo_destroy_string(res!)
+        return val
+    })
+  }
+
+  @objc func resolveId(_ id: String, dbPath: String, methodName: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { resolveId($0, id, dbPath, methodName) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        jolo_destroy_string(res!)
+        return val
+    })
+  }
+
+  @objc func getKerl(_ id: String, dbPath: String resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { getKerl($0, id, dbPath) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         jolo_destroy_string(res!)

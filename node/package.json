@@ -15,12 +15,15 @@
     "rust"
   ],
   "devDependencies": {
+    "@types/jest": "^26.0.20",
     "@jolocom/vaulted-key-provider": "^0.8.0",
     "@types/node": "^14.0.23",
     "fs-extra": "^9.0.1",
+    "jest": "^26.6.3",
     "local-did-resolver": "^0.2.2",
     "neon-cli": "^0.7.1",
     "semver": "^7.3.2",
+    "ts-jest": "^26.4.4",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
   },
@@ -45,6 +48,7 @@
   },
   "scripts": {
     "prepare": "yarn build",
-    "build": "rm -rf js; neon build --release && tsc -p . && node prepare-native-pkg.js"
+    "build": "rm -rf js; neon build --release && tsc -p . && node prepare-native-pkg.js",
+    "test": "jest"
   }
 }
