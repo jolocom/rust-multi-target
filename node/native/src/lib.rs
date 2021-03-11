@@ -1,14 +1,40 @@
-use jolocom_native_utils::{get_id_from_event_str, validate_events_str, wallet};
+use jolocom_native_utils::{did_document, keri, wallet};
 use neon::prelude::*;
+use serde_json::to_string;
 
-fn validate_events(mut cx: FunctionContext) -> JsResult<JsString> {
+fn process_events(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(validate_events_str(&str.as_bytes(), "jun").unwrap()))
+    let path = cx.argument::<JsString>(1)?.value();
+    keri::process_events(&str.as_bytes(), &path).unwrap();
+    Ok(JsUndefined::new())
 }
 
-fn get_id_from_event(mut cx: FunctionContext) -> JsResult<JsString> {
+fn resolve_id(mut cx: FunctionContext) -> JsResult<JsString> {
     let str = cx.argument::<JsString>(0)?.value();
-    Ok(cx.string(get_id_from_event_str(&str.as_bytes()).unwrap()))
+    let path = cx.argument::<JsString>(1)?.value();
+    let method_name = cx.argument::<JsString>(2)?.value();
+    Ok(cx.string(
+        to_string(&did_document::state_to_did_document(
+            keri::get_state(&str.parse().unwrap(), &path)
+                .unwrap()
+                .unwrap(),
+            &method_name,
+        ))
+        .unwrap(),
+    ))
+}
+
+fn get_kerl(mut cx: FunctionContext) -> JsResult<JsString> {
+    let id_str = cx.argument::<JsString>(0)?.value();
+    let path = cx.argument::<JsString>(1)?.value();
+    Ok(cx.string(
+        String::from_utf8(
+            keri::get_kerl(&id_str.parse().unwrap(), &path)
+                .unwrap()
+                .unwrap(),
+        )
+        .unwrap(),
+    ))
 }
 
 fn new_wallet(mut cx: FunctionContext) -> JsResult<JsString> {
@@ -218,8 +244,9 @@ fn receive_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
 }
 
 register_module!(mut cx, {
-    cx.export_function("validateEvents", validate_events)?;
-    cx.export_function("getIdFromEvent", get_id_from_event)?;
+    cx.export_function("processEvents", process_events)?;
+    cx.export_function("resolveId", resolve_id)?;
+    cx.export_function("getKerl", get_kerl)?;
     cx.export_function("newWallet", new_wallet)?;
     cx.export_function("keriInceptWalletFromKeys", keri_incept_wallet_from_keys)?;
     cx.export_function("keriInceptWallet", keri_incept_wallet)?;

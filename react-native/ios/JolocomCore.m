@@ -13,12 +13,20 @@
 }
 
 // see ./JolocomCore.swift
-RCT_EXTERN_METHOD(validateEvents
-                  : (NSString *)kelString resolve
+RCT_EXTERN_METHOD(processEvents
+                  : (NSString *)kelString dbPath
+                  : (NSString *)dbPath resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getIdFromEvent
-                  : (NSString *)event resolve
+RCT_EXTERN_METHOD(resolveId
+                  : (NSString *)id dbPath
+                  : (NSString *)dbPath methodName
+                  : (NSString *)methodName resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getKerl
+                  : (NSString *)id dbPath
+                  : (NSString *)dbPath resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(newWallet
