@@ -186,10 +186,8 @@ fn seal_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let key_id = cx.argument::<JsString>(3)?.value();
     let message = cx.argument::<JsString>(4)?.value();
-    let header = cx.argument::<JsString>(5)?.value();
-    Ok(cx.string(wallet::seal_didcomm_message(&ew, &id, &pass, &key_id, &message, &header)
+    Ok(cx.string(wallet::seal_didcomm_message(&ew, &id, &pass, &message)
         .map_err(|e| e.to_string()).unwrap()))
 }
 
@@ -197,18 +195,12 @@ fn seal_signed_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let key_id = cx.argument::<JsString>(3)?.value();
     let message = cx.argument::<JsString>(4)?.value();
-    let header = cx.argument::<JsString>(5)?.value();
-    let sign_key_id = cx.argument::<JsString>(6)?.value();
     Ok(cx.string(wallet::seal_signed_didcomm_message(
         &ew,
         &id,
         &pass,
-        &key_id,
         &message,
-        &header,
-        &sign_key_id
     ).map_err(|e| e.to_string()).unwrap()))
 }
 
@@ -216,20 +208,12 @@ fn receive_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let key_id = cx.argument::<JsString>(3)?.value();
     let message = cx.argument::<JsString>(4)?.value();
-    let ver_key = cx.argument::<JsString>(5)?.value();
-    let verifying_key = match ver_key.len() {
-        0 => None,
-        _ => Some(ver_key.as_bytes()),
-    };
     Ok(cx.string(wallet::receive_didcomm_message(
         &ew,
         &id,
         &pass,
         &message.as_bytes(),
-        &key_id.as_bytes(),
-        verifying_key
     ).map_err(|e| e.to_string()).unwrap()))
 }
 
