@@ -40,10 +40,6 @@ pub fn get_random_b64(len: usize) -> Result<String, Error> {
 
 pub fn wallet_from(encrypted_wallet: &str, id: &str, pass: &str) -> Result<UnlockedWallet, Error> {
     let ew = base64::decode_config(encrypted_wallet, base64::URL_SAFE)?;
-    //  {
-    //     Ok(w) => w,
-    //     Err(e) => return Err(e.to_string()),
-    // };
     let lw = LockedWallet::new(id, ew);
 
     Ok(lw.unlock(pass.as_bytes())?)
@@ -522,25 +518,20 @@ pub fn seal_didcomm_message(
     encrypted_wallet: &str,
     id: &str,
     pass: &str,
-    key_id: &str,
     message: &str,
-    header: &str
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
-    Ok(uw.seal_encrypted(key_id, message, header)?)
+    Ok(uw.seal_encrypted(message)?)
 }
 
 pub fn seal_signed_didcomm_message(
     encrypted_wallet: &str,
     id: &str,
     pass: &str,
-    key_id: &str,
-    sign_key_id: &str,
-    message: &str,
-    header: &str
+    message: &str
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
-    Ok(uw.seal_signed(key_id, sign_key_id, message, header)?)
+    Ok(uw.seal_signed(message)?)
 }
 
 pub fn receive_didcomm_message(
@@ -548,11 +539,9 @@ pub fn receive_didcomm_message(
     id: &str,
     pass: &str,
     msg_bytes: &[u8],
-    sender_public_key: &[u8],
-    verifying_key: Option<&[u8]>
 ) -> Result<String, Error> {
     let uw = wallet_from(encrypted_wallet, id, pass)?;
-    Ok(uw.receive_message(msg_bytes, sender_public_key, verifying_key)?
+    Ok(uw.receive_message(msg_bytes)?
         .as_raw_json()
         .map_err(|e| Error::WalletError(e.into()))?)
 }
