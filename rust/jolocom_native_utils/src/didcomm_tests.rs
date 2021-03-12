@@ -2,6 +2,7 @@ use super::{
     error::Error,
     wallet::{
     create_didcomm_message,
+    create_jwe_didcomm_message,
     seal_didcomm_message,
     receive_didcomm_message,
     }
@@ -22,17 +23,17 @@ fn create_didcomm_message_test() {
 #[test]
 fn seal_didcomm_message_test() -> Result<(), Error> {
     // Arrange
-    let m = create_didcomm_message();
-    let mut m: didcomm_rs::Message = serde_json::from_str(&m).unwrap();
-    m = m.as_jwe(&didcomm_rs::crypto::CryptoAlgorithm::XC20P)
-        .to(vec!("did:key:z6MkjchhfUsD6mmvni8mCdXHw216Xrm9bQe2mBH1P5RDjVJG"))
-        .from("did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp");
+    let m = create_jwe_didcomm_message(
+        "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp",
+        &["did:key:z6MkjchhfUsD6mmvni8mCdXHw216Xrm9bQe2mBH1P5RDjVJG"],
+        &"ECDH-ES+A256KW".into()
+        ).unwrap();
     // Act
     let sealed  = seal_didcomm_message(
         &base64::encode_config(ALICE_WALLET_WITH_DIDKEY, base64::URL_SAFE), 
         "alice", 
         "alice", 
-        &serde_json::to_string(&m).unwrap());
+        &m);
     // Assert
     assert!(sealed.is_ok());
 
@@ -49,7 +50,7 @@ fn receive_didcomm_message_test() {
     let m = create_didcomm_message();
     let mut m: didcomm_rs::Message = serde_json::from_str(&m).unwrap();
     m = m.as_jwe(&didcomm_rs::crypto::CryptoAlgorithm::XC20P)
-        .to(vec!("did:key:z6MkjchhfUsD6mmvni8mCdXHw216Xrm9bQe2mBH1P5RDjVJG"))
+        .to(&["did:key:z6MkjchhfUsD6mmvni8mCdXHw216Xrm9bQe2mBH1P5RDjVJG"])
         .from("did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp");
     let sealed  = seal_didcomm_message(
         &base64::encode_config(ALICE_WALLET_WITH_DIDKEY, base64::URL_SAFE), 

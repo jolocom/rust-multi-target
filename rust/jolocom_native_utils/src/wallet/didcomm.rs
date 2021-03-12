@@ -1,3 +1,7 @@
+use std::convert::TryInto;
+
+use didcomm_rs::crypto::CryptoAlgorithm;
+
 use super::{
     UnlockedWallet,
     Error,
@@ -8,8 +12,10 @@ pub fn create_didcomm_message() -> String {
     UnlockedWallet::create_message()
 }
 
-pub fn create_jwe_didcomm_message() -> String {
-    todo!()
+pub fn create_jwe_didcomm_message(from: &str, to: &[&str], alg: &String) -> Result<String, Error> {
+    let alg: CryptoAlgorithm = alg.try_into()
+        .map_err(|_| Error::Generic(format!("failed to parse CryptoAlgorithm from {}", alg)))?;
+    Ok(UnlockedWallet::create_jwe_message(from, to, alg))
 }
 
 pub fn seal_didcomm_message(
