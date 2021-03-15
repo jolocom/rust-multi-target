@@ -226,7 +226,7 @@ fn seal_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let message = cx.argument::<JsString>(4)?.value();
+    let message = cx.argument::<JsString>(3)?.value();
     Ok(cx.string(wallet::seal_didcomm_message(&ew, &id, &pass, &message)
         .map_err(|e| e.to_string()).unwrap()))
 }
@@ -235,7 +235,7 @@ fn seal_signed_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let message = cx.argument::<JsString>(4)?.value();
+    let message = cx.argument::<JsString>(3)?.value();
     Ok(cx.string(wallet::seal_signed_didcomm_message(
         &ew,
         &id,
@@ -248,7 +248,7 @@ fn receive_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
     let pass = cx.argument::<JsString>(2)?.value();
-    let message = cx.argument::<JsString>(4)?.value();
+    let message = cx.argument::<JsString>(3)?.value();
     Ok(cx.string(wallet::receive_didcomm_message(
         &ew,
         &id,

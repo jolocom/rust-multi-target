@@ -55,7 +55,7 @@ export const sealDidcommMessage = async (
     ew: string,
     id: string,
     pass: string,
-    message: string,
+    message: string
 ): Promise<string> => await addon.sealMessage(ew, id, pass, message);
 
 export const sealSignedDidcommMessage = async (

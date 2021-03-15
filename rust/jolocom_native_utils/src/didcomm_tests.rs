@@ -29,8 +29,9 @@ fn seal_didcomm_message_test() -> Result<(), Error> {
         &"ECDH-ES+A256KW".into()
         ).unwrap();
     // Act
+    let encoded_alice = base64::encode_config(ALICE_WALLET_WITH_DIDKEY, base64::URL_SAFE);
     let sealed  = seal_didcomm_message(
-        &base64::encode_config(ALICE_WALLET_WITH_DIDKEY, base64::URL_SAFE), 
+        &encoded_alice,
         "alice", 
         "alice", 
         &m);
@@ -57,10 +58,11 @@ fn receive_didcomm_message_test() {
         "alice", 
         "alice",  
         &serde_json::to_string(&m).unwrap()).unwrap();
+    let encoded_bob = base64::encode_config(BOB_WALLET_WITH_DIDKEY, base64::URL_SAFE);
     let received = receive_didcomm_message(
-        &base64::encode_config(BOB_WALLET_WITH_DIDKEY, base64::URL_SAFE), 
-        "bob", 
-        "bob", 
+        &encoded_bob,
+        "bob",
+        "bob",
         &sealed.as_bytes());
     match &received {
         Ok(_) => assert!(true),

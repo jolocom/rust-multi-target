@@ -639,6 +639,11 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"
   integrity sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw==
 
+"@types/url-safe-base64@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/url-safe-base64/-/url-safe-base64-1.1.0.tgz#90d35b9432164896a9d5b3d43bb88fb2ef86f2e2"
+  integrity sha512-cVZIEorjpbV8NgdodMXyLItd9q0wT4k075a2F5Ew5L/zwB80rLIGhb7Owo17le0hhnZcJXizxc7hHdTs1or51A==
+
 "@types/yargs-parser@*":
   version "20.2.0"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-20.2.0.tgz#dd3e6699ba3237f0348cd085e4698780204842f9"
@@ -3859,6 +3864,11 @@ urix@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
+
+url-safe-base64@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/url-safe-base64/-/url-safe-base64-1.1.1.tgz#1711596fbe18dcb4c95103234bf58df2ef225187"
+  integrity sha512-7FAWxRcSliMIuLqDR7a6CHgH6Crkgl8lwLtuum4FmzlNLjWu3KVtcKN0C7VHpJOTgHZlqF6dH4gQpM+xwff7uw==
 
 use@^3.1.0:
   version "3.1.1"
