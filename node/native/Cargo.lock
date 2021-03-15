@@ -628,9 +628,9 @@ dependencies = [
 
 [[package]]
 name = "didcomm-rs"
-version = "0.2.4"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6b3543a00bc3be19013f27af8fc0c87e4c820ada54fc006c7bd4333920a31f0"
+checksum = "a1f82a320b2e1b671fe8fc712daf248f897656cff365ba251bdc730ab0ad5bac"
 dependencies = [
  "aes-gcm",
  "arrayref",
@@ -1032,6 +1032,7 @@ name = "jolocom_native_utils"
 version = "0.1.0"
 dependencies = [
  "base64 0.12.3",
+ "didcomm-rs",
  "funty",
  "keri",
  "serde",
@@ -2020,9 +2021,9 @@ dependencies = [
 
 [[package]]
 name = "universal_wallet"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bde9bf72f23ebf96df3bde9b6d849de32e80cf444a8d4106696ef9149f0d2bb4"
+checksum = "69904e8438122859fa90c7c4a8f2e9e6d4604bccbdacf0fd107759a1be38ab3e"
 dependencies = [
  "aead",
  "arrayref",

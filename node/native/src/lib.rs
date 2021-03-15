@@ -208,6 +208,20 @@ fn create_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(wallet::create_didcomm_message()))
 }
 
+fn create_jwe_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
+    let from = cx.argument::<JsString>(0)?.value();
+    let to_handle: Handle<JsArray> = cx.argument(1)?;
+    let to_vec: Vec<Handle<JsValue>> = to_handle.to_vec(&mut cx)?;
+    let to: Vec<String> = to_vec.iter().fold(Vec::new(), |mut result, elem| {
+        result.push(elem.to_string(&mut cx).unwrap().value());
+        result
+    });
+    let to: Vec<&str> = to.iter().map(std::ops::Deref::deref).collect();
+    let alg = cx.argument::<JsString>(2)?.value();
+    Ok(cx.string(wallet::create_jwe_didcomm_message(&from, &to, &alg)
+        .map_err(|e| e.to_string()).unwrap()))
+}
+
 fn seal_didcomm_message(mut cx: FunctionContext) -> JsResult<JsString> {
     let ew = cx.argument::<JsString>(0)?.value();
     let id = cx.argument::<JsString>(1)?.value();
@@ -264,9 +278,10 @@ register_module!(mut cx, {
     cx.export_function("decrypt", decrypt)?;
     cx.export_function("ecdhKeyAgreement", ecdh_key_agreement)?;
     cx.export_function("getRandom", get_random)?;
-    cx.export_function("createDidcommMessage", create_didcomm_message)?;
-    cx.export_function("sealDidcommMessage", seal_didcomm_message)?;
-    cx.export_function("sealSignedDidcommMessage", seal_signed_didcomm_message)?;
-    cx.export_function("receiveDidcommMessage", receive_didcomm_message)?;
+    cx.export_function("createMessage", create_didcomm_message)?;
+    cx.export_function("createJweMessage", create_jwe_didcomm_message)?;
+    cx.export_function("sealMessage", seal_didcomm_message)?;
+    cx.export_function("sealSignedMessage", seal_signed_didcomm_message)?;
+    cx.export_function("receiveMessage", receive_didcomm_message)?;
     Ok(())
 });
