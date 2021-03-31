@@ -51,3 +51,4 @@ rust/signer/target
 
 # flapigen
 ffi/python/libs
+test_db

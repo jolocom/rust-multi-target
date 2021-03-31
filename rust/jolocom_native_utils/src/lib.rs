@@ -3,5 +3,5 @@ pub mod error;
 pub mod keri;
 pub mod wallet;
 
-// #[cfg(test)]
-// mod didcomm_tests;
+#[cfg(test)]
+mod didcomm_tests;

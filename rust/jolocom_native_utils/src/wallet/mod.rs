@@ -1,3 +1,7 @@
+mod didcomm;
+
+pub use didcomm::*;
+
 use crate::error::Error;
 use base64;
 use core::str::FromStr;
@@ -40,10 +44,6 @@ pub fn get_random_b64(len: usize) -> Result<String, Error> {
 
 pub fn wallet_from(encrypted_wallet: &str, id: &str, pass: &str) -> Result<UnlockedWallet, Error> {
     let ew = base64::decode_config(encrypted_wallet, base64::URL_SAFE)?;
-    //  {
-    //     Ok(w) => w,
-    //     Err(e) => return Err(e.to_string()),
-    // };
     let lw = LockedWallet::new(id, ew);
 
     Ok(lw.unlock(pass.as_bytes())?)
@@ -512,52 +512,6 @@ pub fn ecdh_get_shared_secret_by_controller(
     let shared_secret = uw.ecdh_key_agreement(&key_ref, &pub_key_bytes)?;
 
     Ok(base64::encode_config(shared_secret, base64::URL_SAFE))
-}
-
-pub fn create_didcomm_message() -> String {
-    UnlockedWallet::create_message()
-}
-
-pub fn seal_didcomm_message(
-    encrypted_wallet: &str,
-    id: &str,
-    pass: &str,
-    key_id: &str,
-    message: &str,
-    header: &str,
-) -> Result<String, Error> {
-    let uw = wallet_from(encrypted_wallet, id, pass)?;
-    Ok(uw.seal_encrypted(key_id, message, header)?)
-}
-
-pub fn seal_signed_didcomm_message(
-    encrypted_wallet: &str,
-    id: &str,
-    pass: &str,
-    key_id: &str,
-    sign_key_id: &str,
-    message: &str,
-    header: &str,
-) -> Result<String, Error> {
-    let uw = wallet_from(encrypted_wallet, id, pass)?;
-    Ok(uw.seal_signed(key_id, sign_key_id, message, header)?)
-}
-
-pub fn receive_didcomm_message(
-    encrypted_wallet: &str,
-    id: &str,
-    pass: &str,
-    msg_bytes: &[u8],
-    sender_public_key: &[u8],
-    verifying_key: Option<&[u8]>,
-) -> Result<String, Error> {
-    let uw = wallet_from(encrypted_wallet, id, pass)?;
-    // TODO we will have to figure out encodings for the sender + verifying key which make sense and
-    // indicate what kind of key it is
-    Ok(uw
-        .receive_message(msg_bytes, sender_public_key, verifying_key)?
-        .as_raw_json()
-        .map_err(|e| Error::WalletError(e.into()))?)
 }
 
 #[test]

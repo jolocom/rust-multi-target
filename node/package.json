@@ -15,16 +15,18 @@
     "rust"
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.20",
     "@jolocom/vaulted-key-provider": "^0.8.0",
-    "@types/node": "^14.0.23",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.33",
+    "@types/url-safe-base64": "^1.1.0",
     "fs-extra": "^9.0.1",
     "jest": "^26.6.3",
     "neon-cli": "^0.7.1",
     "semver": "^7.3.2",
     "ts-jest": "^26.4.4",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "url-safe-base64": "^1.1.1"
   },
   "os": [
     "linux",
@@ -35,19 +37,20 @@
     "x64"
   ],
   "optionalDependencies": {
-    "@jolocom/native-core-node-10-win32-x64": "^2.0.0",
-    "@jolocom/native-core-node-12-win32-x64": "^2.0.0",
-    "@jolocom/native-core-node-14-win32-x64": "^2.0.0",
     "@jolocom/native-core-node-10-darwin-x64": "^2.0.0",
     "@jolocom/native-core-node-10-linux-x64": "^2.0.0",
+    "@jolocom/native-core-node-10-win32-x64": "^2.0.0",
     "@jolocom/native-core-node-12-darwin-x64": "^2.0.0",
     "@jolocom/native-core-node-12-linux-x64": "^2.0.0",
+    "@jolocom/native-core-node-12-win32-x64": "^2.0.0",
     "@jolocom/native-core-node-14-darwin-x64": "^2.0.0",
-    "@jolocom/native-core-node-14-linux-x64": "^2.0.0"
+    "@jolocom/native-core-node-14-linux-x64": "^2.0.0",
+    "@jolocom/native-core-node-14-win32-x64": "^2.0.0"
   },
   "scripts": {
     "prepare": "yarn build",
     "build": "rm -rf js; neon build --release && tsc -p . && node prepare-native-pkg.js",
     "test": "jest"
-  }
+  },
+  "dependencies": {}
 }

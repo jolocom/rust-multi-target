@@ -45,6 +45,33 @@ export const resolveId = async (
     methodName: string
 ): Promise<string> => await addon.resolveId(id, dbPath, methodName);
 
+export const createDidcommMessage = async ():
+    Promise<string> => await addon.createMessage();
+
+export const createJweDidcommMessage = async(from: string, to: [string], alg: string):
+    Promise<string> => await addon.createJweMessage(from, to, alg);
+
+export const sealDidcommMessage = async (
+    ew: string,
+    id: string,
+    pass: string,
+    message: string
+): Promise<string> => await addon.sealMessage(ew, id, pass, message);
+
+export const sealSignedDidcommMessage = async (
+    ew: string,
+    id: string,
+    pass: string,
+    message: string
+): Promise<string> => await addon.sealSignedMessage(ew, id, pass, message);
+
+export const receiveDidcommMessage = async (
+    ew: string,
+    id: string,
+    pass: string,
+    message: string
+): Promise<string> => await addon.receiveMessage(ew, id, pass, message);
+
 export const walletUtils: EncryptedWalletUtils = {
     newWallet: async (
         id: string,
