@@ -1,0 +1,66 @@
+{
+  "dids": [],
+  "server": null,
+  "plugins": [
+    {
+      "plugin_type": "KeyVault",
+      "name": "KeyVault",
+      "file": {
+        "path": "./plugins",
+        "name": "libkey_vault"
+      }
+    },
+    {
+      "plugin_type": "Credentials",
+      "name": "Credentials",
+      "file": {
+        "path": "./plugins",
+        "name": "libjsonld_credentials"
+      }
+    },
+    {
+      "plugin_type": "Database",
+      "name": "SledDb",
+      "file": {
+        "path": "./plugins",
+        "name": "libsled_db"
+      }
+    },
+    {
+      "plugin_type": "Messenger",
+      "name": "Didcomm",
+      "file": {
+        "path": "./plugins",
+        "name": "libdidcomm"
+      }
+    },
+    {
+      "plugin_type": "Resolver",
+      "name": "DDOResolver",
+      "file": {
+        "path": "./plugins",
+        "name": "libddoresolver"
+      }
+    },
+    {
+      "plugin_type": "Transport",
+      "name": "http",
+      "file": {
+        "path": "./plugins",
+        "name": "libhttp_transport"
+      }
+    }
+  ],
+  "logger": {
+    "level": "info",
+    "dir": "./var"
+  },
+  "db": {
+    "database_url": "./var/holder-sdk-db.sqlite"
+  },
+  "escalate_to": "!!CHANGE_ME!!",
+  "secret": "!!CHANGE_ME_should_be_32+characters_long!!",
+  "keri": {
+    "db_dir": "./var"
+  }
+}

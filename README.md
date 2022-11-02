@@ -1,5 +1,7 @@
 # Jolocom Native Core Bindings
 
+CHECK https://stackoverflow.com/questions/9861372/android-where-system-loadlibrary-loads-files
+
 This package contains Node and React Native bindings for
 [jolocom/wallet-rs](https://github.com/jolocom/wallet-rs) and
 [jolocom/keriox](https://github.com/jolocom/keriox)
