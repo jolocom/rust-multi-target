@@ -28,6 +28,16 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void createIdentityWithConfig(String config, Promise promise) {
+    try {
+      String result = createIdentityWithConfig(config);
+      promise.resolve(result);
+    } catch (Exception e) {
+      rejectWithException(promise, "Could not create identity", e);
+    }
+  }
+
+  @ReactMethod
   public void createIdentity(String path, Promise promise) {
     try {
       String result = createIdentity(path);
@@ -38,4 +48,5 @@ public class JolocomCoreModule extends ReactContextBaseJavaModule {
   }
 
   private static native String createIdentity(String path);
+  private static native String createIdentityWithConfig(String config);
 }
