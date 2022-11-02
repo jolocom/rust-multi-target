@@ -5,7 +5,7 @@ pub fn create_actor(path: String) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn create_actor_from_config_str(config: String) {
-    let sdk_config = 
-    
+pub fn create_actor_from_config_str(config: String) -> Result<(), Error> {
+    DecentActor::from_config_str(config)?;
+    Ok(())
 }
