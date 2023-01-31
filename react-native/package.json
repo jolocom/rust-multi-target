@@ -1,7 +1,7 @@
 {
   "name": "@jolocom/native-core-react-native",
   "description": "Jolocom Core React Native bindings for jolocom/wallet-rs",
-  "version": "1.2.0",
+  "version": "1.3.1",
   "main": "index.js",
   "files": [
     "index.js",
@@ -14,7 +14,6 @@
     "email": "dev@jolocom.io"
   },
   "scripts": {
-    "prepare": "yarn build",
     "test": "(cd ../rust/jolocom_native_utils && cargo test)",
     "clean": "(cd ../rust/jolocom_native_utils && cargo clean)",
     "clean:wrapper": "(cd ./rust/keriox_wrapper && cargo clean)",
